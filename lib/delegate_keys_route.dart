@@ -72,7 +72,7 @@ class DelegateKeysRoute extends StatelessWidget {
           const Linky(
               '''Below are 'delegate' key statements signed by your active key or by any of your older, replaced, equivalent keys.
 Click on them to restate them with (with your current key only).      
-http://RTFM#delegates.'''),
+https://RTFM#delegates.'''),
           const StatementActionPicker({TrustVerb.delegate}, [TrustVerb.delegate, TrustVerb.clear]),
           Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
             OutlinedButton(
