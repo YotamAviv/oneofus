@@ -51,6 +51,7 @@ dependencies:
   url_launcher: ^6.3.0
   flutter_linkify: ^6.0.0
   loading_animation_widget: ^1.2.1
+  share_plus: ^10.0.3
 
 dev_dependencies:
   flutter_test:

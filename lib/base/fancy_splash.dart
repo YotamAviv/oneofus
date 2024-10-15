@@ -32,6 +32,7 @@ class FancySplash extends StatelessWidget {
                 await Clipboard.setData(
                     ClipboardData(text: encoder.convert(MyKeys.oneofusPublicKey)));
               }),
+          const Spacer(),
           FloatingActionButton(
               heroTag: 'QR sign-in',
               tooltip: 'QR sign-in',

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:oneofus/share.dart';
 import 'package:oneofus/widgets/demo_statement_route.dart';
 import 'package:oneofus/main.dart';
 import 'package:oneofus/base/my_statements.dart';
@@ -88,6 +89,21 @@ Widget buildTrustMenu(context) {
       child: const Text('Trust...'));
 }
 
+Widget buildEtcMenu(context) {
+  return SubmenuButton(menuChildren: [
+    MenuItemButton(
+        onPressed: () async {
+          await sharePublicKeyQr();
+        },
+        child: const Text('Share public key QR code')),
+    MenuItemButton(
+        onPressed: () async {
+          await sharePublicKeyText();
+        },
+        child: const Text('Share public key text')),
+  ], child: const Text('Etc'),);
+}
+
 Widget buildHelpMenu(context) {
   return MenuItemButton(
       onPressed: () async {
@@ -120,6 +136,7 @@ List<Widget> buildMenus(context) {
   return [
     buildKeysMenu(context),
     buildTrustMenu(context),
+    buildEtcMenu(context),
     // const MenuTitle(['one-', 'of-', 'us.', 'net']),
     if (devMenu) buildDebugMenu(context),
     buildHelpMenu(context),
