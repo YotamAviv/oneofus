@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:oneofus/main.dart';
 import 'package:oneofus/trusts_route.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
@@ -24,7 +25,7 @@ class FancySplash extends StatelessWidget {
       Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          FloatingActionButton(
+          if (kDev) FloatingActionButton(
               heroTag: 'Copy',
               tooltip: 'Copy',
               child: const Icon(Icons.copy),
@@ -49,13 +50,10 @@ class FancySplash extends StatelessWidget {
               tooltip: 'New Trust',
               child: const Icon(Icons.person_add),
               onPressed: () async {
-                String? scanned = await QrScanner.scan(
-                    'Scan a public key QR Code to trust or block',
-                    scannerJsonPublicKeyValidate,
-                    context);
-                if (b(scanned)) {
-                  await scannerTrust(scanned!, context);
-                }
+                Json? jsonPublicKey = await QrScanner.scanPublicKey(context);
+                if (!b(jsonPublicKey)) return;
+                if (!context.mounted) return;
+                Jsonish? jsonish = await startTrust(jsonPublicKey!, context);
               }),
         ],
       ),

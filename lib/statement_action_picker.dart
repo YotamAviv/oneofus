@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:oneofus/base/my_keys.dart';
 import 'package:oneofus/base/menus.dart';
 import 'package:oneofus/oneofus/jsonish.dart';
+import 'package:oneofus/oneofus/ui/linky.dart';
 
 import 'modify_statement_route.dart';
 import 'base/my_statements.dart';
@@ -9,7 +10,7 @@ import 'oneofus/trust_statement.dart';
 import 'widgets/statement_widget.dart';
 
 /// Displays statement boxes based on search verbs.
-/// Allows user to choose a statement and alter it
+/// Allows user to choose a statement and re-state it
 class StatementActionPicker extends StatefulWidget {
   final Set<TrustVerb> searchVerbs;
   final List<TrustVerb> choiceVerbs;
@@ -43,7 +44,7 @@ class _StatementActionPickerState extends State<StatementActionPicker> {
 
   @override
   Widget build(BuildContext context) {
-    List<TrustStatement> statements = MyStatements.collect(widget.searchVerbs);
+    List<TrustStatement> statements = MyStatements.getByVerbs(widget.searchVerbs);
     List<Row> rows = <Row>[];
     for (TrustStatement statement in statements) {
       rows.add(Row(children: [
@@ -52,13 +53,14 @@ class _StatementActionPickerState extends State<StatementActionPicker> {
           statement,
           () async {
             Jsonish? jsonish =
-                await ModifyStatementRoute.show(statement, widget.choiceVerbs, context);
+                await ModifyStatementRoute.show(statement, widget.choiceVerbs, false, context);
             if (context.mounted) await prepareX(context); // redundant?
             setState(() {});
           },
         ))
       ]));
     }
+
     return ListView(
         shrinkWrap: true, physics: const AlwaysScrollableScrollPhysics(), children: rows);
   }

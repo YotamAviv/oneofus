@@ -23,12 +23,12 @@ const kNerdsterDomain = 'nerdster.org';
 
 Future<void> backup() async {
   print(kOneofusDomain);
-  for (String t in [MyKeys.oneofusToken, ...MyStatements.getEquivalentKeys()]) {
+  for (String t in [MyKeys.oneofusToken, ...MyStatements.equivalentKeys]) {
     await Backup.backup(FireFactory.find(kOneofusDomain), t);
   }
 
   print(kNerdsterDomain);
-  Iterable<TrustStatement> delegateStatements = MyStatements.collect({TrustVerb.delegate});
+  Iterable<TrustStatement> delegateStatements = MyStatements.getByVerbs({TrustVerb.delegate});
   Iterable<TrustStatement> nerdsterDelegateStatements =
       delegateStatements.where((s) => s.domain == 'nerdster.org');
   Iterable<String> myNerdsterDelegateKeys = nerdsterDelegateStatements.map((s) => s.subjectToken);

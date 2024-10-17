@@ -13,6 +13,10 @@ import 'oneofus/util.dart';
 import 'statement_action_picker.dart';
 import 'widgets/qr_scanner.dart';
 
+String trustDesc = '''You reference other folks' public key in trust/block statements: 
+Trust is meant to certify that they're human, understand this, and are acting in good faith.
+Block is an extreme measure and should be reserved for bots, spammers, and other bad actors.''';
+
 class TrustsRoute extends StatelessWidget {
   const TrustsRoute({super.key});
 
@@ -26,6 +30,7 @@ class TrustsRoute extends StatelessWidget {
         body: SafeArea(
             child: Column(children: [
           const Linky(
+            // TODO: Make this text be part of StatementActionPicker
               '''Below are trust statements signed by your active key or by any of your older, replaced, equivalent keys.
 Click on them to restate and/or modify them with (with your current key only).      
 RTFM: http://RTFM#re-state.'''),
@@ -35,19 +40,17 @@ RTFM: http://RTFM#re-state.'''),
               TrustVerb.block
             }, [
               TrustVerb.trust,
-              TrustVerb.clear,
               TrustVerb.block,
+              TrustVerb.clear,
             ]),
           ),
           Row(children: [
             OutlinedButton(
                 onPressed: () async {
-                  String? scanned = await QrScanner.scan(
-                      'Scan a public key QR Code', scannerJsonPublicKeyValidate, context);
-                  if (b(scanned)) {
-                    if (!context.mounted) return;
-                    Jsonish? jsonish = await scannerTrust(scanned!, context);
-                  }
+                  Json? jsonPublicKey = await QrScanner.scanPublicKey(context);
+                  if (!b(jsonPublicKey)) return;
+                  if (!context.mounted) return;
+                  Jsonish? jsonish = await startTrust(jsonPublicKey!, context);
                 },
                 child: const Text('New Trust or block')),
           ]),
@@ -55,31 +58,16 @@ RTFM: http://RTFM#re-state.'''),
   }
 }
 
-var validJsonNotKey = {"name": "Tom"};
-
-Future<bool> scannerJsonPublicKeyValidate(String string) async {
+Future<Jsonish?> startTrust(Json subjectJson, context) async {
   try {
-    Json publicKeyJson = jsonDecode(string);
-    await crypto.parsePublicKey(publicKeyJson);
-    return true;
-  } catch (e) {
-    print('scannerJsonValidate($string) returning: false');
-    return false;
-  }
-}
+    String subjectToken = Jsonish(subjectJson).token;
 
-Future<Jsonish?> scannerTrust(String jsonS, context) async {
-  try {
-    Json subjectKeyJson = await parsePublicKey(jsonS);
-    String subjectToken = Jsonish(subjectKeyJson).token;
-
-    // Check
+    // Checks
     if (subjectToken == MyKeys.oneofusToken) {
       await alert('''That's you''', '''Don't trust your own key.''', ['Okay'], context);
       return null;
     }
-    TrustStatement ts;
-    Iterable<TrustStatement> myReplaces = (MyStatements.collect(const {TrustVerb.replace}))
+    Iterable<TrustStatement> myReplaces = (MyStatements.getByVerbs(const {TrustVerb.replace}))
         .where((s) => s.subjectToken == subjectToken);
     if (myReplaces.isNotEmpty) {
       await alert('''That's you''', '''This is one of your equivalent keys.
@@ -87,33 +75,39 @@ If you need to clear or change that, go to menu => Keys => one-of-us... and clea
           ['Okay'], context);
       return null;
     }
-    Iterable<TrustStatement> myDelegates = (MyStatements.collect(const {TrustVerb.delegate}))
+    Iterable<TrustStatement> myDelegates = (MyStatements.getByVerbs(const {TrustVerb.delegate}))
         .where((s) => s.subjectToken == subjectToken);
     if (myDelegates.isNotEmpty) {
-      await alert('''That's your delegate key''', '''This is one of your delegate keys.
+      await alert('''That's you''', '''This is one of your delegate keys.
 If you need to clear or change that, go to menu => Keys => Delegates... and clear or change your statement delegating that key.''',
           ['Okay'], context);
       return null;
     }
 
+    TrustStatement prototype;
+    // TODO: Verify this is correct and working as intended. If I scan a key that one of my equivs trusted, what's desired?
+    // Regardless: Don't crash (assert(false)).
     Iterable<TrustStatement> myTrustsBlocks =
-        (MyStatements.collect(const {TrustVerb.trust, TrustVerb.block}))
+        (MyStatements.getByVerbs(const {TrustVerb.trust, TrustVerb.block}))
             .where((s) => s.subjectToken == subjectToken);
+    bool newStatement;
     if (myTrustsBlocks.isNotEmpty) {
       assert(myTrustsBlocks.length == 1);
-      ts = myTrustsBlocks.first;
+      prototype = myTrustsBlocks.first;
+      newStatement = false;
     } else {
-      Json statementStarterJson = {
+      Json prototypeJson = {
         "statement": kOneofusDomain,
         "time": clock.nowIso,
         "I": MyKeys.oneofusPublicKey,
-        TrustVerb.trust.label: subjectKeyJson,
+        TrustVerb.trust.label: subjectJson,
       };
-      ts = TrustStatement(Jsonish(statementStarterJson));
+      prototype = TrustStatement(Jsonish(prototypeJson));
+      newStatement = true;
     }
 
     Jsonish? jsonish =
-        await ModifyStatementRoute.show(ts, const [TrustVerb.trust, TrustVerb.block], context);
+        await ModifyStatementRoute.show(prototype, const [TrustVerb.trust, TrustVerb.block, TrustVerb.clear], newStatement, context);
     return jsonish;
   } catch (e) {
     await alertException(context, e);

@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:oneofus/oneofus/jsonish.dart';
 
 import '../oneofus/util.dart';
 
@@ -27,6 +30,16 @@ class QrScanner extends StatefulWidget {
               )),
     );
     return scanned;
+  }
+
+  static Future<Json?> scanPublicKey(BuildContext context) async {
+    String? string = await QrScanner.scan('Scan a public key QR Code', validatePublicKeyJson, context);
+    if (b(string)) {
+      if (!context.mounted) return null;
+      Json json = await parsePublicKey(string!);
+      return json;
+    }
+    return null;
   }
 }
 
@@ -144,3 +157,15 @@ class _QrScannerState extends State<QrScanner> {
     );
   }
 }
+
+Future<bool> validatePublicKeyJson(String string) async {
+  try {
+    Json publicKeyJson = jsonDecode(string);
+    await crypto.parsePublicKey(publicKeyJson);
+    return true;
+  } catch (e) {
+    print('scannerJsonValidate($string) returning: false');
+    return false;
+  }
+}
+

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:oneofus/confirm_statement_route.dart';
 import 'package:oneofus/oneofus/ui/linky.dart';
+import 'package:oneofus/oneofus/ui/rtfm_anchors.dart';
 import 'package:oneofus/widgets/statement_widget.dart';
 
 import 'key_widget.dart';
@@ -46,7 +47,7 @@ class DemoStatementRoute extends StatelessWidget {
         appBar: AppBar(title: const Text('Statement Samples')),
         body: ListView(shrinkWrap: true, physics: const AlwaysScrollableScrollPhysics(), children: [
           const Linky(
-              '''Read the RTFM here: https://www.one-of-us.net/man
+              '''Read the https://RTFM
 
 Statements:
 - Statements are signed by keys and stored in the cloud.

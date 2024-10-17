@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:oneofus/widgets/demo_statement_route.dart';
 import 'package:oneofus/base/my_statements.dart';
 import 'package:oneofus/oneofus/fetcher.dart';
 import 'package:oneofus/oneofus/ui/linky.dart';
+import 'package:oneofus/widgets/demo_statement_route.dart';
 
 import 'base/my_keys.dart';
 import 'modify_statement_route.dart';
 import 'oneofus/jsonish.dart';
 import 'oneofus/trust_statement.dart';
+import 'oneofus/ui/alert.dart';
 import 'oneofus/util.dart';
 import 'statement_action_picker.dart';
-import 'trusts_route.dart';
-import 'oneofus/ui/alert.dart';
 import 'widgets/qr_scanner.dart';
 
 // TODO(2): Show the statements with different colors for shadowed and conflicting blocks.
@@ -48,13 +47,13 @@ https://RTFM#claim-oneofus-key''',
                     if (context.mounted) await claimKey(context);
                   }
                 },
-                child: const Text('Claim a different key')),
+                child: const Text('Claim existing')),
             OutlinedButton(
                 onPressed: () async {
                   Jsonish? jsonish;
                   if (context.mounted) jsonish = await replaceMyKey(context);
                 },
-                child: const Text('Replace my key')),
+                child: const Text('Replace current')),
           ]),
         ]));
   }
@@ -62,7 +61,7 @@ https://RTFM#claim-oneofus-key''',
 
 Future<Jsonish?> claimKey(BuildContext context) async {
   String? scanned =
-      await QrScanner.scan('public key QR code to replace', scannerJsonPublicKeyValidate, context);
+      await QrScanner.scan('public key QR code to replace', validatePublicKeyJson, context);
   if (b(scanned)) {
     Json subjectKeyJson = await parsePublicKey(scanned!);
     // NOTE: The check for context.mounted (see below) breaks things.
@@ -93,7 +92,7 @@ Future<Jsonish?> claimKey(BuildContext context) async {
 /// - Claiming a delegate key involves issuing a statement, and we usually let the user edit and
 /// LGTM those. Might be nice to do the same here. But I won't; it's too complicated and will
 /// confuse the user. Instead:
-/// TODO: Warn the user when he deletes an 'replace' statement if he's going to abandon keys.
+/// TODO: Warn the user when he clears an 'replace' statement that he's going to abandon keys.
 Future<Jsonish?> replaceMyKey(BuildContext context) async {
   try {
     Json current = MyKeys.oneofusPublicKey;
@@ -106,6 +105,7 @@ Future<Jsonish?> replaceMyKey(BuildContext context) async {
       return jsonish;
     }
   } catch (e) {
+    // TODO: Check if this catch is necessary. Should probably have one higher up the stack.
     if (context.mounted) await alertException(context, e);
   } finally {
     await MyKeys.rejectContingentOneofus();
@@ -126,23 +126,23 @@ Future<Jsonish?> stateReplaceKey(Json subjectJson, BuildContext context) async {
           context);
       return null;
     }
-    Iterable<TrustStatement> mine = MyStatements.getStatementsAboutSubject(subjectToken);
+    Iterable<TrustStatement> mine = MyStatements.getBySubject(subjectToken);
     if (mine.isNotEmpty) {
       TrustStatement ts = mine.first;
       switch (ts.verb) {
         case TrustVerb.trust:
-          await alert('already trust "${ts.moniker}"', '', ['Okay'], context);
+          await alert('That appears to be the trust key held by "${ts.moniker}".', '', ['Okay'], context);
           return null;
         case TrustVerb.block:
-          await alert('already block', 'comment: ${ts.comment}', ['Okay'], context);
+          await alert("You've blocked this key.", 'comment: ${ts.comment}', ['Okay'], context);
           return null;
         case TrustVerb.replace:
           await alert(
-              'This is one of your equivalent keys', 'comment: ${ts.comment}', ['Okay'], context);
+              'This is one of your equivalent keys.', 'comment: ${ts.comment}', ['Okay'], context);
           return null;
         case TrustVerb.delegate:
           await alert(
-              'This is one of your delegate keys', 'domain: ${ts.domain}', ['Okay'], context);
+              'This is one of your delegate keys.', 'domain: ${ts.domain}', ['Okay'], context);
           return null;
         default:
           throw Exception('Unexpected');
@@ -180,17 +180,17 @@ https://RTFM#replace-oneofus-key.''',
       revokeAt = allStatementsNoDistinctNoVerify.last.token;
     }
 
-    Json statementStarterJson = {
+    Json prototypeJson = {
       "statement": kOneofusDomain,
       "time": clock.nowIso,
       "I": MyKeys.oneofusPublicKey,
       TrustVerb.replace.label: subjectJson,
       "with": {"revokeAt": revokeAt}
     };
-    TrustStatement ts = TrustStatement(Jsonish(statementStarterJson));
+    TrustStatement prototype = TrustStatement(Jsonish(prototypeJson));
 
-    assert(ts.subjectToken == subjectToken);
-    Jsonish? jsonish = await ModifyStatementRoute.show(ts, [TrustVerb.replace], context,
+    assert(prototype.subjectToken == subjectToken);
+    Jsonish? jsonish = await ModifyStatementRoute.show(prototype, [TrustVerb.replace], true, context,
         subjectKeyDemo: myEquivalentKey);
     return jsonish;
   } catch (e, stackTrace) {

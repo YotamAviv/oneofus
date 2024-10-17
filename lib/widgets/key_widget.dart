@@ -27,7 +27,7 @@ class KeyWidget extends StatelessWidget {
 
   factory KeyWidget(String keyToken) {
     TrustStatement? delegateStatement;
-    List<TrustStatement> delegateStatements = MyStatements.collect({TrustVerb.delegate});
+    List<TrustStatement> delegateStatements = MyStatements.getByVerbs({TrustVerb.delegate});
     Iterable<TrustStatement> tokenDelegateStatements =
         delegateStatements.where((TrustStatement s) => s.subjectToken == keyToken);
     if (tokenDelegateStatements.isNotEmpty) {
@@ -36,7 +36,7 @@ class KeyWidget extends StatelessWidget {
     }
 
     TrustStatement? blockStatement;
-    List<TrustStatement> blockStatements = MyStatements.collect({TrustVerb.block});
+    List<TrustStatement> blockStatements = MyStatements.getByVerbs({TrustVerb.block});
     Iterable<TrustStatement> tokenBlockStatements =
         blockStatements.where((TrustStatement s) => s.subjectToken == keyToken);
     if (tokenBlockStatements.isNotEmpty) {
@@ -50,7 +50,7 @@ class KeyWidget extends StatelessWidget {
     if (keyToken == MyKeys.oneofusToken) {
       keyType = KeyType.oneofus;
       revoked = false; // DEFER: Make sure you haven't revoked yourself.
-    } else if (MyStatements.getEquivalentKeys().contains(keyToken)) {
+    } else if (MyStatements.equivalentKeys.contains(keyToken)) {
       keyType = KeyType.oneofus;
       revoked = true;
     } else if (b(delegateStatement)) {

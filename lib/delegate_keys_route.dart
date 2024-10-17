@@ -77,14 +77,14 @@ https://RTFM#delegates.'''),
           Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
             OutlinedButton(
                 onPressed: () async {
-                  Jsonish? jsonish = await createNewDelegateKey(null, context);
-                },
-                child: const Text('Create new')),
-            OutlinedButton(
-                onPressed: () async {
                   Jsonish? jsonish = await claimDelegateKey(context);
                 },
                 child: const Text('Claim existing')),
+            OutlinedButton(
+                onPressed: () async {
+                  Jsonish? jsonish = await createNewDelegateKey(null, context);
+                },
+                child: const Text('Create new')),
           ]),
         ]));
   }
@@ -102,7 +102,7 @@ Future<Jsonish?> createNewDelegateKey(String? domain, BuildContext context) asyn
     if (b(domain)) "with": {"domain": domain}
   };
   TrustStatement ts = TrustStatement(Jsonish(statementStarterJson));
-  Jsonish? jsonish = await ModifyStatementRoute.show(ts, const [TrustVerb.delegate], context);
+  Jsonish? jsonish = await ModifyStatementRoute.show(ts, const [TrustVerb.delegate], true, context);
   if (b(jsonish)) {
     ts = Statement.make(jsonish!) as TrustStatement;
     assert(ts.domain!.length > 1);
@@ -114,7 +114,7 @@ Future<Jsonish?> createNewDelegateKey(String? domain, BuildContext context) asyn
 
 Future<Jsonish?> claimDelegateKey(BuildContext context) async {
   String? scanned =
-      await QrScanner.scan('Scan a public key QR code', scannerJsonPublicKeyValidate, context);
+      await QrScanner.scan('Scan a public key QR code', validatePublicKeyJson, context);
   if (b(scanned)) {
     Json subjectKeyJson = await parsePublicKey(scanned!);
     return await stateClaimDelegateKey(subjectKeyJson, context);
@@ -127,15 +127,14 @@ Future<Jsonish?> stateClaimDelegateKey(Json subjectJson, BuildContext context,
   try {
     String subjectToken = getToken(subjectJson);
 
-    // Check
+    // Checks
     if (subjectToken == MyKeys.oneofusToken) {
       await alert(
           '''That's you''', '''That's your, active own one-of-us key.''', ['Okay'], context);
       return null;
     }
-
     // Lookup my disposition to this key
-    Iterable<TrustStatement> mine = MyStatements.getStatementsAboutSubject(subjectToken);
+    Iterable<TrustStatement> mine = MyStatements.getBySubject(subjectToken);
     if (mine.isNotEmpty) {
       TrustStatement ts = mine.first;
       switch (ts.verb) {
@@ -158,17 +157,17 @@ Future<Jsonish?> stateClaimDelegateKey(Json subjectJson, BuildContext context,
       }
     }
 
-    Json statementStarterJson = {
+    Json prototypeJson = {
       "statement": kOneofusDomain,
       "time": clock.nowIso,
       "I": MyKeys.oneofusPublicKey,
       TrustVerb.delegate.label: subjectJson,
       if (b(domain)) 'with': {'domain': domain}
     };
-    TrustStatement ts = TrustStatement(Jsonish(statementStarterJson));
+    TrustStatement prototype = TrustStatement(Jsonish(prototypeJson));
 
-    assert(ts.subjectToken == subjectToken);
-    Jsonish? jsonish = await ModifyStatementRoute.show(ts, [TrustVerb.delegate], context);
+    assert(prototype.subjectToken == subjectToken);
+    Jsonish? jsonish = await ModifyStatementRoute.show(prototype, [TrustVerb.delegate], true, context);
     return jsonish;
   } catch (e, stackTrace) {
     if (context.mounted) {
@@ -179,7 +178,7 @@ Future<Jsonish?> stateClaimDelegateKey(Json subjectJson, BuildContext context,
 }
 
 Future<void> encourageDelegateRepInvariant(BuildContext context) async {
-  List<TrustStatement> delegateStatements = MyStatements.collect({TrustVerb.delegate});
+  List<TrustStatement> delegateStatements = MyStatements.getByVerbs({TrustVerb.delegate});
   bool isClaimed(String domain, String publicKeyToken) {
     for (TrustStatement statement in delegateStatements) {
       if (statement.domain == domain && statement.subjectToken == publicKeyToken) {

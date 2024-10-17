@@ -25,18 +25,18 @@ Future<void> prepareX(BuildContext context) async {
   }
 }
 
-Widget buildKeysMenu(context) {
+Widget buildKeysMenu2(context) {
   return SubmenuButton(menuChildren: <Widget>[
     MenuItemButton(
         onPressed: () async {
           await prepareX(context);
           if (context.mounted) await encourageDelegateRepInvariant(context);
           await Navigator.of(context)
-              .push(MaterialPageRoute(builder: (context) => const OneofusKeysRoute()));
+              .push(MaterialPageRoute(builder: (context) => const TrustsRoute()));
           if (context.mounted) await prepareX(context);
           if (context.mounted) await encourageDelegateRepInvariant(context);
         },
-        child: const Text('one-of-us...')),
+        child: const Text('My network: [trust, block] others')),
     MenuItemButton(
         onPressed: () async {
           await prepareX(context);
@@ -46,34 +46,18 @@ Widget buildKeysMenu(context) {
           if (context.mounted) await prepareX(context);
           if (context.mounted) await encourageDelegateRepInvariant(context);
         },
-        child: const Text('Delegates ...')),
-    SubmenuButton(menuChildren: [
-      MenuItemButton(
-          onPressed: () async {
-            await prepareX(context);
-            if (context.mounted) await encourageDelegateRepInvariant(context);
-            await Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => Import(),
-              ),
-            );
-            if (context.mounted) await prepareX(context);
-            if (context.mounted) await encourageDelegateRepInvariant(context);
-          },
-          child: const Text('Import...')),
-      MenuItemButton(
-          onPressed: () async {
-            await prepareX(context);
-            var content = MyKeys.export();
-            await Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => Export(content),
-              ),
-            );
-          },
-          child: const Text('Export...')),
-    ], child: const Text('Import / Export')),
-  ], child: const Text('Keys'));
+        child: const Text('My services: [delegate] auth')),
+    MenuItemButton(
+        onPressed: () async {
+          await prepareX(context);
+          if (context.mounted) await encourageDelegateRepInvariant(context);
+          await Navigator.of(context)
+              .push(MaterialPageRoute(builder: (context) => const OneofusKeysRoute()));
+          if (context.mounted) await prepareX(context);
+          if (context.mounted) await encourageDelegateRepInvariant(context);
+        },
+        child: const Text('My identity: [replace] to claim my own keys')),
+  ], child: const Text('Sign'));
 }
 
 Widget buildTrustMenu(context) {
@@ -90,18 +74,49 @@ Widget buildTrustMenu(context) {
 }
 
 Widget buildEtcMenu(context) {
-  return SubmenuButton(menuChildren: [
-    MenuItemButton(
-        onPressed: () async {
-          await sharePublicKeyQr();
-        },
-        child: const Text('Share public key QR code')),
-    MenuItemButton(
-        onPressed: () async {
-          await sharePublicKeyText();
-        },
-        child: const Text('Share public key text')),
-  ], child: const Text('Etc'),);
+  return SubmenuButton(
+    menuChildren: [
+      SubmenuButton(menuChildren: [
+        MenuItemButton(
+            onPressed: () async {
+              await sharePublicKeyQr();
+            },
+            child: const Text('QR code')),
+        MenuItemButton(
+            onPressed: () async {
+              await sharePublicKeyText();
+            },
+            child: const Text('JSON text')),
+      ], child: const Text('Share my public key')),
+      SubmenuButton(menuChildren: [
+        MenuItemButton(
+            onPressed: () async {
+              await prepareX(context);
+              if (context.mounted) await encourageDelegateRepInvariant(context);
+              await Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => Import(),
+                ),
+              );
+              if (context.mounted) await prepareX(context);
+              if (context.mounted) await encourageDelegateRepInvariant(context);
+            },
+            child: const Text('Import...')),
+        MenuItemButton(
+            onPressed: () async {
+              await prepareX(context);
+              var content = MyKeys.export();
+              await Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => Export(content),
+                ),
+              );
+            },
+            child: const Text('Export...')),
+      ], child: const Text('Import / Export private keys')),
+    ],
+    child: const Text('Etc'),
+  );
 }
 
 Widget buildHelpMenu(context) {
@@ -112,7 +127,7 @@ Widget buildHelpMenu(context) {
       child: const Text('?'));
 }
 
-Widget buildDebugMenu(context) {
+Widget buildDevMenu(context) {
   return SubmenuButton(menuChildren: <Widget>[
     MenuItemButton(
         onPressed: () async {
@@ -129,16 +144,18 @@ Widget buildDebugMenu(context) {
           await MyKeys.wipe(context);
         },
         child: const Text('wipe')),
-  ], child: const Text('Debug'));
+  ], child: const Text('Dev'));
 }
 
 List<Widget> buildMenus(context) {
   return [
-    buildKeysMenu(context),
-    buildTrustMenu(context),
+    buildKeysMenu2(context),
+    // buildKeysMenu(context),
+    // buildTrustMenu(context),
     buildEtcMenu(context),
+    // SizedBox(width: 50,),
     // const MenuTitle(['one-', 'of-', 'us.', 'net']),
-    if (devMenu) buildDebugMenu(context),
+    if (kDev) buildDevMenu(context),
     buildHelpMenu(context),
   ];
 }
