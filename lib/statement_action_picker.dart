@@ -3,6 +3,7 @@ import 'package:oneofus/base/my_keys.dart';
 import 'package:oneofus/base/menus.dart';
 import 'package:oneofus/oneofus/jsonish.dart';
 import 'package:oneofus/oneofus/ui/linky.dart';
+import 'package:oneofus/trusts_route.dart';
 
 import 'modify_statement_route.dart';
 import 'base/my_statements.dart';
@@ -11,10 +12,11 @@ import 'widgets/statement_widget.dart';
 
 /// Displays statement boxes based on search verbs.
 /// Allows user to choose a statement and re-state it
+///
+
 class StatementActionPicker extends StatefulWidget {
   final Set<TrustVerb> verbs;
 
-  // TODO: reduce to just 'verbs'. Clear should be on us.
   const StatementActionPicker(this.verbs, {super.key});
 
   @override
@@ -44,32 +46,50 @@ class _StatementActionPickerState extends State<StatementActionPicker> {
 
   @override
   Widget build(BuildContext context) {
-    List<TrustStatement> statements = MyStatements.getByVerbs(widget.verbs);
-    List<Row> rows = <Row>[];
-    for (TrustStatement statement in statements) {
-      rows.add(Row(children: [
-        Flexible(
-            child: StatementWidget(
-          statement,
-          () async {
+    List stuff = [];
+    List<TrustStatement> activeStatements = MyStatements.getByVerbsActive(widget.verbs);
+    List<TrustStatement> equivStatements = MyStatements.getByVerbsEquiv(widget.verbs);
 
-            bool fresh2 = !(MyStatements.getByI(MyKeys.oneofusToken)
-                .any((s) => s.subjectToken == statement.subjectToken));
-            assert(!fresh2);
-
-            List<TrustVerb> verbs2 = List.of(widget.verbs);
-            if (!fresh2) {
-              verbs2.add(TrustVerb.clear);
-            }
-
-            Jsonish? jsonish =
-                await ModifyStatementRoute.show(statement, verbs2, false, context);
-            if (context.mounted) await prepareX(context); // redundant?
-            setState(() {});
-          },
-        ))
-      ]));
+    String? desc;
+    if (activeStatements.isEmpty && equivStatements.isEmpty) {
+      desc = '''You haven't issued any ${formatVerbs(widget.verbs)} statements.''';
+      stuff.add(desc);
     }
+
+    String? descActive;
+    if (activeStatements.isNotEmpty) {
+      descActive =
+          '''Below are ${formatVerbs(widget.verbs)} statements signed by your active key. You can click on these to edit (re-state) them with updated fields or to clear (erase) them.''';
+      stuff.add(descActive);
+      stuff.addAll(activeStatements);
+    }
+
+    String? descEquiv;
+    if (equivStatements.isNotEmpty) {
+      descEquiv =
+          '''Below are ${formatVerbs(widget.verbs)} statements signed by your equivalent keys. You can't edit or delete these (because you don't posses those replaced keys) but you can still re-state them and probably override them with your current key.''';
+      stuff.add(descEquiv);
+      stuff.addAll(equivStatements);
+    }
+
+
+    List<Widget> rows = <Widget>[];
+    for (var thing in stuff) {
+      if (thing is String) {
+        rows.add(Text(thing));
+      } else if (thing is TrustStatement) {
+        onTap() async {
+          Jsonish? jsonish = await ModifyStatementRoute.show(thing, [...widget.verbs], false, context);
+          if (context.mounted) {
+            await prepareX(context); // redundant?
+            setState(() {});
+          }
+        }
+        rows.add(StatementWidget(thing, onTap));
+        // rows.add(Row(children: [Flexible(child: StatementWidget(thing, onTap))]));
+      }
+    }
+
     return Column(children: rows);
   }
 }

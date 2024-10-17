@@ -10,6 +10,7 @@ import 'package:oneofus/oneofus/ui/alert.dart';
 import 'package:oneofus/oneofus/ui/linky.dart';
 import 'package:oneofus/oneofus_revoke_at_editor.dart';
 import 'package:oneofus/text_editor.dart';
+import 'package:oneofus/trusts_route.dart';
 import 'package:oneofus/widgets/key_widget.dart';
 import 'package:oneofus/widgets/loading.dart';
 
@@ -32,30 +33,36 @@ import 'widgets/statement_widget.dart';
 ///   - moniker
 ///   - comment
 ///
+/// Clear:
+/// invisible: fresh statement (can't delete if it doesn't even exist yet)
+/// disabled: can't delete if signed by equiv key
+/// enabled: not fresh && signed by my key.
+///
 /// Consider: Pass in the help per choice. Sounds good, but this is called by
 /// StatementActionPicker in a generic way, and so the help would have to be passed to that.
 /// Would that be more spaghetti or less?
 class ModifyStatementRoute extends StatefulWidget {
   final TrustStatement statement;
-  late final List<TrustVerb> choices;
+  late final List<TrustVerb> verbs;
   final bool fresh;
   final KeyWidget? subjectKeyDemo;
 
-  ModifyStatementRoute(this.statement, choices, this.fresh,  {this.subjectKeyDemo, super.key}) {
-    this.choices = checkClear(choices);
+  ModifyStatementRoute(this.statement, verbs, this.fresh, {this.subjectKeyDemo, super.key}) {
+    this.verbs = checkClear(verbs);
   }
 
-  List<TrustVerb> checkClear(List<TrustVerb> choices) {
-    List<TrustVerb> choices2 = [...choices];
-    bool fresh2 = !(MyStatements.getByI(MyKeys.oneofusToken)
-        .any((s) => s.subjectToken == statement.subjectToken));
-    assert(fresh == fresh2, '${fresh} != $fresh2');
-    if (choices2.contains(TrustVerb.clear)) {
-      if (statement.iToken != MyKeys.oneofusToken || fresh2) {
-        choices2.remove(TrustVerb.clear);
-      }
+  // CODE: ...
+  List<TrustVerb> checkClear(List<TrustVerb> verbs) {
+    // Try and compute fresh on our own rather than having it passed in reliably.
+    bool fresh2 = statement.iToken == MyKeys.oneofusToken &&
+        !(MyStatements.getByI(MyKeys.oneofusToken)
+            .any((s) => s.subjectToken == statement.subjectToken));
+    assert(fresh2 == fresh, '$fresh2 != $fresh');
+    List<TrustVerb> verbs2 = [...verbs];
+    if (!fresh) {
+      verbs2.add(TrustVerb.clear);
     }
-    return choices2;
+    return verbs2;
   }
 
   @override
@@ -66,8 +73,8 @@ class ModifyStatementRoute extends StatefulWidget {
       TrustStatement statement, List<TrustVerb> choices, bool fresh, BuildContext context,
       {KeyWidget? subjectKeyDemo}) async {
     Jsonish? out = await Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => ModifyStatementRoute(statement, choices, fresh,
-            subjectKeyDemo: subjectKeyDemo)));
+        builder: (context) =>
+            ModifyStatementRoute(statement, choices, fresh, subjectKeyDemo: subjectKeyDemo)));
     return out;
   }
 }
@@ -94,32 +101,41 @@ class _ModifyStatementRouteState extends State<ModifyStatementRoute> {
   @override
   Widget build(BuildContext context) {
     if (pushInitiated) return const Loading();
-    if (widget.choices.length == 1 && !b(choice)) {
+    if (widget.verbs.length == 1 && !b(choice)) {
       // Don't know why, but build is being called twice, don't want to call _makeEditors twice.
-      choice = widget.choices.first;
+      choice = widget.verbs.first;
       _makeEditors(widget.statement, choice!);
     }
 
-    List<Widget> choices = <Widget>[];
-    for (TrustVerb verb in widget.choices) {
+    List<Widget> buttons = <Widget>[];
+    for (TrustVerb verb in widget.verbs) {
       VoidCallback? onPressed = makeOnPressed(verb);
       ButtonStyle? style;
       if (b(onPressed) && b(choice)) {
         Color color = errors.value ? Colors.red : Colors.green;
         style = OutlinedButton.styleFrom(side: BorderSide(width: 3.0, color: color));
       }
-      choices.add(OutlinedButton(
+      buttons.add(OutlinedButton(
           onPressed: !errors.value ? onPressed : null, style: style, child: Text(verb.label)));
     }
 
-    bool fresh = !MyStatements.getByI(MyKeys.oneofusToken)
-        .any((s) => s.subjectToken == widget.statement.subjectToken);
-    assert(widget.fresh == fresh, '${widget.fresh} != $fresh');
-    String desc = 'newStatement=${widget.fresh}, choice=$choice, choices=${widget.choices}';
-    bool over = widget.statement.iToken != MyKeys.oneofusToken;
+    // bool fresh = !MyStatements.getByI(MyKeys.oneofusToken)
+    //     .any((s) => s.subjectToken == widget.statement.subjectToken);
+    // assert(widget.fresh == fresh, '${widget.fresh} != $fresh');
+    bool fresh = widget.fresh;
+    bool fresh2 = widget.statement.iToken == MyKeys.oneofusToken &&
+        !(MyStatements.getByI(MyKeys.oneofusToken)
+            .any((s) => s.subjectToken == widget.statement.subjectToken));
+    assert(fresh2 == fresh, '$fresh2 != $fresh');
 
-    Iterable<String> verbs = widget.choices.where((v) => v != TrustVerb.clear).map((v) => v.label);
-    String title = fresh ? 'State $verbs' : 'Re-state / Clear $verbs';
+    String title;
+    if (fresh) {
+      title = 'State ${formatVerbs(widget.verbs)}';
+    } else if (widget.statement.iToken == MyKeys.oneofusToken) {
+      title = 'Re-state / Clear ${formatVerbs(widget.verbs)}';
+    } else {
+      title = 'Re-state / Override ${formatVerbs(widget.verbs)}';
+    }
 
     String desc1;
     if (b(choice)) {
@@ -144,7 +160,6 @@ class _ModifyStatementRouteState extends State<ModifyStatementRoute> {
         appBar: AppBar(title: Text(title)),
         body: ListView(children: [
           Text(desc1),
-          Text(desc),
 //           const Linky(
 //               '''Choose (or confirm) a verb (in case one isn't already chosen) to issue a new (or updated) statement.
 // You may be prompted for updated field values.
@@ -152,6 +167,7 @@ class _ModifyStatementRouteState extends State<ModifyStatementRoute> {
           if (widget.statement.iToken != MyKeys.oneofusToken) const Linky('''NOTE:
 The statement below was signed by one of your replaced, equivalent keys, not by your current, active key.            
 If you restate this statement with your active key, the old statement signed by your old key cannot be overwritten but should be understood to be stale.'''),
+
           StatementWidget(
             widget.statement,
             null,
@@ -161,11 +177,11 @@ If you restate this statement with your active key, the old statement signed by 
             Column(
               children: editorWidgets!,
             ),
-          Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: choices),
+          Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: buttons),
         ]));
   }
 
-  // (This 'makeOnPressed' is a bit screwy and confusing, sorry;)
+// (This 'makeOnPressed' is a bit screwy and confusing, sorry;)
   Function()? makeOnPressed(TrustVerb thisChoice) {
     // Don't let the user Fetcher.push again
     if (pushInitiated) return null;
@@ -209,7 +225,7 @@ If you restate this statement with your active key, the old statement signed by 
     }
   }
 
-  // return true if okay to continue.
+// return true if okay to continue.
   Future<bool> _prePush(Json json) async {
     // Check if user will overwrite a local delegate key pair.
     if (choice == TrustVerb.delegate) {

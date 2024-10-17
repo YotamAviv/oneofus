@@ -16,6 +16,14 @@ import 'widgets/qr_scanner.dart';
 
 // TODO(2): Show the statements with different colors for shadowed and conflicting blocks.
 
+String _descTop0 = '''This app has your one-of-us public/private key pair and uses it to sign structured statements (like trust in others, for example).
+Similarly, others may use their apps and keys to sign statements referencing your public key, which represents your identity.
+Stuff happens (lost phone, compromised keys, apps reinstalled, ...), and so sometimes new keys are needed, but people should maintain their singular identities.
+This is facilitated by "replace" statements (ie, my new key replaces my lost key, but I'm still the same person).''';
+
+ String _descBottom = '''- Choose "Claim existing .." if you have used a one-of-us key before, but it's not the one on this device.
+ - Choose "Replace.." if you suspect that the key on this device has been compromised.''';
+
 class OneofusKeysRoute extends StatelessWidget {
   static const Set<TrustVerb> verbs = {TrustVerb.replace};
 
@@ -30,14 +38,9 @@ class OneofusKeysRoute extends StatelessWidget {
                 shrinkWrap: true,
                 physics: const AlwaysScrollableScrollPhysics(),
                 children: [
-              const Linky(
-                  '''Your active one-of-us key is on this phone and is used to sign statements trusting other folks' keys and your other keys. 
-(It wouldn't make sense to use it to state that you trust it; that's what your associates do with their keys, and that's why you don't see a trust statement box for your current, active key.)
-
-Below are 'replace' key statements signed by your active key or by any of your older, replaced, equivalent keys.
-Click on them to restate them with (with your current key only).      
-http://RTFM#replace-oneofus-key.'''),
+              Linky(_descTop0),
               const StatementActionPicker(verbs),
+              Linky(_descBottom),
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 OutlinedButton(
                     onPressed: () async {

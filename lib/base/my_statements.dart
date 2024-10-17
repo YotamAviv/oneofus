@@ -22,7 +22,7 @@ class MyStatements {
     notifier.value = clock.now;
   }
 
-  // Equivalent keys only, specifically omit Keys.oneofusToken
+  // Equivalent keys only; active, canonical key (Keys.oneofusToke) is specifically omitted.
   // (Bart has gotten into situations where he replaced a replaced and his main key was also equivalent.)
   static Set<String> get equivalentKeys {
     List<TrustStatement> replaceStatements = getByVerbs({TrustVerb.replace});
@@ -45,6 +45,22 @@ class MyStatements {
   static List<TrustStatement> getByVerbs(Set<TrustVerb> searchVerbs) {
     List<TrustStatement> list = <TrustStatement>[];
     _collect(MyKeys.oneofusToken, searchVerbs, list, {});
+    list.sort(_compare);
+    return list;
+  }
+
+  static List<TrustStatement> getByVerbsActive(Set<TrustVerb> searchVerbs) {
+    List<TrustStatement> list = <TrustStatement>[];
+    _collect(MyKeys.oneofusToken, searchVerbs, list, {});
+    list.removeWhere((s) => s.iToken != MyKeys.oneofusToken);
+    list.sort(_compare);
+    return list;
+  }
+
+  static List<TrustStatement> getByVerbsEquiv(Set<TrustVerb> searchVerbs) {
+    List<TrustStatement> list = <TrustStatement>[];
+    _collect(MyKeys.oneofusToken, searchVerbs, list, {});
+    list.removeWhere((s) => s.iToken == MyKeys.oneofusToken);
     list.sort(_compare);
     return list;
   }

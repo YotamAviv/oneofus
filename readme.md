@@ -1,5 +1,5 @@
 # Nice ones:
-tar -czf ~/backups/oneofus2.git.`date2`.tgz .git
+tar -czf ~/backups/oneofus.git.`date2`.tgz .git
 
 
 
