@@ -17,44 +17,43 @@ String trustDesc = '''You reference other folks' public key in trust/block state
 Trust is meant to certify that they're human, understand this, and are acting in good faith.
 Block is an extreme measure and should be reserved for bots, spammers, and other bad actors.''';
 
+String formatVerbs(Iterable<TrustVerb> verbs) {
+  return verbs.map((v) => v.label).toString();
+}
+
 class TrustsRoute extends StatelessWidget {
+  static const Set<TrustVerb> verbs = {TrustVerb.trust, TrustVerb.block};
+
   const TrustsRoute({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: const Text('Trust Statements')),
-        // I hacked around here and in StatementPicker to make stuff scroll when
-        // there's too many statements to fit, don't understand any of it.
-        // Tried: CustomScrollView with SliverFillRemaining, SingleChildScrollView, etc...
+        appBar: AppBar(title: Text('${formatVerbs(verbs)} Statements')),
         body: SafeArea(
-            child: Column(children: [
-          const Linky(
-            // TODO: Make this text be part of StatementActionPicker
-              '''Below are trust statements signed by your active key or by any of your older, replaced, equivalent keys.
+            child: ListView(
+                shrinkWrap: true,
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: [
+              const Linky(
+                  // TODO: Make this text be part of StatementActionPicker
+                  '''Below are trust statements signed by your active key or by any of your older, replaced, equivalent keys.
 Click on them to restate and/or modify them with (with your current key only).      
 RTFM: http://RTFM#re-state.'''),
-          const Flexible(
-            child: StatementActionPicker({
-              TrustVerb.trust,
-              TrustVerb.block
-            }, [
-              TrustVerb.trust,
-              TrustVerb.block,
-              TrustVerb.clear,
-            ]),
-          ),
-          Row(children: [
-            OutlinedButton(
-                onPressed: () async {
-                  Json? jsonPublicKey = await QrScanner.scanPublicKey(context);
-                  if (!b(jsonPublicKey)) return;
-                  if (!context.mounted) return;
-                  Jsonish? jsonish = await startTrust(jsonPublicKey!, context);
-                },
-                child: const Text('New Trust or block')),
-          ]),
-        ])));
+              const Flexible(
+                child: StatementActionPicker(verbs),
+              ),
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                OutlinedButton(
+                    onPressed: () async {
+                      Json? jsonPublicKey = await QrScanner.scanPublicKey(context);
+                      if (!b(jsonPublicKey)) return;
+                      if (!context.mounted) return;
+                      Jsonish? jsonish = await startTrust(jsonPublicKey!, context);
+                    },
+                    child: const Text('New Trust or block')),
+              ]),
+            ])));
   }
 }
 
@@ -90,11 +89,11 @@ If you need to clear or change that, go to menu => Keys => Delegates... and clea
     Iterable<TrustStatement> myTrustsBlocks =
         (MyStatements.getByVerbs(const {TrustVerb.trust, TrustVerb.block}))
             .where((s) => s.subjectToken == subjectToken);
-    bool newStatement;
+    bool fresh;
     if (myTrustsBlocks.isNotEmpty) {
       assert(myTrustsBlocks.length == 1);
       prototype = myTrustsBlocks.first;
-      newStatement = false;
+      fresh = false;
     } else {
       Json prototypeJson = {
         "statement": kOneofusDomain,
@@ -103,11 +102,18 @@ If you need to clear or change that, go to menu => Keys => Delegates... and clea
         TrustVerb.trust.label: subjectJson,
       };
       prototype = TrustStatement(Jsonish(prototypeJson));
-      newStatement = true;
+      fresh = true;
     }
 
-    Jsonish? jsonish =
-        await ModifyStatementRoute.show(prototype, const [TrustVerb.trust, TrustVerb.block, TrustVerb.clear], newStatement, context);
+    // Shouldn't need to check for clear (distincter)
+    // bool fresh2 = !(MyStatements.getByI(MyKeys.oneofusToken)
+    //     .any((s) => s.subjectToken == prototype.subjectToken && s.verb != TrustVerb.clear));
+    bool fresh2 = !(MyStatements.getByI(MyKeys.oneofusToken)
+        .any((s) => s.subjectToken == prototype.subjectToken));
+    assert(fresh == fresh2, '$fresh != $fresh2');
+
+    Jsonish? jsonish = await ModifyStatementRoute.show(
+        prototype, const [TrustVerb.trust, TrustVerb.block, TrustVerb.clear], fresh, context);
     return jsonish;
   } catch (e) {
     await alertException(context, e);

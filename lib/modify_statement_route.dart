@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:jwk/jwk.dart';
 import 'package:oneofus/base/menus.dart';
 import 'package:oneofus/base/my_statements.dart';
 import 'package:oneofus/delegate_revoke_at_editor.dart';
@@ -31,56 +32,26 @@ import 'widgets/statement_widget.dart';
 ///   - moniker
 ///   - comment
 ///
+/// Consider: Pass in the help per choice. Sounds good, but this is called by
+/// StatementActionPicker in a generic way, and so the help would have to be passed to that.
+/// Would that be more spaghetti or less?
 class ModifyStatementRoute extends StatefulWidget {
   final TrustStatement statement;
   late final List<TrustVerb> choices;
-
-  /// Consider: Pass in the help per choice. Sounds good, but this is called by
-  /// StatementActionPicker in a generic way, and so the help would have to be passed to that.
-  /// Would that be more spaghetti or less?
-  ///
-  /// In general
-  ///
-  /// Trust/block [trust, block, (clear)]
-  ///
-  /// Replace [replace, (clear)]
-  ///
-  /// Delegate [delegate, (clear)]
-  ///
-  /// The caller should know if this is going to be a new statement or a re-state
-  /// new trust
-  /// new block
-  /// (no clear)
-  ///
-  /// editing trust/block stated by this key
-  /// ...
-  ///
-  /// new replace my key
-  ///
-  /// old replace my key
-  /// - update fields
-  /// - clear
-  ///
-  /// new delegate for this key
-  ///
-  /// update delegate for this key
-  ///
-  /// restate or clear delegate for equiv key
-  ///
-  ///
-  final bool newStatement;
+  final bool fresh;
   final KeyWidget? subjectKeyDemo;
 
-  ModifyStatementRoute(this.statement, choices, this.newStatement,  {this.subjectKeyDemo, super.key}) {
+  ModifyStatementRoute(this.statement, choices, this.fresh,  {this.subjectKeyDemo, super.key}) {
     this.choices = checkClear(choices);
   }
 
   List<TrustVerb> checkClear(List<TrustVerb> choices) {
     List<TrustVerb> choices2 = [...choices];
-    bool fresh = !MyStatements.getByI(MyKeys.oneofusToken)
-        .any((s) => s.subjectToken == statement.subjectToken);
+    bool fresh2 = !(MyStatements.getByI(MyKeys.oneofusToken)
+        .any((s) => s.subjectToken == statement.subjectToken));
+    assert(fresh == fresh2, '${fresh} != $fresh2');
     if (choices2.contains(TrustVerb.clear)) {
-      if (statement.iToken != MyKeys.oneofusToken || fresh) {
+      if (statement.iToken != MyKeys.oneofusToken || fresh2) {
         choices2.remove(TrustVerb.clear);
       }
     }
@@ -92,10 +63,10 @@ class ModifyStatementRoute extends StatefulWidget {
 
   // CODE: Understand what a "MaterialPageRoute" is and consider getting rid of these "show" helpers.
   static Future<Jsonish?> show(
-      TrustStatement statement, List<TrustVerb> choices, bool newStatement, BuildContext context,
+      TrustStatement statement, List<TrustVerb> choices, bool fresh, BuildContext context,
       {KeyWidget? subjectKeyDemo}) async {
     Jsonish? out = await Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => ModifyStatementRoute(statement, choices, newStatement,
+        builder: (context) => ModifyStatementRoute(statement, choices, fresh,
             subjectKeyDemo: subjectKeyDemo)));
     return out;
   }
@@ -110,9 +81,8 @@ class _ModifyStatementRouteState extends State<ModifyStatementRoute> {
   @override
   void initState() {
     super.initState();
-    // I was getting errors related to widget "currently being built",
-    // and this seems to have fixed it.
     errors.addListener(() {
+      // I was getting errors related to widget "currently being built", and this seems to have fixed it.
       SchedulerBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
           setState(() {});
@@ -144,11 +114,12 @@ class _ModifyStatementRouteState extends State<ModifyStatementRoute> {
 
     bool fresh = !MyStatements.getByI(MyKeys.oneofusToken)
         .any((s) => s.subjectToken == widget.statement.subjectToken);
-    assert(widget.newStatement == fresh);
-    String desc = 'newStatement=${widget.newStatement}, choice=$choice, choices=${widget.choices}';
+    assert(widget.fresh == fresh, '${widget.fresh} != $fresh');
+    String desc = 'newStatement=${widget.fresh}, choice=$choice, choices=${widget.choices}';
     bool over = widget.statement.iToken != MyKeys.oneofusToken;
 
-    String title = fresh ? 'State a Statement' : 'Modify / Clear a Statement';
+    Iterable<String> verbs = widget.choices.where((v) => v != TrustVerb.clear).map((v) => v.label);
+    String title = fresh ? 'State $verbs' : 'Re-state / Clear $verbs';
 
     String desc1;
     if (b(choice)) {

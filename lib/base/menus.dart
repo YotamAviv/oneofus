@@ -36,7 +36,7 @@ Widget buildKeysMenu2(context) {
           if (context.mounted) await prepareX(context);
           if (context.mounted) await encourageDelegateRepInvariant(context);
         },
-        child: const Text('My network: [trust, block] others')),
+        child: const Text('My network: [trust, block] people')),
     MenuItemButton(
         onPressed: () async {
           await prepareX(context);
@@ -46,7 +46,7 @@ Widget buildKeysMenu2(context) {
           if (context.mounted) await prepareX(context);
           if (context.mounted) await encourageDelegateRepInvariant(context);
         },
-        child: const Text('My services: [delegate] auth')),
+        child: const Text('My services: [delegate] authority')),
     MenuItemButton(
         onPressed: () async {
           await prepareX(context);
@@ -56,7 +56,7 @@ Widget buildKeysMenu2(context) {
           if (context.mounted) await prepareX(context);
           if (context.mounted) await encourageDelegateRepInvariant(context);
         },
-        child: const Text('My identity: [replace] to claim my own keys')),
+        child: const Text('My identity: [replace] (or claim) my own keys')),
   ], child: const Text('Sign'));
 }
 

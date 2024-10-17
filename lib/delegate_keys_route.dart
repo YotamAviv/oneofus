@@ -62,31 +62,37 @@ import 'statement_action_picker.dart';
 /// (no moniker)
 
 class DelegateKeysRoute extends StatelessWidget {
+  static const Set<TrustVerb> verbs = {TrustVerb.delegate};
+
   const DelegateKeysRoute({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: const Text('Delegate keys')),
-        body: ListView(children: [
-          const Linky(
-              '''Below are 'delegate' key statements signed by your active key or by any of your older, replaced, equivalent keys.
+        appBar: AppBar(title: Text('${formatVerbs(verbs)} Statements')),
+        body: SafeArea(
+            child: ListView(
+                shrinkWrap: true,
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: [
+              const Linky(
+                  '''Below are 'delegate' key statements signed by your active key or by any of your older, replaced, equivalent keys.
 Click on them to restate them with (with your current key only).      
 https://RTFM#delegates.'''),
-          const StatementActionPicker({TrustVerb.delegate}, [TrustVerb.delegate, TrustVerb.clear]),
-          Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-            OutlinedButton(
-                onPressed: () async {
-                  Jsonish? jsonish = await claimDelegateKey(context);
-                },
-                child: const Text('Claim existing')),
-            OutlinedButton(
-                onPressed: () async {
-                  Jsonish? jsonish = await createNewDelegateKey(null, context);
-                },
-                child: const Text('Create new')),
-          ]),
-        ]));
+              const StatementActionPicker(verbs),
+              Column(children: [
+                OutlinedButton(
+                    onPressed: () async {
+                      Jsonish? jsonish = await claimDelegateKey(context);
+                    },
+                    child: const Text('Claim existing delegate key')),
+                OutlinedButton(
+                    onPressed: () async {
+                      Jsonish? jsonish = await createNewDelegateKey(null, context);
+                    },
+                    child: const Text('Create new delegate key')),
+              ]),
+            ])));
   }
 }
 
@@ -167,7 +173,8 @@ Future<Jsonish?> stateClaimDelegateKey(Json subjectJson, BuildContext context,
     TrustStatement prototype = TrustStatement(Jsonish(prototypeJson));
 
     assert(prototype.subjectToken == subjectToken);
-    Jsonish? jsonish = await ModifyStatementRoute.show(prototype, [TrustVerb.delegate], true, context);
+    Jsonish? jsonish =
+        await ModifyStatementRoute.show(prototype, [TrustVerb.delegate], true, context);
     return jsonish;
   } catch (e, stackTrace) {
     if (context.mounted) {

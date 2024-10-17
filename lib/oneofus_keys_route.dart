@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:oneofus/base/my_statements.dart';
 import 'package:oneofus/oneofus/fetcher.dart';
 import 'package:oneofus/oneofus/ui/linky.dart';
+import 'package:oneofus/trusts_route.dart';
 import 'package:oneofus/widgets/demo_statement_route.dart';
 
 import 'base/my_keys.dart';
@@ -16,46 +17,52 @@ import 'widgets/qr_scanner.dart';
 // TODO(2): Show the statements with different colors for shadowed and conflicting blocks.
 
 class OneofusKeysRoute extends StatelessWidget {
+  static const Set<TrustVerb> verbs = {TrustVerb.replace};
+
   const OneofusKeysRoute({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: const Text('one-of-us.net keys')),
-        body: ListView(children: [
-          const Linky(
-              '''Your active one-of-us key is on this phone and is used to sign statements trusting other folks' keys and your other keys. 
+        appBar: AppBar(title: Text('${formatVerbs(verbs)} Statements')),
+        body: SafeArea(
+            child: ListView(
+                shrinkWrap: true,
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: [
+              const Linky(
+                  '''Your active one-of-us key is on this phone and is used to sign statements trusting other folks' keys and your other keys. 
 (It wouldn't make sense to use it to state that you trust it; that's what your associates do with their keys, and that's why you don't see a trust statement box for your current, active key.)
 
 Below are 'replace' key statements signed by your active key or by any of your older, replaced, equivalent keys.
 Click on them to restate them with (with your current key only).      
 http://RTFM#replace-oneofus-key.'''),
-          const StatementActionPicker({TrustVerb.replace}, [TrustVerb.replace, TrustVerb.clear]),
-          Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-            OutlinedButton(
-                onPressed: () async {
-                  String? okay = await alert(
-                      'Be sure',
-                      '''In case you've re-installed the app, lost track of key, or something else, it's good to claim any past keys that you've used so that they are associated with your current one-of-us key.
+              const StatementActionPicker(verbs),
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                OutlinedButton(
+                    onPressed: () async {
+                      String? okay = await alert(
+                          'Be sure',
+                          '''In case you've re-installed the app, lost track of key, or something else, it's good to claim any past keys that you've used so that they are associated with your current one-of-us key.
 
 But do make sure that you don't accidentally claim somebody else's key (that's the type of act that will get you blocked).
 
 https://RTFM#claim-oneofus-key''',
-                      ['Okay', 'Cancel'],
-                      context);
-                  if (match(okay, 'Okay')) {
-                    if (context.mounted) await claimKey(context);
-                  }
-                },
-                child: const Text('Claim existing')),
-            OutlinedButton(
-                onPressed: () async {
-                  Jsonish? jsonish;
-                  if (context.mounted) jsonish = await replaceMyKey(context);
-                },
-                child: const Text('Replace current')),
-          ]),
-        ]));
+                          ['Okay', 'Cancel'],
+                          context);
+                      if (match(okay, 'Okay')) {
+                        if (context.mounted) await claimKey(context);
+                      }
+                    },
+                    child: const Text('Claim existing one-of-us key')),
+                OutlinedButton(
+                    onPressed: () async {
+                      Jsonish? jsonish;
+                      if (context.mounted) jsonish = await replaceMyKey(context);
+                    },
+                    child: const Text('Replace my current one-of-us key')),
+              ]),
+            ])));
   }
 }
 
@@ -131,7 +138,8 @@ Future<Jsonish?> stateReplaceKey(Json subjectJson, BuildContext context) async {
       TrustStatement ts = mine.first;
       switch (ts.verb) {
         case TrustVerb.trust:
-          await alert('That appears to be the trust key held by "${ts.moniker}".', '', ['Okay'], context);
+          await alert(
+              'That appears to be the trust key held by "${ts.moniker}".', '', ['Okay'], context);
           return null;
         case TrustVerb.block:
           await alert("You've blocked this key.", 'comment: ${ts.comment}', ['Okay'], context);
@@ -150,8 +158,7 @@ Future<Jsonish?> stateReplaceKey(Json subjectJson, BuildContext context) async {
     }
 
     Iterable<TrustStatement> allStatementsNoDistinctNoVerify =
-        (await Fetcher(subjectToken, kOneofusDomain).fetchAllNoVerify())
-            .cast<TrustStatement>();
+        (await Fetcher(subjectToken, kOneofusDomain).fetchAllNoVerify()).cast<TrustStatement>();
     String revokeAt;
     if (allStatementsNoDistinctNoVerify.isEmpty) {
       String? okay = await alert(
@@ -190,7 +197,8 @@ https://RTFM#replace-oneofus-key.''',
     TrustStatement prototype = TrustStatement(Jsonish(prototypeJson));
 
     assert(prototype.subjectToken == subjectToken);
-    Jsonish? jsonish = await ModifyStatementRoute.show(prototype, [TrustVerb.replace], true, context,
+    Jsonish? jsonish = await ModifyStatementRoute.show(
+        prototype, [TrustVerb.replace], true, context,
         subjectKeyDemo: myEquivalentKey);
     return jsonish;
   } catch (e, stackTrace) {

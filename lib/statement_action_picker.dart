@@ -12,10 +12,10 @@ import 'widgets/statement_widget.dart';
 /// Displays statement boxes based on search verbs.
 /// Allows user to choose a statement and re-state it
 class StatementActionPicker extends StatefulWidget {
-  final Set<TrustVerb> searchVerbs;
-  final List<TrustVerb> choiceVerbs;
+  final Set<TrustVerb> verbs;
 
-  const StatementActionPicker(this.searchVerbs, this.choiceVerbs, {super.key});
+  // TODO: reduce to just 'verbs'. Clear should be on us.
+  const StatementActionPicker(this.verbs, {super.key});
 
   @override
   State<StatefulWidget> createState() => _StatementActionPickerState();
@@ -44,7 +44,7 @@ class _StatementActionPickerState extends State<StatementActionPicker> {
 
   @override
   Widget build(BuildContext context) {
-    List<TrustStatement> statements = MyStatements.getByVerbs(widget.searchVerbs);
+    List<TrustStatement> statements = MyStatements.getByVerbs(widget.verbs);
     List<Row> rows = <Row>[];
     for (TrustStatement statement in statements) {
       rows.add(Row(children: [
@@ -52,16 +52,24 @@ class _StatementActionPickerState extends State<StatementActionPicker> {
             child: StatementWidget(
           statement,
           () async {
+
+            bool fresh2 = !(MyStatements.getByI(MyKeys.oneofusToken)
+                .any((s) => s.subjectToken == statement.subjectToken));
+            assert(!fresh2);
+
+            List<TrustVerb> verbs2 = List.of(widget.verbs);
+            if (!fresh2) {
+              verbs2.add(TrustVerb.clear);
+            }
+
             Jsonish? jsonish =
-                await ModifyStatementRoute.show(statement, widget.choiceVerbs, false, context);
+                await ModifyStatementRoute.show(statement, verbs2, false, context);
             if (context.mounted) await prepareX(context); // redundant?
             setState(() {});
           },
         ))
       ]));
     }
-
-    return ListView(
-        shrinkWrap: true, physics: const AlwaysScrollableScrollPhysics(), children: rows);
+    return Column(children: rows);
   }
 }
