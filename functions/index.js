@@ -10,9 +10,8 @@ const admin = require('firebase-admin');
 admin.initializeApp();
 
 // Deployed! Try at: https://us-central1-one-of-us-net.cloudfunctions.net/export?token=2c3142d16cac3c5aeb6d7d40a4ca6beb7bd92431
-exports.export = functions.https.onRequest(async (req, res) => {
+exports.export2 = onRequest(async (req, res) => {
   const token = req.query.token;
-
   if (!token) {
     return res.status(400).send('Missing collection name');
   }
