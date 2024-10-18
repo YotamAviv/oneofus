@@ -15,9 +15,9 @@ import 'statement_action_picker.dart';
 import 'widgets/qr_scanner.dart';
 
 String _descTop0 = '''You reference other folks' public keys in trust/block statements: 
-Trust is meant to certify that they're human, understand this, and are acting in good faith.
-Block is extreme and should be reserved for bots, spammers, and other bad actors.
-In aggregate, these form the one-of-us network.''';
+Trust: {human, capable, acting in good faith}
+Block: {bots, spammers, and other bad actors}
+These form the one-of-us network.''';
 
 String _descBottom = '''.''';
 

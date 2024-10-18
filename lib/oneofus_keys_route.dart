@@ -3,7 +3,6 @@ import 'package:oneofus/base/menus.dart';
 import 'package:oneofus/base/my_statements.dart';
 import 'package:oneofus/oneofus/fetcher.dart';
 import 'package:oneofus/oneofus/ui/linky.dart';
-import 'package:oneofus/trusts_route.dart';
 import 'package:oneofus/widgets/demo_statement_route.dart';
 
 import 'base/my_keys.dart';
@@ -15,17 +14,12 @@ import 'oneofus/util.dart';
 import 'statement_action_picker.dart';
 import 'widgets/qr_scanner.dart';
 
-// TODO(2): Show the statements with different colors for shadowed and conflicting blocks.
-
 String _descTop0 =
-    '''This app has your one-of-us public/private key pair and uses it to sign structured statements (like trust in others, for example).
-Similarly, others may use their apps and keys to sign statements referencing your public key, which represents your identity.
-Stuff happens (lost phone, compromised keys, apps reinstalled, ...), and so sometimes new keys are needed, but people should maintain their singular identities.
-This is facilitated by "replace" statements (ie, my new key replaces my lost key, but I'm still the same person).''';
+    '''This app holds your active one-of-us public/private key pair and uses it to sign statements.
+Stuff happens (lost phones, compromised keys, apps reinstalled, ...), and sometimes replacement keys are needed. But individuals should maintain their singular identities.
+"replace" statements facilitate this (as in: "my new key replaces my lost key, but I remain the same person").''';
 
-String _descBottom =
-    '''- Choose "Claim existing .." if you have used a one-of-us key before, but it's not the one on this device.
- - Choose "Replace.." if you suspect that the key on this device has been compromised.''';
+String _descBottom = '''.''';
 
 class OneofusKeysRoute extends StatelessWidget {
   static const Set<TrustVerb> verbs = {TrustVerb.replace};

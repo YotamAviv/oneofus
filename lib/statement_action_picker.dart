@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:oneofus/base/my_keys.dart';
 import 'package:oneofus/base/menus.dart';
+import 'package:oneofus/base/my_keys.dart';
 import 'package:oneofus/oneofus/jsonish.dart';
-import 'package:oneofus/oneofus/ui/linky.dart';
-import 'package:oneofus/trusts_route.dart';
 
-import 'modify_statement_route.dart';
 import 'base/my_statements.dart';
+import 'modify_statement_route.dart';
 import 'oneofus/trust_statement.dart';
 import 'widgets/statement_widget.dart';
 
 /// Displays statement boxes based on search verbs.
-/// Allows user to choose a statement and re-state it
+/// Allows user to pick a statement and re-state it
 ///
+// TODO(2): Show the statements with different colors for shadowed and conflicting blocks.
 
 class StatementActionPicker extends StatefulWidget {
   final Set<TrustVerb> verbs;
@@ -72,19 +71,20 @@ class _StatementActionPickerState extends State<StatementActionPicker> {
       stuff.addAll(equivStatements);
     }
 
-
     List<Widget> rows = <Widget>[];
     for (var thing in stuff) {
       if (thing is String) {
         rows.add(Text(thing));
       } else if (thing is TrustStatement) {
         onTap() async {
-          Jsonish? jsonish = await ModifyStatementRoute.show(thing, [...widget.verbs], false, context);
+          Jsonish? jsonish =
+              await ModifyStatementRoute.show(thing, [...widget.verbs], false, context);
           if (context.mounted) {
             await prepareX(context); // redundant?
             setState(() {});
           }
         }
+
         rows.add(StatementWidget(thing, onTap));
         // rows.add(Row(children: [Flexible(child: StatementWidget(thing, onTap))]));
       }

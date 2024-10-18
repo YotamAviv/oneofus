@@ -62,7 +62,7 @@ Widget buildKeysMenu2(context) {
           if (context.mounted) await encourageDelegateRepInvariant(context);
         },
         child: Text('My equivalent one-of-us keys: ${formatVerbs(OneofusKeysRoute.verbs)}')),
-  ], child: const Text('State'));
+  ], child: const Text('state'));
 }
 
 Widget buildEtcMenu(context) {
@@ -107,7 +107,7 @@ Widget buildEtcMenu(context) {
             child: const Text('Export...')),
       ], child: const Text('Import / Export private keys')),
     ],
-    child: const Text('Etc'),
+    child: const Text('/etc'),
   );
 }
 
@@ -136,7 +136,7 @@ Widget buildDevMenu(context) {
           await MyKeys.wipe(context);
         },
         child: const Text('wipe')),
-  ], child: const Text('Dev'));
+  ], child: const Text('dev'));
 }
 
 List<Widget> buildMenus(context) {
