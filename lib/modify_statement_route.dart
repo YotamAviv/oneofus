@@ -132,9 +132,9 @@ class _ModifyStatementRouteState extends State<ModifyStatementRoute> {
     if (fresh) {
       title = 'State ${formatVerbs(widget.verbs)}';
     } else if (widget.statement.iToken == MyKeys.oneofusToken) {
-      title = 'Re-state / Clear ${formatVerbs(widget.verbs)}';
+      title = 'Restate/Clear ${formatVerbs(widget.verbs)}';
     } else {
-      title = 'Re-state / Override ${formatVerbs(widget.verbs)}';
+      title = 'Override ${formatVerbs(widget.verbs)}';
     }
 
     String desc1;

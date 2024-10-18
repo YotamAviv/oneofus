@@ -44,27 +44,38 @@ class DemoStatementRoute extends StatelessWidget {
 
     const space = SizedBox(height: 20);
     return Scaffold(
-        appBar: AppBar(title: const Text('Statement Samples')),
+        appBar: AppBar(title: const Text('Statements, Keys, oh my..')),
         body: ListView(shrinkWrap: true, physics: const AlwaysScrollableScrollPhysics(), children: [
-          const Linky(
-              '''Read the https://RTFM
+          const Linky('''Read the https://RTFM
 
 Statements:
 - Statements are signed by keys and stored in the cloud.
 - Statements are signed using someone's private key. The signing public key is referenced in the statement, and anyone can verify its authenticity.
 - All one-of-us statements are also about some other key.
 - The top right key in a statement box represents the signing key; top left represents the subject key.
- 
-Keys:
+'''),
+
+          const Linky('''Keys:'''),
+          const Linky('''
 - Your keys (private/public pairs) are stored on your phone. 
 - Keys can be 
   - a one-of-us key of yours (green), a delegate key of yours (blue), or someone else's (gray)
   - revoked, replaced, or blocked (cross through icon)
-  - local (you have the private key on your phone - dark color) or lost (light color)
+  - local (you have the private key on your phone - dark color) or lost (light color)'''),
+          Row(
+            children: [
+              myOneofusKey,
+              myEquivalentKey,
+              myActiveDelegateKey,
+              myLostDelegateKey,
+              keyIBlocked,
+              keyITrust
+            ],
+          ),
 
-Sample statements:'''),
           space,
-
+          const Linky('''Samples:'''),
+          space,
           const Linky(
               '''The owner of this key is human, known to me, and is capable of understanding what we're doing here.'''),
           make(myOneofusKey, TrustVerb.trust, keyITrust,
@@ -72,7 +83,6 @@ Sample statements:'''),
               comment:
                   'Use the comment and moniker fields so that you and/or others know who this person is (ex. moniker: Steve, comment: coke dealer)'),
           space,
-
           const Linky(
               '''Fraud, deception, or foolishness has been committed using this key; it is not to be trusted.'''),
           make(myOneofusKey, TrustVerb.block, keyIBlocked,

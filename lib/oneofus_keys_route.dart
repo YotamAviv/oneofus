@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:oneofus/base/menus.dart';
 import 'package:oneofus/base/my_statements.dart';
 import 'package:oneofus/oneofus/fetcher.dart';
 import 'package:oneofus/oneofus/ui/linky.dart';
@@ -16,12 +17,14 @@ import 'widgets/qr_scanner.dart';
 
 // TODO(2): Show the statements with different colors for shadowed and conflicting blocks.
 
-String _descTop0 = '''This app has your one-of-us public/private key pair and uses it to sign structured statements (like trust in others, for example).
+String _descTop0 =
+    '''This app has your one-of-us public/private key pair and uses it to sign structured statements (like trust in others, for example).
 Similarly, others may use their apps and keys to sign statements referencing your public key, which represents your identity.
 Stuff happens (lost phone, compromised keys, apps reinstalled, ...), and so sometimes new keys are needed, but people should maintain their singular identities.
 This is facilitated by "replace" statements (ie, my new key replaces my lost key, but I'm still the same person).''';
 
- String _descBottom = '''- Choose "Claim existing .." if you have used a one-of-us key before, but it's not the one on this device.
+String _descBottom =
+    '''- Choose "Claim existing .." if you have used a one-of-us key before, but it's not the one on this device.
  - Choose "Replace.." if you suspect that the key on this device has been compromised.''';
 
 class OneofusKeysRoute extends StatelessWidget {
@@ -32,14 +35,16 @@ class OneofusKeysRoute extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text('${formatVerbs(verbs)} Statements')),
+        appBar: AppBar(title: Text(formatVerbs(verbs))),
         body: SafeArea(
             child: ListView(
                 shrinkWrap: true,
                 physics: const AlwaysScrollableScrollPhysics(),
                 children: [
               Linky(_descTop0),
+              const Divider(height: 10, thickness: 2),
               const StatementActionPicker(verbs),
+              const Divider(height: 10, thickness: 2),
               Linky(_descBottom),
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 OutlinedButton(

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:oneofus/base/menus.dart';
 import 'package:oneofus/oneofus/ui/linky.dart';
 import 'package:oneofus/oneofus/ui/alert.dart';
 
@@ -13,13 +14,12 @@ import 'oneofus/util.dart';
 import 'statement_action_picker.dart';
 import 'widgets/qr_scanner.dart';
 
-String trustDesc = '''You reference other folks' public key in trust/block statements: 
+String _descTop0 = '''You reference other folks' public keys in trust/block statements: 
 Trust is meant to certify that they're human, understand this, and are acting in good faith.
-Block is an extreme measure and should be reserved for bots, spammers, and other bad actors.''';
+Block is extreme and should be reserved for bots, spammers, and other bad actors.
+In aggregate, these form the one-of-us network.''';
 
-String formatVerbs(Iterable<TrustVerb> verbs) {
-  return verbs.map((v) => v.label).toString();
-}
+String _descBottom = '''.''';
 
 class TrustsRoute extends StatelessWidget {
   static const Set<TrustVerb> verbs = {TrustVerb.trust, TrustVerb.block};
@@ -29,20 +29,17 @@ class TrustsRoute extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text('${formatVerbs(verbs)} Statements')),
+        appBar: AppBar(title: Text(formatVerbs(verbs))),
         body: SafeArea(
             child: ListView(
                 shrinkWrap: true,
                 physics: const AlwaysScrollableScrollPhysics(),
                 children: [
-              const Linky(
-                  // TODO: Make this text be part of StatementActionPicker
-                  '''Below are trust statements signed by your active key or by any of your older, replaced, equivalent keys.
-Click on them to restate and/or modify them with (with your current key only).      
-RTFM: http://RTFM#re-state.'''),
-              const Flexible(
-                child: StatementActionPicker(verbs),
-              ),
+              Linky(_descTop0),
+              const Divider(height: 10, thickness: 2),
+              const StatementActionPicker(verbs),
+              const Divider(height: 10, thickness: 2),
+              Linky(_descBottom),
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 OutlinedButton(
                     onPressed: () async {

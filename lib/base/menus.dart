@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:oneofus/oneofus/trust_statement.dart';
 import 'package:oneofus/share.dart';
 import 'package:oneofus/widgets/demo_statement_route.dart';
 import 'package:oneofus/main.dart';
@@ -25,6 +26,10 @@ Future<void> prepareX(BuildContext context) async {
   }
 }
 
+String formatVerbs(Iterable<TrustVerb> verbs) {
+  return Set.of(verbs.where((v) => v != TrustVerb.clear).map((v) => v.label)).toString();
+}
+
 Widget buildKeysMenu2(context) {
   return SubmenuButton(menuChildren: <Widget>[
     MenuItemButton(
@@ -36,7 +41,7 @@ Widget buildKeysMenu2(context) {
           if (context.mounted) await prepareX(context);
           if (context.mounted) await encourageDelegateRepInvariant(context);
         },
-        child: const Text('My network: [trust, block] people')),
+        child: Text('My network: ${formatVerbs(TrustsRoute.verbs)}')),
     MenuItemButton(
         onPressed: () async {
           await prepareX(context);
@@ -46,7 +51,7 @@ Widget buildKeysMenu2(context) {
           if (context.mounted) await prepareX(context);
           if (context.mounted) await encourageDelegateRepInvariant(context);
         },
-        child: const Text('My services: [delegate] authority')),
+        child: Text('My authorized services: ${formatVerbs(DelegateKeysRoute.verbs)}')),
     MenuItemButton(
         onPressed: () async {
           await prepareX(context);
@@ -56,21 +61,8 @@ Widget buildKeysMenu2(context) {
           if (context.mounted) await prepareX(context);
           if (context.mounted) await encourageDelegateRepInvariant(context);
         },
-        child: const Text('My identity: [replace] (or claim) my own keys')),
-  ], child: const Text('Sign'));
-}
-
-Widget buildTrustMenu(context) {
-  return MenuItemButton(
-      onPressed: () async {
-        await prepareX(context);
-        if (context.mounted) await encourageDelegateRepInvariant(context);
-        await Navigator.of(context)
-            .push(MaterialPageRoute(builder: (context) => const TrustsRoute()));
-        if (context.mounted) await prepareX(context);
-        if (context.mounted) await encourageDelegateRepInvariant(context);
-      },
-      child: const Text('Trust...'));
+        child: Text('My equivalent one-of-us keys: ${formatVerbs(OneofusKeysRoute.verbs)}')),
+  ], child: const Text('State'));
 }
 
 Widget buildEtcMenu(context) {

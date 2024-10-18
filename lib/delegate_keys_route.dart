@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:oneofus/base/menus.dart';
 import 'package:oneofus/base/my_keys.dart';
 import 'package:oneofus/modify_statement_route.dart';
 import 'package:oneofus/base/my_statements.dart';
@@ -61,6 +62,13 @@ import 'statement_action_picker.dart';
 /// Set or change 'comment' (null okay).
 /// (no moniker)
 
+String _descTop0 =
+    '''Delegate key pairs allow other services (the Nerd'ster) to state stuff as you.
+You can revoke these delegates at any time, including retroactively.  
+''';
+
+String _descBottom = '''.''';
+
 class DelegateKeysRoute extends StatelessWidget {
   static const Set<TrustVerb> verbs = {TrustVerb.delegate};
 
@@ -69,28 +77,28 @@ class DelegateKeysRoute extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text('${formatVerbs(verbs)} Statements')),
+        appBar: AppBar(title: Text(formatVerbs(verbs))),
         body: SafeArea(
             child: ListView(
                 shrinkWrap: true,
                 physics: const AlwaysScrollableScrollPhysics(),
                 children: [
-              const Linky(
-                  '''Below are 'delegate' key statements signed by your active key or by any of your older, replaced, equivalent keys.
-Click on them to restate them with (with your current key only).      
-https://RTFM#delegates.'''),
+              Linky(_descTop0),
+              const Divider(height: 10, thickness: 2),
               const StatementActionPicker(verbs),
-              Column(children: [
-                OutlinedButton(
-                    onPressed: () async {
-                      Jsonish? jsonish = await claimDelegateKey(context);
-                    },
-                    child: const Text('Claim existing delegate key')),
+              const Divider(height: 10, thickness: 2),
+              Linky(_descBottom),
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 OutlinedButton(
                     onPressed: () async {
                       Jsonish? jsonish = await createNewDelegateKey(null, context);
                     },
                     child: const Text('Create new delegate key')),
+                OutlinedButton(
+                    onPressed: () async {
+                      Jsonish? jsonish = await claimDelegateKey(context);
+                    },
+                    child: const Text('Claim existing delegate key')),
               ]),
             ])));
   }
