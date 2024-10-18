@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:oneofus/base/menus.dart';
 import 'package:oneofus/base/my_keys.dart';
-import 'package:oneofus/modify_statement_route.dart';
 import 'package:oneofus/base/my_statements.dart';
+import 'package:oneofus/modify_statement_route.dart';
 import 'package:oneofus/oneofus/crypto/crypto.dart';
 import 'package:oneofus/oneofus/jsonish.dart';
 import 'package:oneofus/oneofus/statement.dart';
 import 'package:oneofus/oneofus/ui/alert.dart';
 import 'package:oneofus/oneofus/ui/linky.dart';
 import 'package:oneofus/oneofus/util.dart';
-import 'package:oneofus/trusts_route.dart';
 import 'package:oneofus/widgets/qr_scanner.dart';
 
 import 'oneofus/trust_statement.dart';
@@ -22,6 +21,7 @@ import 'statement_action_picker.dart';
 /// Strive towards and encourage a delegate keys rep invariant:
 ///   Delegate key pair local (on phone) only if delegate key associated with you.
 ///
+/// The crux of the biscuit: How much work will this be? A lot, and it will require unit tests.
 /// A local delegate key pair can become no longer associated with you when the user does a
 /// variety of things.
 /// - clear a delegate statement, maybe (seems obvious, but there could be an equivalent
@@ -30,37 +30,16 @@ import 'statement_action_picker.dart';
 /// - modify revokeAt for a replaced Oneofus key
 /// - The user can also overwrite his private key by creating a new delegate key for a domain when
 ///   one already exists
-/// The crux of the biscuit: How much work will this be? A lot, and it will require unit tests.
-
-/// TODO: Update comments and thoughts to match code.
 /// Warnings that I can't promise to get right, and so I'll not even try:
 /// - local delegate key becomes disassociated
-/// Warnings thatI can get right:
+/// Warnings that I can get right:
 ///  'You currently have a delegate key pair for $domain on this device. Overwrite it?'
 /// - TODO: Warn at import keys
 ///  'This will overwrite all existing keys.'
 ///
-/// I'll do the ones I can and also
-/// - check invariant after any possible change and offer the user:
+/// So: Check invariant after any possible change and offer the user:
 ///   'You currently have a delegate key pair for $domain on this device, but it is not associated with you. Claim it or delete it?'
-
-/// Definitions:
-/// 'Lost key':
-/// A key that represented or still represents you but which you don't have the private key.
-/// 'My Oneofus keys':
-/// Firebase: chain of replace statements to them.
-/// (Note that any of these can be lost.)
-/// 'My delegate keys':
-/// Firebase: keys I've delegated using any of my Oneofus keys (includes equivalent keys).
-/// (Note that any of these can be lost.)
 ///
-/// Storing multiple key pairs the same host (or Oneofus) is not supported. A user can
-/// make a mess using multiple devices, import/export, but it should be a manageable mess.
-///
-/// The basics:
-/// Set or update 'revokeAt' for delegate keys (null okay).
-/// Set or change 'comment' (null okay).
-/// (no moniker)
 
 String _descTop0 =
     '''Delegate key pairs allow other services (the Nerd'ster) to state stuff as you.
