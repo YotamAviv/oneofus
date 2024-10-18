@@ -83,7 +83,7 @@ class NoKeys extends StatelessWidget {
                     '''1) Choose create a new key now
 2) Next use menu / one-of-us.net keys and choose: 'Claim a different key' where you'll be asked to identify your lost key
 4) Finally, inform those who who signed off on your old key and ask them to trust your new key.
-More at: https://www.one-of-us.net/man
+More at: https://RTFM#replace
                       ''',
                     ['Okay'], context);
               },

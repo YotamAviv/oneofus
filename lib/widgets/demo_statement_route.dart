@@ -44,11 +44,9 @@ class DemoStatementRoute extends StatelessWidget {
 
     const space = SizedBox(height: 20);
     return Scaffold(
-        appBar: AppBar(title: const Text('Statements, Keys, oh my..')),
+        appBar: AppBar(title: const Text('Statements, keys, oh my..')),
         body: ListView(shrinkWrap: true, physics: const AlwaysScrollableScrollPhysics(), children: [
-          const Linky('''Read the https://RTFM
-
-Statements:
+          const Linky('''Statements:
 - Statements are signed by keys and stored in the cloud.
 - Statements are signed using someone's private key. The signing public key is referenced in the statement, and anyone can verify its authenticity.
 - All one-of-us statements are also about some other key.
@@ -74,7 +72,7 @@ Statements:
           ),
 
           space,
-          const Linky('''Samples:'''),
+          const Linky('''Samples below.. Read the https://RTFM..'''),
           space,
           const Linky(
               '''The owner of this key is human, known to me, and is capable of understanding what we're doing here.'''),

@@ -57,7 +57,6 @@ class ShowQr extends StatelessWidget {
     ShowQr big = ShowQr(text, color: Colors.black);
     return showDialog(
         context: context,
-        barrierDismissible: true,
         builder: (BuildContext context) =>
             Dialog(child: Padding(padding: const EdgeInsets.all(15), child: big)));
   }

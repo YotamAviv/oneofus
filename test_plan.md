@@ -23,7 +23,6 @@ Using prod is required for some stuff
           - verify
             - Phone: Export
             - Web: centered but not with delegate
-              TODO: Make Nerdster QR Sign in dialog narrower
   - Moto
     - QR web sign-in again
       - create delegate yes

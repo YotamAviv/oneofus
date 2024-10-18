@@ -21,9 +21,6 @@ tar -czf ~/backups/oneofus.git.`date2`.tgz .git
     - lost key: can't clear (erase) or overwrite equivalent statements 
 
 ** delegates **
-  - Consider rep invariant:
-    you have stored delegate key pairs <=> those delegate keys are associated with you
-
   - DEFER:
     - when replacing key, offer to claim delegate keys
     - when clearing a delegate key, warn that you'll lose the delegate keys stored on your phone and then delete them.

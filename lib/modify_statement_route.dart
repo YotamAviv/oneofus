@@ -160,10 +160,6 @@ class _ModifyStatementRouteState extends State<ModifyStatementRoute> {
         appBar: AppBar(title: Text(title)),
         body: ListView(children: [
           Text(desc1),
-//           const Linky(
-//               '''Choose (or confirm) a verb (in case one isn't already chosen) to issue a new (or updated) statement.
-// You may be prompted for updated field values.
-// https://RTFM'''),
           if (widget.statement.iToken != MyKeys.oneofusToken) const Linky('''NOTE:
 The statement below was signed by one of your replaced, equivalent keys, not by your current, active key.            
 If you restate this statement with your active key, the old statement signed by your old key cannot be overwritten but should be understood to be stale.'''),
