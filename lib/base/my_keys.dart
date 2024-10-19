@@ -162,7 +162,7 @@ class MyKeys {
 
   static Json export() => _useExportNotifier.value;
 
-  static void import(Json json) async {
+  static Future<void> import(Json json) async {
     // validate input (should throw exception if input is bad)
     for (var keyJson in json.values) {
       await crypto.parseKeyPair(keyJson);

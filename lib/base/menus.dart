@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:oneofus/base/my_statements.dart';
+import 'package:oneofus/main.dart';
+import 'package:oneofus/oneofus/fetcher.dart';
 import 'package:oneofus/oneofus/trust_statement.dart';
 import 'package:oneofus/share.dart';
 import 'package:oneofus/widgets/demo_statement_route.dart';
-import 'package:oneofus/main.dart';
-import 'package:oneofus/base/my_statements.dart';
-import 'package:oneofus/oneofus/fetcher.dart';
-import 'package:oneofus/oneofus/menu_title.dart';
 import 'package:oneofus/widgets/loading.dart';
 
-import '../misc/backup.dart';
 import '../delegate_keys_route.dart';
+import '../misc/backup.dart';
 import '../misc/import_export.dart';
-import 'my_keys.dart';
 import '../oneofus_keys_route.dart';
 import '../trusts_route.dart';
+import 'my_keys.dart';
 
 /// Catch-all that should be called before doing anything.
 Future<void> prepareX(BuildContext context) async {

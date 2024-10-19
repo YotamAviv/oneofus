@@ -3,7 +3,7 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class Loading extends StatelessWidget {
   static push(BuildContext context) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => Loading()));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => const Loading()));
   }
 
   static pop(BuildContext context) {

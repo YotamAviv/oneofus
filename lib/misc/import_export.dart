@@ -62,10 +62,10 @@ class Import extends StatelessWidget {
                   icon: const Icon(Icons.paste, color: Colors.black))
             ]),
             const Spacer(flex: 5),
-            OkCancel(() {
+            OkCancel(() async {
               try {
                 dynamic content = jsonDecode(controller.text);
-                MyKeys.import(content);
+                await MyKeys.import(content);
                 Navigator.pop(context);
               } catch(e) {
                 alertException(context, e);
