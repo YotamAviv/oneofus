@@ -1,11 +1,12 @@
 # Nice ones:
 tar -czf ~/backups/oneofus.git.`date2`.tgz .git
-
+git tag PROD-v`date2`
 
 
 
 # BUGS:
-
+- delegate confusion after importing keys
+- broken rtfm link on ?
 
 # TODO:
 

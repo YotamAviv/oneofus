@@ -72,7 +72,7 @@ class DemoStatementRoute extends StatelessWidget {
           ),
 
           space,
-          const Linky('''Samples below.. Read the https://RTFM..'''),
+          const Linky('''Samples below.. Read the https://RTFM#..'''),
           space,
           const Linky(
               '''The owner of this key is human, known to me, and is capable of understanding what we're doing here.'''),
