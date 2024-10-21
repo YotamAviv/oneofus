@@ -253,8 +253,7 @@ You should only block a key in case you have strong reason to believe that the k
 - does not represent a real person
 - or maybe it does represent a person, but that person is not acting in good faith (eg. blocks indiscriminately, trusts fake "Elon", etc..)
 - or maybe that person trusts too carelessly or just doesn't get it (eg. scans QR keys from Instagram)
-https://RTFM#block-oneofus-key
-''',
+https://RTFM#block''',
           ['Okay', 'Cancel'],
           context);
       return match(okay, 'Okay');

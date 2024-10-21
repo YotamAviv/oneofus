@@ -49,7 +49,7 @@ class OneofusKeysRoute extends StatelessWidget {
 
 But do make sure that you don't accidentally claim somebody else's key (that's the type of act that will get you blocked).
 
-https://RTFM#claim-oneofus-key''',
+https://RTFM#replace''',
                           ['Okay', 'Cancel'],
                           context);
                       if (match(okay, 'Okay')) {
@@ -167,7 +167,7 @@ Future<Jsonish?> stateReplaceKey(Json subjectJson, BuildContext context) async {
           'Replacing an unused key',
           '''No statements made by your current one-of-us key were found,  
 and so it will be revoked since always rather than revoked at a particular, last valid statement.
-https://RTFM#replace-oneofus-key.''',
+https://RTFM#replace''',
           ['Okay', 'Cancel'],
           context);
       if (!match(okay, 'Okay')) {
@@ -178,7 +178,7 @@ https://RTFM#replace-oneofus-key.''',
       String? okay = await alert(
           'Replacing (and revoking) a key',
           '''This key will be replaced and revoked as of the last statement made by it, but you can change that value so that it will be revoked even earlier, at a particular last valid statement.
-https://RTFM#replace-oneofus-key.''',
+https://RTFM#replace''',
           ['Okay', 'Cancel'],
           context);
       if (!match(okay, 'Okay')) {

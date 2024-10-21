@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:oneofus/confirm_statement_route.dart';
 import 'package:oneofus/oneofus/ui/linky.dart';
-import 'package:oneofus/oneofus/ui/rtfm_anchors.dart';
 import 'package:oneofus/widgets/statement_widget.dart';
 
 import 'key_widget.dart';
@@ -72,7 +71,7 @@ class DemoStatementRoute extends StatelessWidget {
           ),
 
           space,
-          const Linky('''Samples below.. Read the https://RTFM#..'''),
+          const Linky('''Samples below.. Read the https://RTFM'''),
           space,
           const Linky(
               '''The owner of this key is human, known to me, and is capable of understanding what we're doing here.'''),
