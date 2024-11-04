@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:oneofus/main.dart';
+import 'package:oneofus/oneofus/ui/alert.dart';
 import 'package:oneofus/trusts_route.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
@@ -33,6 +34,29 @@ class FancySplash extends StatelessWidget {
                 await Clipboard.setData(
                     ClipboardData(text: encoder.convert(MyKeys.oneofusPublicKey)));
               }),
+          if (kDev)
+            const SizedBox(width: 8),
+          FloatingActionButton(
+              heroTag: 'help',
+              tooltip: 'Confused?',
+              child: const Icon(Icons.help),
+              onPressed: () async {
+                await alert(
+                    'Confused?',
+                    '''This is a new paradigm, and, yes, it can be confusing. 
+
+- Your public/private key pair is stored on your phone. It's used to sign trust statements which can't forged and are therefore portable to any service.
+  
+- The QR code on the main screen is your public key (the gibberish below is the text).
+
+- Click the add_person icon (bottom right) to scan someone else's public key to one-of-us trust them.
+
+- Click the login icon (second from right) to sign in to a partner (the Nerd'ster) as yourself.
+
+Your signed statements are published at: https://export.one-of-us.org/?token=${MyKeys.oneofusToken}''',
+                    ['Okay'],
+                    context);
+              }),
           const Spacer(),
           FloatingActionButton(
               heroTag: 'QR sign-in',
@@ -45,6 +69,7 @@ class FancySplash extends StatelessWidget {
                   await signIn(scanned!, context);
                 }
               }),
+          const SizedBox(width: 8),
           FloatingActionButton(
               heroTag: 'New Trust',
               tooltip: 'New Trust',
