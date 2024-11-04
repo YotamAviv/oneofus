@@ -3,6 +3,7 @@ import 'package:oneofus/base/my_statements.dart';
 import 'package:oneofus/main.dart';
 import 'package:oneofus/oneofus/fetcher.dart';
 import 'package:oneofus/oneofus/trust_statement.dart';
+import 'package:oneofus/oneofus/ui/my_checkbox.dart';
 import 'package:oneofus/share.dart';
 import 'package:oneofus/widgets/demo_statement_route.dart';
 import 'package:oneofus/widgets/loading.dart';
@@ -13,6 +14,11 @@ import '../misc/import_export.dart';
 import '../oneofus_keys_route.dart';
 import '../trusts_route.dart';
 import 'my_keys.dart';
+
+// TODO: Persist prefs.
+class Prefs {
+  static ValueNotifier<bool> skipLgtm = ValueNotifier<bool>(false);
+}
 
 /// Catch-all that should be called before doing anything.
 Future<void> prepareX(BuildContext context) async {
@@ -105,6 +111,11 @@ Widget buildEtcMenu(context) {
             },
             child: const Text('Export...')),
       ], child: const Text('Import / Export private keys')),
+      SubmenuButton(menuChildren: [
+// Prefs
+        MyCheckbox(Prefs.skipLgtm, 'Skip statement reviews'),
+// MyCheckbox(Prefs.showDevMenu, 'show DEV menu'),
+      ], child: const Text('Prefs')),
     ],
     child: const Text('/etc'),
   );

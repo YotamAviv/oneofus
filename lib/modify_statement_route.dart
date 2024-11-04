@@ -202,10 +202,15 @@ If you restate this statement with your active key, the old statement signed by 
           if (mounted) Navigator.pop(context, null);
           return;
         }
-        bool? lgtm = await Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) => ConfirmStatementRoute(json)),
-        );
-        if (b(lgtm) && lgtm!) {
+        bool? lgtm;
+        if (Prefs.skipLgtm.value) {
+          lgtm = true;
+        } else {
+          lgtm = await Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) => ConfirmStatementRoute(json)),
+          );
+        }
+        if (bb(lgtm)) {
           setState(() {
             pushInitiated = true;
           });
