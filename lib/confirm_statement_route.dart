@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:oneofus/base/my_keys.dart';
+import 'package:oneofus/oneofus/ui/linky.dart';
 
 import 'oneofus/jsonish.dart';
 
@@ -12,6 +14,9 @@ class ConfirmStatementRoute extends StatelessWidget {
     return Scaffold(
         appBar: AppBar(title: const Text('Confirm Statement')),
         body: ListView(children: [
+          Linky('''For your review: This app intends to:
+- Sign the statemet below using your one-of-us key
+- Publish it at: https://export.one-of-us.net/?token=${MyKeys.oneofusToken}'''),
           TextField(
             enabled: false,
             style: GoogleFonts.courierPrime(
@@ -22,11 +27,14 @@ class ConfirmStatementRoute extends StatelessWidget {
             controller: TextEditingController()..text = Jsonish.encoder.convert(json),
             maxLines: null,
           ),
-          OutlinedButton(
-              onPressed: () async {
-                Navigator.of(context).pop(true);
-              },
-              child: const Text('LGTM')),
+          Row(children: [
+            OutlinedButton(
+                onPressed: () async {
+                  Navigator.of(context).pop(true);
+                },
+                child: const Text('Looks good')),
+            Text('TODO:'),
+          ],)
         ]));
   }
 }

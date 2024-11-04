@@ -17,7 +17,7 @@ import 'widgets/qr_scanner.dart';
 String _descTop0 = '''You reference other folks' public keys in trust/block statements: 
 Trust: {human, capable, acting in good faith}
 Block: {bots, spammers, and other bad actors}
-These form the one-of-us network.''';
+These statements form your (and others') one-of-us network.''';
 
 String _descBottom = '''.''';
 
