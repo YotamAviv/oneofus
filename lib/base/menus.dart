@@ -15,7 +15,6 @@ import '../oneofus_keys_route.dart';
 import '../trusts_route.dart';
 import 'my_keys.dart';
 
-// TODO: Persist prefs.
 class Prefs {
   static ValueNotifier<bool> skipLgtm = ValueNotifier<bool>(false);
 }
