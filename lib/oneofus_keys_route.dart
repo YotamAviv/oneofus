@@ -184,9 +184,8 @@ https://RTFM#replace''',
       if (!match(okay, 'Okay')) {
         return null;
       }
-      // Revoke at the most recent statement made by that key
-      String token = getToken(subjectJson);
-      revokeAt = allStatementsNoDistinctNoVerify.last.token;
+      // Revoke at the most recent statement made by that key. (Most recent is first not last.)
+      revokeAt = allStatementsNoDistinctNoVerify.first.token;
     }
 
     Json prototypeJson = {

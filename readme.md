@@ -5,8 +5,8 @@ git tag PROD-v`date2`
 
 
 # BUGS:
-- delegate confusion after importing keys
-- broken rtfm link on ?
+
+- Huh? delegate confusion after importing keys
 
 # TODO:
 

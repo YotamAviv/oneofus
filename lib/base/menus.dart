@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:oneofus/base/my_statements.dart';
 import 'package:oneofus/main.dart';
+import 'package:oneofus/oneofus/distincter.dart';
 import 'package:oneofus/oneofus/fetcher.dart';
 import 'package:oneofus/oneofus/trust_statement.dart';
 import 'package:oneofus/oneofus/ui/my_checkbox.dart';
@@ -24,6 +25,7 @@ Future<void> prepareX(BuildContext context) async {
   try {
     Loading.push(context);
     Fetcher.clear();
+    clearDistinct(); // Redundant? Should this be somewhere deeper?
     await MyStatements.load();
   } finally {
     Loading.pop(context);
