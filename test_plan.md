@@ -1,13 +1,13 @@
-## Challenges
-- Firebase emulator not compatible (atm) with actual phone with scanner.
+## Testing challenges
+- I haven't successfully run the Firebase emulator with an actual phone (with a camera) (I probably just need to change a local host setting somewhere).
 - Copy/paste funky between emulator / Linux / emacs inconsistent behavior.
 - Firebase seems to cache on the phone.
 
 ### 2 phones?
 - I own my own Android but don't want to mess with it.
 - I own a designated Moto G Play for this.
-- The Android Emulator ('3a') is fine for much but can't scan anything, 
-and that does need to be tested.
+- The Android Emulator ('3a') is fine for much but can't scan anything (can't point camera at it), and it can't open website links, 
+  which do need to be tested.
 
 ### PROD. Fake, too
 Using prod is required for some stuff
