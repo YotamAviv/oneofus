@@ -97,6 +97,12 @@ https://RTFM#replace
           OutlinedButton(
               onPressed: () async {
                 OouKeyPair newKeyPair = await crypto.createKeyPair();
+                await alert('Congratulations', '''You're about to posses a public/private cryptographic key pair!
+
+- Your public key is displayed in both QR and text on the main screen. Other folks with the app can scan that to one-of-us trust you as a responsible human.
+
+- Use the add_person icon to scan other folks' screens to trust them. Doing so will use your private key to sign trust statements and publish them to form your and our trust network of responsible humans. 
+''', ['Okay'], context);
                 await MyKeys.storeOneofusKey(newKeyPair);
               },
               child: const Text('Create new key')),
