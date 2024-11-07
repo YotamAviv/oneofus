@@ -1,5 +1,4 @@
 # Nice ones:
-tar -czf ~/backups/oneofus.git.`date2`.tgz .git
 git tag PROD-v`date2`
 
 

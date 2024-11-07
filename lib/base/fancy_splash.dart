@@ -45,15 +45,13 @@ class FancySplash extends StatelessWidget {
                     'Confused?',
                     '''This is a new paradigm, and, yes, it can be confusing. 
 
-- Your public/private key pair is stored on your phone. It's used to sign trust statements which can't forged and are therefore portable to any service.
+- Your public/private key pair is stored on your phone and ss used to sign and publish trust statements which can't forged and are therefore portable to any service.
   
 - The QR code on the main screen is your public key (the gibberish below is the text).
 
 - Click the add_person icon (bottom right) to scan someone else's public key to one-of-us trust them.
 
-- Click the login icon (second from right) to sign in to a partner (the Nerd'ster) as yourself.
-
-Your signed statements are published at: https://export.one-of-us.org/?token=${MyKeys.oneofusToken}''',
+- Click the login icon (second from right) to sign in to a partner (the Nerd'ster) as yourself.''',
                     ['Okay'],
                     context);
               }),
