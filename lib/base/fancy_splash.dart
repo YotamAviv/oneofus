@@ -45,7 +45,7 @@ class FancySplash extends StatelessWidget {
                     'Confused?',
                     '''This is a new paradigm, and, yes, it can be confusing. 
 
-- Your public/private key pair is stored on your phone and ss used to sign and publish trust statements which can't forged and are therefore portable to any service.
+- Your public/private key pair is stored on your phone and ss used to sign and publish trust statements which can't easily be forged and are therefore portable to any service.
   
 - The QR code on the main screen is your public key (the gibberish below is the text).
 
