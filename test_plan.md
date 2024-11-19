@@ -38,6 +38,7 @@ Using prod is required for some stuff
 
 - trust a stranger, use Amotz
   - (QR code or copy/paste), (main screen or trusts screen)
+  - restart app, trust Amotz again using person_add, should show existing trust
     - edit trust
     - block
     - clear
