@@ -5,6 +5,12 @@ git tag PROD-v`date2`
 
 # BUGS:
 
+- Andrew bug (fixed)
+  - don't see that I already trust Andrew when I person_add.
+  - see clear twice when I try and re-trust Andrew (or anyone), but not always.
+    Before displaying my trust/blocks, I don't see trust twice.
+
+
 - Huh? delegate confusion after importing keys
 
 # TODO:

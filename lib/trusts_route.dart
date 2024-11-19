@@ -110,7 +110,7 @@ If you need to clear or change that, go to menu => Keys => Delegates... and clea
     assert(fresh == fresh2, '$fresh != $fresh2');
 
     Jsonish? jsonish = await ModifyStatementRoute.show(
-        prototype, const [TrustVerb.trust, TrustVerb.block, TrustVerb.clear], fresh, context);
+        prototype, const [TrustVerb.trust, TrustVerb.block], fresh, context);
     return jsonish;
   } catch (e) {
     await alertException(context, e);

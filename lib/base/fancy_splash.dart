@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:oneofus/base/menus.dart';
 import 'package:oneofus/main.dart';
 import 'package:oneofus/oneofus/ui/alert.dart';
 import 'package:oneofus/trusts_route.dart';
@@ -49,7 +50,7 @@ class FancySplash extends StatelessWidget {
   
 - The QR code on the main screen is your public key (the gibberish below is the text).
 
-- Click the add_person icon (bottom right) to scan someone else's public key to one-of-us trust them.
+- Click the person_add icon (bottom right) to scan someone else's public key to one-of-us trust them.
 
 - Click the login icon (second from right) to sign in to a partner (the Nerd'ster) as yourself.''',
                     ['Okay'],
@@ -63,6 +64,7 @@ class FancySplash extends StatelessWidget {
               onPressed: () async {
                 String? scanned =
                 await QrScanner.scan('Scan QR Sign-in', scannerSignInValidate, context);
+                if (context.mounted) await prepareX(context);
                 if (b(scanned)) {
                   await signIn(scanned!, context);
                 }
@@ -76,6 +78,7 @@ class FancySplash extends StatelessWidget {
                 Json? jsonPublicKey = await QrScanner.scanPublicKey(context);
                 if (!b(jsonPublicKey)) return;
                 if (!context.mounted) return;
+                if (context.mounted) await prepareX(context);
                 Jsonish? jsonish = await startTrust(jsonPublicKey!, context);
               }),
         ],

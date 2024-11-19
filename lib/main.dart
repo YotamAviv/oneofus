@@ -31,6 +31,7 @@ void main() async {
     await nerdsterFireInit();
     if (_fire == FireChoice.emulator) {
       NerdsterFire.nerdsterFirestore.useFirestoreEmulator('localhost', 8080);
+      // (Just using 192.168.1.97 for emulator didn't work.)
       // $ firebase --project=nerdster emulators:start
       FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8081);
       // $ firebase --project=one-of-us-net -config=oneofus-nerdster.firebase.json emulators:start
