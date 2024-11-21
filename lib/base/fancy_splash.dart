@@ -44,22 +44,22 @@ class FancySplash extends StatelessWidget {
               onPressed: () async {
                 await alert(
                     'Confused?',
-                    '''This is a new paradigm, and, yes, it can be confusing. 
+                    '''The QR code on the main screen is your public key (the gibberish below is the text).
+                    
+Your public/private key pair is stored on your phone and is used to sign and publish trust statements.
 
-- Your public/private key pair is stored on your phone and ss used to sign and publish trust statements which can't casually be forged and are therefore portable to any service.
-  
-- The QR code on the main screen is your public key (the gibberish below is the text).
+Click person_add (bottom right) to scan someone else's public key to one-of-us trust them.
 
-- Click the person_add icon (bottom right) to scan someone else's public key to one-of-us trust them.
+Click login (second from right) to sign in to a partner (the Nerd'ster) as yourself.
 
-- Click the login icon (second from right) to sign in to a partner (the Nerd'ster) as yourself.''',
+https://one-of-us.net''',
                     ['Okay'],
                     context);
               }),
           const Spacer(),
           FloatingActionButton(
-              heroTag: 'QR sign-in',
-              tooltip: 'QR sign-in',
+              heroTag: 'Partner sign-in',
+              tooltip: 'Partner sign-in',
               child: const Icon(Icons.login),
               onPressed: () async {
                 String? scanned =
