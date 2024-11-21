@@ -14,7 +14,7 @@ enum FireChoice {
   prod;
 }
 
-const FireChoice _fire = FireChoice.prod;
+const FireChoice _fire = FireChoice.fake;
 const int? slowPushMillis = null;
 const bool kDev = false;
 const bool exceptionWhenTryingToPush = false;

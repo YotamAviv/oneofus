@@ -7,16 +7,73 @@ import 'key_widget.dart';
 import '../oneofus/jsonish.dart';
 import '../oneofus/trust_statement.dart';
 
+const space = SizedBox(height: 20);
+
 final KeyWidget myOneofusKey = KeyWidget.skip('dummy', true, KeyType.oneofus, false);
 final KeyWidget myEquivalentKey = KeyWidget.skip('dummy', false, KeyType.oneofus, true);
 final KeyWidget myActiveDelegateKey = KeyWidget.skip('dummy', true, KeyType.delegate, false);
 final KeyWidget myLostDelegateKey = KeyWidget.skip('dummy', false, KeyType.delegate, false);
+final KeyWidget myRevokedDelegateKey = KeyWidget.skip('dummy', false, KeyType.delegate, true);
 final KeyWidget keyIBlocked = KeyWidget.skip('dummy', false, KeyType.other, true);
 final KeyWidget keyITrust = KeyWidget.skip('dummy', false, KeyType.other, false);
 
+Future<void> showDemoKeys(context) async {
+  await Navigator.of(context).push(MaterialPageRoute(builder: (context) => DemoKeysRoute()));
+}
+
+class DemoKeysRoute extends StatelessWidget {
+  DemoKeysRoute({super.key});
+
+  final Json keyX = {};
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Keys')),
+      body: ListView(shrinkWrap: true, physics: const AlwaysScrollableScrollPhysics(), children: [
+        const Linky('''
+Your keys (private/public pairs) are stored on your phone. 
+Public keys can be 
+  - your active one-of-us identity key (green)
+  - your active one delegate key (blue)
+  - someone else's key (gray)'''),
+        Row(
+          children: [
+            myOneofusKey,
+            myActiveDelegateKey,
+            keyITrust
+          ],
+        ),
+        space,
+      const Linky('''
+Keys can be: replaced, revoked, or blocked (cross through icon)'''),
+        Row(
+          children: [
+            myEquivalentKey,
+            myRevokedDelegateKey,
+            keyIBlocked,
+          ],
+        ),
+      space,
+      const Linky('''
+The private key may be available or lost:
+  - available (the private key is on your phone - dark color)
+  - lost (this app does not have the private key - light color)'''),
+        Row(
+          children: [
+            myEquivalentKey,
+            myLostDelegateKey,
+          ],
+        ),
+        space,
+        const Linky('''Read the https://RTFM'''),
+      ]),
+    );
+  }
+}
+
 Future<void> showDemoStatements(context) async {
-  DemoStatementRoute demoBoxRoute = DemoStatementRoute();
-  await Navigator.of(context).push(MaterialPageRoute(builder: (context) => demoBoxRoute));
+  await Navigator.of(context).push(MaterialPageRoute(builder: (context) => DemoStatementRoute()));
 }
 
 class DemoStatementRoute extends StatelessWidget {
@@ -41,44 +98,23 @@ class DemoStatementRoute extends StatelessWidget {
       return box;
     }
 
-    const space = SizedBox(height: 20);
     return Scaffold(
-        appBar: AppBar(title: const Text('Statements, keys, oh my..')),
+        appBar: AppBar(title: const Text('Statements')),
         body: ListView(shrinkWrap: true, physics: const AlwaysScrollableScrollPhysics(), children: [
-          const Linky('''Statements:
-- Statements are signed by keys and stored in the cloud.
-- Statements are signed using someone's private key. The signing public key is referenced in the statement, and anyone can verify its authenticity.
-- All one-of-us statements are also about some other key.
-- The top right key in a statement box represents the signing key; top left represents the subject key.
-'''),
+          const Linky('''One-of-us trust statements are 
+- signed by a key (top right of statement box display)
+- use a verb: trust, block, replace, delegate
+- reference another key (top left of statement box display)
+Different verbs may require different fields, such as: moniker, revokeAt, comment, etc..
+Samples below:'''),
 
-          const Linky('''Keys:'''),
-          const Linky('''
-- Your keys (private/public pairs) are stored on your phone. 
-- Keys can be 
-  - a one-of-us key of yours (green), a delegate key of yours (blue), or someone else's (gray)
-  - revoked, replaced, or blocked (cross through icon)
-  - local (you have the private key on your phone - dark color) or lost (light color)'''),
-          Row(
-            children: [
-              myOneofusKey,
-              myEquivalentKey,
-              myActiveDelegateKey,
-              myLostDelegateKey,
-              keyIBlocked,
-              keyITrust
-            ],
-          ),
-
-          space,
-          const Linky('''Samples below.. Read the https://RTFM'''),
           space,
           const Linky(
               '''The owner of this key is human, known to me, and is capable of understanding what we're doing here.'''),
           make(myOneofusKey, TrustVerb.trust, keyITrust,
-              moniker: 'moniker',
+              moniker: 'Steve',
               comment:
-                  'Use the comment and moniker fields so that you and/or others know who this person is (ex. moniker: Steve, comment: coke dealer)'),
+                  'College buddy'),
           space,
           const Linky(
               '''Fraud, deception, or foolishness has been committed using this key; it is not to be trusted.'''),
@@ -94,9 +130,12 @@ class DemoStatementRoute extends StatelessWidget {
           space,
 
           const Linky(
-              '''I've delegated this disposable key for domain.com to make statements on my behalf.'''),
+              '''I've delegated this disposable key for nerdster.org to make statements on my behalf.'''),
           make(myOneofusKey, TrustVerb.delegate, myActiveDelegateKey,
-              domain: 'domain.com', comment: 'optional comment'),
+              domain: 'nerdster.org'),
+          space,
+
+          const Linky('''Read the https://RTFM'''),
         ]));
   }
 }

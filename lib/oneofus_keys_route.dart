@@ -16,8 +16,8 @@ import 'widgets/qr_scanner.dart';
 
 String _descTop0 =
     '''This app holds your active one-of-us public/private key pair and uses it to sign statements.
-Stuff happens (lost phones, compromised keys, apps reinstalled, ...), and sometimes replacement keys are needed. But individuals should maintain their singular identities.
-"replace" statements facilitate this (as in: "my new key replaces my lost key, but I remain the same person").''';
+Stuff happens (lost phones, compromised keys, apps reinstalled, ...), and sometimes replacement keys are needed.
+Individuals should maintain their singular identities, and "replace" statements facilitate this (as in: "my new key replaces my lost key, but I remain the same person").''';
 
 String _descBottom = '''.''';
 

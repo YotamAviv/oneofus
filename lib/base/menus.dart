@@ -123,11 +123,18 @@ Widget buildEtcMenu(context) {
 }
 
 Widget buildHelpMenu(context) {
-  return MenuItemButton(
-      onPressed: () async {
-        await showDemoStatements(context);
-      },
-      child: const Text('?'));
+  return SubmenuButton(menuChildren: <Widget>[
+    MenuItemButton(
+        onPressed: () async {
+          await showDemoStatements(context);
+        },
+        child: const Text('statements')),
+    MenuItemButton(
+        onPressed: () async {
+          await showDemoKeys(context);
+        },
+        child: const Text('keys')),
+  ], child: const Text('?'));
 }
 
 Widget buildDevMenu(context) {

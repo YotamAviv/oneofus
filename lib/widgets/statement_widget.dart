@@ -18,7 +18,8 @@ class StatementWidget extends StatelessWidget {
   final KeyWidget? iKeyDemo; // used to override display (color and style)
   final KeyWidget? subjectKeyDemo; // used to override display (color and style)
 
-  const StatementWidget(this.statement, this.onTap, {this.iKeyDemo, this.subjectKeyDemo, super.key});
+  const StatementWidget(this.statement, this.onTap,
+      {this.iKeyDemo, this.subjectKeyDemo, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +92,7 @@ class _StatementBoxI extends StatelessWidget {
         if (b(statement.revokeAt))
           Row(
             children: [
-              const Text('revoked at:'),
+              const Text('revokeAt:'),
               const SizedBox(width: 8),
               Flexible(
                   child: Text(
@@ -107,10 +108,10 @@ class _StatementBoxI extends StatelessWidget {
         Tooltip(
             textAlign: TextAlign.left,
             message: 'comment',
-            child: TextField(
-              enabled: false,
-              controller: TextEditingController()..text = statement.comment ?? '',
-              maxLines: null,
+            child: Text(
+              statement.comment ?? '',
+              style: const TextStyle(color: Colors.black54, fontSize: 13),
+              maxLines: 3,
             )),
       ],
     );
