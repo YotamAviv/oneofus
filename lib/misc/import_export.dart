@@ -40,7 +40,9 @@ class Export extends StatelessWidget {
 
 class Import extends StatelessWidget {
   final TextEditingController controller = TextEditingController();
+
   Import({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,8 +69,8 @@ class Import extends StatelessWidget {
                 dynamic content = jsonDecode(controller.text);
                 await MyKeys.import(content);
                 Navigator.pop(context);
-              } catch(e) {
-                alertException(context, e);
+              } catch (e) {
+                await alertException(context, e);
               }
             }, 'Import'),
           ]),

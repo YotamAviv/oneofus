@@ -3,6 +3,9 @@ import 'package:oneofus/base/my_statements.dart';
 import 'package:oneofus/main.dart';
 import 'package:oneofus/oneofus/distincter.dart';
 import 'package:oneofus/oneofus/fetcher.dart';
+import 'package:oneofus/oneofus/fire_factory.dart';
+import 'package:oneofus/oneofus/fire_util.dart';
+import 'package:oneofus/oneofus/jsonish.dart';
 import 'package:oneofus/oneofus/trust_statement.dart';
 import 'package:oneofus/oneofus/ui/my_checkbox.dart';
 import 'package:oneofus/share.dart';
@@ -24,6 +27,7 @@ class Prefs {
 Future<void> prepareX(BuildContext context) async {
   try {
     Loading.push(context);
+    // TODO: Jsonish.wipeCache(); // With this not commented out, crypto verify is slow all the time.
     Fetcher.clear();
     clearDistinct(); // Redundant? Should this be somewhere deeper?
     await MyStatements.load();
@@ -137,8 +141,15 @@ Widget buildHelpMenu(context) {
   ], child: const Text('?'));
 }
 
+// TODO: Add functionality: 7 clicks to be a developer.
 Widget buildDevMenu(context) {
+  const String kOneofusCol = 'firecheck: phone:oneofus';
   return SubmenuButton(menuChildren: <Widget>[
+    MenuItemButton(
+        onPressed: () async {
+          await checkRead(FireFactory.find(kOneofusDomain), kOneofusCol);
+        },
+        child: const Text('checkfire: oneofus, read')),
     MenuItemButton(
         onPressed: () async {
           try {

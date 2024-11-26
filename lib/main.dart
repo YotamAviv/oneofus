@@ -17,12 +17,9 @@ enum FireChoice {
 
 const FireChoice _fire = FireChoice.prod;
 const int? slowPushMillis = null;
-const bool kDev = false;
+const bool kDev = true;
 const bool exceptionWhenTryingToPush = false;
 // TODO: also simulate slow fetch.
-
-const bool fireCheckRead = false;
-const bool fireCheckWrite = false;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,15 +39,6 @@ void main() async {
   } else {
     FireFactory.registerFire(kOneofusDomain, FakeFirebaseFirestore());
     FireFactory.registerFire('nerdster.org', FakeFirebaseFirestore());
-  }
-
-  if (fireCheckWrite) {
-    await checkWrite('firecheck:ONE-OF-US-nerdster.org', FireFactory.find('nerdster.org'));
-    await checkWrite('firecheck:ONE-OF-US-one-of-us.net', FireFactory.find('one-of-us.net'));
-  }
-  if (fireCheckRead) {
-    await checkRead('firecheck:ONE-OF-US-nerdster.org', FireFactory.find('nerdster.org'));
-    await checkRead('firecheck:ONE-OF-US-one-of-us.net', FireFactory.find('one-of-us.net'));
   }
 
   TrustStatement.init();
