@@ -3,6 +3,18 @@ git tag PROD-v`date2`
 
 
 
+
+2008  history
+ 2009  firebase login
+ 2010  dart pub global activate flutterfire_cli
+ 2011  flutterfire configure
+ 2012  flutter pub add firebase_core
+ 2013  flutterfire configure
+ 
+
+
+
+
 # BUGS:
 
 - Andrew bug (fixed)
