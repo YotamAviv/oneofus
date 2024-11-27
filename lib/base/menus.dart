@@ -32,7 +32,19 @@ Future<void> prepareX(BuildContext context) async {
     clearDistinct(); // Redundant? Should this be somewhere deeper?
     await MyStatements.load();
   } finally {
-    Loading.pop(context);
+    // TODO: FIX: Happens reliably when I import my keys
+  //   E/flutter (22245): [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled Exception: Looking up a deactivated widget's ancestor is unsafe.
+  // E/flutter (22245): At this point the state of the widget's element tree is no longer stable.
+  // E/flutter (22245): To safely refer to a widget's ancestor in its dispose() method, save a reference to the ancestor by calling dependOnInheritedWidgetOfExactType() in the widget's didChangeDependencies() method.
+  // E/flutter (22245): #0      Element._debugCheckStateIsActiveForAncestorLookup.<anonymous closure> (package:flutter/src/widgets/framework.dart:4873:9)
+  // E/flutter (22245): #1      Element._debugCheckStateIsActiveForAncestorLookup (package:flutter/src/widgets/framework.dart:4887:6)
+  // E/flutter (22245): #2      Element.findAncestorStateOfType (package:flutter/src/widgets/framework.dart:4958:12)
+  // E/flutter (22245): #3      Navigator.of (package:flutter/src/widgets/navigator.dart:2781:40)
+  // E/flutter (22245): #4      Navigator.pop (package:flutter/src/widgets/navigator.dart:2665:15)
+  // E/flutter (22245): #5      Loading.pop (package:oneofus/widgets/loading.dart:10:15)
+  // E/flutter (22245): #6      prepareX (package:oneofus/base/menus.dart:35:13)
+
+  Loading.pop(context);
   }
 }
 

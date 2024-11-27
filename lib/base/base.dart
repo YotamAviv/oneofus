@@ -70,9 +70,9 @@ class NoKeys extends StatelessWidget {
                     builder: (context) => Import(),
                   ),
                 );
-                if (context.mounted) {
-                  await encourageDelegateRepInvariant(context);
-                }
+                // TODO: This "if (context.mounted)" seems wrong. Same elsewhere.
+                if (context.mounted) await prepareX(context);
+                if (context.mounted) await encourageDelegateRepInvariant(context);
               },
               child: const Text('Import key(s)')),
           const Spacer(),
