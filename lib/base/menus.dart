@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 import 'package:oneofus/base/my_statements.dart';
 import 'package:oneofus/main.dart';
 import 'package:oneofus/oneofus/distincter.dart';
@@ -10,7 +11,6 @@ import 'package:oneofus/oneofus/trust_statement.dart';
 import 'package:oneofus/oneofus/ui/my_checkbox.dart';
 import 'package:oneofus/share.dart';
 import 'package:oneofus/widgets/demo_statement_route.dart';
-import 'package:oneofus/widgets/loading.dart';
 
 import '../delegate_keys_route.dart';
 import '../misc/backup.dart';
@@ -26,25 +26,14 @@ class Prefs {
 /// Catch-all that should be called before doing anything.
 Future<void> prepareX(BuildContext context) async {
   try {
-    Loading.push(context);
+    context.loaderOverlay.show();
+
     // TODO: Jsonish.wipeCache(); // With this not commented out, crypto verify is slow all the time.
     Fetcher.clear();
     clearDistinct(); // Redundant? Should this be somewhere deeper?
     await MyStatements.load();
   } finally {
-    // TODO: FIX: Happens reliably when I import my keys
-  //   E/flutter (22245): [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled Exception: Looking up a deactivated widget's ancestor is unsafe.
-  // E/flutter (22245): At this point the state of the widget's element tree is no longer stable.
-  // E/flutter (22245): To safely refer to a widget's ancestor in its dispose() method, save a reference to the ancestor by calling dependOnInheritedWidgetOfExactType() in the widget's didChangeDependencies() method.
-  // E/flutter (22245): #0      Element._debugCheckStateIsActiveForAncestorLookup.<anonymous closure> (package:flutter/src/widgets/framework.dart:4873:9)
-  // E/flutter (22245): #1      Element._debugCheckStateIsActiveForAncestorLookup (package:flutter/src/widgets/framework.dart:4887:6)
-  // E/flutter (22245): #2      Element.findAncestorStateOfType (package:flutter/src/widgets/framework.dart:4958:12)
-  // E/flutter (22245): #3      Navigator.of (package:flutter/src/widgets/navigator.dart:2781:40)
-  // E/flutter (22245): #4      Navigator.pop (package:flutter/src/widgets/navigator.dart:2665:15)
-  // E/flutter (22245): #5      Loading.pop (package:oneofus/widgets/loading.dart:10:15)
-  // E/flutter (22245): #6      prepareX (package:oneofus/base/menus.dart:35:13)
-
-  Loading.pop(context);
+    context.loaderOverlay.hide();
   }
 }
 
@@ -165,10 +154,10 @@ Widget buildDevMenu(context) {
     MenuItemButton(
         onPressed: () async {
           try {
-            Loading.push(context);
+            context.loadingOverlay.show();
             await backup();
           } finally {
-            Loading.pop(context);
+            context.loadingOverlay.hide();
           }
         },
         child: const Text('backup')),

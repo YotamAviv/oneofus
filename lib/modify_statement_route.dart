@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:jwk/jwk.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 import 'package:oneofus/base/menus.dart';
 import 'package:oneofus/base/my_statements.dart';
 import 'package:oneofus/delegate_revoke_at_editor.dart';
@@ -10,9 +10,7 @@ import 'package:oneofus/oneofus/ui/alert.dart';
 import 'package:oneofus/oneofus/ui/linky.dart';
 import 'package:oneofus/oneofus_revoke_at_editor.dart';
 import 'package:oneofus/text_editor.dart';
-import 'package:oneofus/trusts_route.dart';
 import 'package:oneofus/widgets/key_widget.dart';
-import 'package:oneofus/widgets/loading.dart';
 
 import 'base/my_keys.dart';
 import 'confirm_statement_route.dart';
@@ -100,7 +98,7 @@ class _ModifyStatementRouteState extends State<ModifyStatementRoute> {
 
   @override
   Widget build(BuildContext context) {
-    if (pushInitiated) return const Loading();
+    // if (pushInitiated) return const Text('wait...');
     if (widget.verbs.length == 1 && !b(choice)) {
       // Don't know why, but build is being called twice, don't want to call _makeEditors twice.
       choice = widget.verbs.first;
@@ -318,7 +316,7 @@ https://RTFM#revoke-delegate
 
     Jsonish? jsonish;
     try {
-      Loading.push(context);
+      context.loaderOverlay.show();
 
       if (b(slowPushMillis)) {
         for (int i = (slowPushMillis! ~/ 100); i > 0; i--) {
@@ -337,7 +335,7 @@ https://RTFM#revoke-delegate
       // DEFER: Report back to me.
       await alertException(context, e);
     } finally {
-      Loading.pop(context);
+      context.loaderOverlay.hide();
     }
 
     if (context.mounted) await prepareX(context); // redundant?

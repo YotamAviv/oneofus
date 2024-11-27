@@ -1,12 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 import 'package:oneofus/fire/nerdster_fire.dart';
 
 import 'base/base.dart';
 import 'base/my_keys.dart';
 import 'oneofus/fire_factory.dart';
-import 'oneofus/fire_util.dart';
 import 'oneofus/trust_statement.dart';
 
 enum FireChoice {
@@ -17,7 +17,7 @@ enum FireChoice {
 
 const FireChoice _fire = FireChoice.prod;
 const int? slowPushMillis = null;
-const bool kDev = true;
+const bool kDev = false;
 const bool exceptionWhenTryingToPush = false;
 // TODO: also simulate slow fetch.
 
@@ -45,9 +45,6 @@ void main() async {
   await MyKeys.init();
 
   runApp(
-    const MaterialApp(
-      title: 'ONE-OF-US.NET',
-      home: Base(),
-    ),
+    GlobalLoaderOverlay(child: const MaterialApp(title: 'ONE-OF-US.NET', home: const Base())),
   );
 }
