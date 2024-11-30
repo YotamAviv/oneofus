@@ -41,8 +41,7 @@ import 'statement_action_picker.dart';
 ///   'You currently have a delegate key pair for $domain on this device, but it is not associated with you. Claim it or delete it?'
 ///
 
-String _descTop0 =
-    '''Delegate key pairs allow other services (the Nerd'ster) to state stuff as you.
+String _descTop0 = '''Delegate key pairs allow other services (the Nerd'ster) to state stuff as you.
 Revoke these delegates at any time (including retroactively).  
 ''';
 
@@ -95,7 +94,7 @@ Future<Jsonish?> createNewDelegateKey(String? domain, BuildContext context) asyn
     if (b(domain)) "with": {"domain": domain}
   };
   TrustStatement ts = TrustStatement(Jsonish(statementStarterJson));
-  Jsonish? jsonish = await ModifyStatementRoute.show(ts, const [TrustVerb.delegate], true, context);
+  Jsonish? jsonish = await ModifyStatementRoute.show(ts, const [TrustVerb.delegate], context);
   if (b(jsonish)) {
     ts = Statement.make(jsonish!) as TrustStatement;
     assert(ts.domain!.length > 1);
@@ -160,8 +159,7 @@ Future<Jsonish?> stateClaimDelegateKey(Json subjectJson, BuildContext context,
     TrustStatement prototype = TrustStatement(Jsonish(prototypeJson));
 
     assert(prototype.subjectToken == subjectToken);
-    Jsonish? jsonish =
-        await ModifyStatementRoute.show(prototype, [TrustVerb.delegate], true, context);
+    Jsonish? jsonish = await ModifyStatementRoute.show(prototype, [TrustVerb.delegate], context);
     return jsonish;
   } catch (e, stackTrace) {
     if (context.mounted) {

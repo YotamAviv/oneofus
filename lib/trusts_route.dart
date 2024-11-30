@@ -103,14 +103,8 @@ If you need to clear or change that, go to menu => Keys => Delegates... and clea
     }
 
     // Shouldn't need to check for clear (distincter)
-    // bool fresh2 = !(MyStatements.getByI(MyKeys.oneofusToken)
-    //     .any((s) => s.subjectToken == prototype.subjectToken && s.verb != TrustVerb.clear));
-    bool fresh2 = !(MyStatements.getByI(MyKeys.oneofusToken)
-        .any((s) => s.subjectToken == prototype.subjectToken));
-    assert(fresh == fresh2, '$fresh != $fresh2');
-
     Jsonish? jsonish = await ModifyStatementRoute.show(
-        prototype, const [TrustVerb.trust, TrustVerb.block], fresh, context);
+        prototype, const [TrustVerb.trust, TrustVerb.block], context);
     return jsonish;
   } catch (e) {
     await alertException(context, e);

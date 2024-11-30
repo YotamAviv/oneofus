@@ -77,8 +77,7 @@ class _StatementActionPickerState extends State<StatementActionPicker> {
         rows.add(Text(thing));
       } else if (thing is TrustStatement) {
         onTap() async {
-          Jsonish? jsonish =
-              await ModifyStatementRoute.show(thing, [...widget.verbs], false, context);
+          Jsonish? jsonish = await ModifyStatementRoute.show(thing, [...widget.verbs], context);
           if (context.mounted) {
             await prepareX(context); // redundant?
             setState(() {});

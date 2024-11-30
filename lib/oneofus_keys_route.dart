@@ -198,8 +198,7 @@ https://RTFM#replace''',
     TrustStatement prototype = TrustStatement(Jsonish(prototypeJson));
 
     assert(prototype.subjectToken == subjectToken);
-    Jsonish? jsonish = await ModifyStatementRoute.show(
-        prototype, [TrustVerb.replace], true, context,
+    Jsonish? jsonish = await ModifyStatementRoute.show(prototype, [TrustVerb.replace], context,
         subjectKeyDemo: myEquivalentKey);
     return jsonish;
   } catch (e, stackTrace) {
