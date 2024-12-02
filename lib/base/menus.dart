@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:loader_overlay/loader_overlay.dart';
+import 'package:oneofus/base/about.dart';
 import 'package:oneofus/base/my_statements.dart';
 import 'package:oneofus/main.dart';
 import 'package:oneofus/oneofus/distincter.dart';
@@ -72,7 +73,7 @@ Widget buildKeysMenu2(context) {
           if (context.mounted) await encourageDelegateRepInvariant(context);
         },
         child: Text('My equivalent one-of-us keys: ${formatVerbs(OneofusKeysRoute.verbs)}')),
-  ], child: const Text('state'));
+  ], child: const Text('State'));
 }
 
 Widget buildEtcMenu(context) {
@@ -129,14 +130,20 @@ Widget buildHelpMenu(context) {
   return SubmenuButton(menuChildren: <Widget>[
     MenuItemButton(
         onPressed: () async {
-          await showDemoStatements(context);
-        },
-        child: const Text('statements')),
-    MenuItemButton(
-        onPressed: () async {
           await showDemoKeys(context);
         },
-        child: const Text('keys')),
+        child: const Text('Keys')),
+    MenuItemButton(
+        onPressed: () async {
+          await showDemoStatements(context);
+        },
+        child: const Text('Statements')),
+    MenuItemButton(
+        onPressed: () async {
+          await Navigator.of(context)
+              .push(MaterialPageRoute(builder: (context) => About.singleton));
+        },
+        child: const Text('About')),
   ], child: const Text('?'));
 }
 

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:loader_overlay/loader_overlay.dart';
+import 'package:oneofus/base/about.dart';
 import 'package:oneofus/fire/nerdster_fire.dart';
 
 import 'base/base.dart';
@@ -41,6 +42,7 @@ void main() async {
     FireFactory.registerFire('nerdster.org', FakeFirebaseFirestore());
   }
 
+  await About.init();
   TrustStatement.init();
   await MyKeys.init();
 
