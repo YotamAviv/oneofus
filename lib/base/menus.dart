@@ -6,7 +6,6 @@ import 'package:oneofus/oneofus/distincter.dart';
 import 'package:oneofus/oneofus/fetcher.dart';
 import 'package:oneofus/oneofus/fire_factory.dart';
 import 'package:oneofus/oneofus/fire_util.dart';
-import 'package:oneofus/oneofus/jsonish.dart';
 import 'package:oneofus/oneofus/trust_statement.dart';
 import 'package:oneofus/oneofus/ui/my_checkbox.dart';
 import 'package:oneofus/share.dart';
@@ -118,9 +117,8 @@ Widget buildEtcMenu(context) {
             child: const Text('Export...')),
       ], child: const Text('Import / Export private keys')),
       SubmenuButton(menuChildren: [
-// Prefs
         MyCheckbox(Prefs.skipLgtm, 'Skip statement reviews'),
-// MyCheckbox(Prefs.showDevMenu, 'show DEV menu'),
+        // MyCheckbox(Prefs.showDevMenu, 'show DEV menu'),
       ], child: const Text('Prefs')),
     ],
     child: const Text('/etc'),
@@ -145,12 +143,30 @@ Widget buildHelpMenu(context) {
 // TODO: Add functionality: 7 clicks to be a developer.
 Widget buildDevMenu(context) {
   const String kOneofusCol = 'firecheck: phone:oneofus';
+  const String kNerdsterCol = 'firecheck: phone:nerdster';
   return SubmenuButton(menuChildren: <Widget>[
-    MenuItemButton(
-        onPressed: () async {
-          await checkRead(FireFactory.find(kOneofusDomain), kOneofusCol);
-        },
-        child: const Text('checkfire: oneofus, read')),
+    SubmenuButton(menuChildren: [
+      MenuItemButton(
+          onPressed: () async {
+            await checkRead(FireFactory.find(kOneofusDomain), kOneofusCol);
+          },
+          child: const Text('oneofus read')),
+      MenuItemButton(
+          onPressed: () async {
+            await checkWrite(FireFactory.find(kOneofusDomain), kOneofusCol);
+          },
+          child: const Text('oneofus write')),
+      MenuItemButton(
+          onPressed: () async {
+            await checkRead(FireFactory.find(kNerdsterDomain), kNerdsterCol);
+          },
+          child: const Text('nerdster read')),
+      MenuItemButton(
+          onPressed: () async {
+            await checkWrite(FireFactory.find(kNerdsterDomain), kNerdsterCol);
+          },
+          child: const Text('nerdster write')),
+    ], child: const Text('Firebase check')),
     MenuItemButton(
         onPressed: () async {
           try {
