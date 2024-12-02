@@ -3,6 +3,8 @@ import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:oneofus/fire/nerdster_fire.dart';
+import 'package:oneofus/misc/backup.dart';
+import 'package:oneofus/oneofus/fire_util.dart';
 
 import 'base/base.dart';
 import 'base/my_keys.dart';
@@ -17,7 +19,7 @@ enum FireChoice {
 
 const FireChoice _fire = FireChoice.prod;
 const int? slowPushMillis = null;
-const bool kDev = false;
+const bool kDev = true;
 const bool exceptionWhenTryingToPush = false;
 // TODO: also simulate slow fetch.
 
@@ -40,6 +42,8 @@ void main() async {
     FireFactory.registerFire(kOneofusDomain, FakeFirebaseFirestore());
     FireFactory.registerFire('nerdster.org', FakeFirebaseFirestore());
   }
+
+  await checkRead(FireFactory.find(kNerdsterDomain), 'firecheck: phone:nerdster');
 
   TrustStatement.init();
   await MyKeys.init();
