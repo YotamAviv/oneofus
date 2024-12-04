@@ -43,10 +43,10 @@ Using prod is required for some stuff
     - block
     - clear
 
-- claim a used key, use Yotam's
+- claim an existing key, use Yotam's
     - (3a okay or Moto, okay, still PROD)
     - verify see options for last statement token
-  - trust yourself and fail  gracefully
+  - trust yourself and fail gracefully
     - Yotam
     - Yotam's delegate
     - yourself
