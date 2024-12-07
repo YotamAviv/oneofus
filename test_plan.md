@@ -15,20 +15,18 @@ Using prod is required for some stuff
 
 # Test Plan
 
-### Start
-
--  wipe
-  - create new key
+-  Wipe app data on Android (or use the Dev menu if compiled in Dev mode)
+  - Create new key
 
 -  QR web sign-in using phone scanner, without creating a delegate key
   - create delegate: NO
-  - verify
+  - Verify
     - Phone: Use menu /etc => Import / export private keys => Export, verify that you only see the one-of-us.net key.
     - Web: centered (not centered as Yotam) but not with delegate. On the Nerdster, turn on menu => Prefs +> everything. In the tree view, verify that "Me" has no children. 
 
 -  QR web sign-in again, create delegate
-  - create delegate yes
-  - verify
+  - create delegate: YES
+  - Verify
     - Phone: Use menu /etc => Import / export private keys => Export, verify that you only see the one-of-us.net key.
     - Web: centered and signed in. On the Nerdster, turn on menu => Prefs +> everything. In the tree view, verify that "Me" has a delegate key and a a delegate statement.
 
