@@ -17,22 +17,22 @@ Using prod is required for some stuff
 
 ### Start
 
-1. wipe
+-  wipe
   - create new key
 
-1. QR web sign-in using phone scanner, without creating a delegate key
+-  QR web sign-in using phone scanner, without creating a delegate key
   - create delegate: NO
   - verify
     - Phone: Use menu /etc => Import / export private keys => Export, verify that you only see the one-of-us.net key.
     - Web: centered (not centered as Yotam) but not with delegate. On the Nerdster, turn on menu => Prefs +> everything. In the tree view, verify that "Me" has no children. 
 
-1. QR web sign-in again, create delegate
+-  QR web sign-in again, create delegate
   - create delegate yes
   - verify
     - Phone: Use menu /etc => Import / export private keys => Export, verify that you only see the one-of-us.net key.
     - Web: centered and signed in. On the Nerdster, turn on menu => Prefs +> everything. In the tree view, verify that "Me" has a delegate key and a a delegate statement.
 
-1. Submit 2 things, verify revokeAt 
+-  Submit 2 things, verify revokeAt 
   - submit subject "A"
   - submit subject "B"
   - revoke delegate at first (the earlier of the 2, "A")
@@ -40,7 +40,7 @@ Using prod is required for some stuff
   - revoke at always and check. You should see neither A nor B.
   - un-revoke. You should see both A and B again.
 
-1. Trust a stranger, use Amotz
+-  Trust a stranger, use Amotz
   - Scan QR from the https://nerdster.web.app
   - (Trusting from both the main screen or the trusts screen should be tested, maybe test a different one each time.)
   - Exit app and restart.
@@ -49,7 +49,7 @@ Using prod is required for some stuff
     - block
     - clear
 
-1. Claim an existing key, use Yotam's
+-  Claim an existing key, use Yotam's
   - Use menu State => {replace}
   - Scan Yotam's key from https://nerdster.web.app/?showJson=true&showStatements=true&showKeys=true&skipVerify=true
   - Verify that you see options related to last statement token
@@ -59,26 +59,26 @@ Using prod is required for some stuff
     - Yourself (You'll need to QR sign into the Nerdster to see your own QR code)
   - Verify: The app should show Yotam's not-local delegate key uner menu State => {delegate}
 
-1. Claim a delegate
+-  Claim a delegate
   - fail gracefully on these below:
     - equivalent key, use Yotam's
     - one of your existing delegate keys, use Yotam's
     - your own Oneofus key.
   - Hmmm.. try claiming Andrew's delegate key (I haven't tried this but should)
 
-1. Start again (wipe) (probably not necessary, can probably optimize)
+-  Start again (wipe) (probably not necessary, can probably optimize)
 
-1. Claim Yotam's key from the start
+-  Claim Yotam's key from the start
   - Replace Yotam's key revoking a few statements back
 
-1. QR sign in
+-  QR sign in
   - App should offer to create delegate key
 
-1. Replace my key (State menu => {replace})
+-  Replace my key (State menu => {replace})
   - Replace my key
     - re-state trust in Amotz with the new replacement key
   
-1. Check all hyperlinks
+-  Check all hyperlinks
   - menu => ?
     - Keys
     - Statements
