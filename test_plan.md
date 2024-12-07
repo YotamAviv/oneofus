@@ -34,20 +34,20 @@ Using prod is required for some stuff
 
 -  Submit 2 things, verify revokeAt 
   - submit subject "A"
-  - submit subject "B"
-  - revoke delegate at first (the earlier of the 2, "A")
-  - refresh Nerdster and check. You should A but not B.
-  - revoke at always and check. You should see neither A nor B.
-  - un-revoke. You should see both A and B again.
+    - submit subject "B"
+    - revoke delegate at first (the earlier of the 2, "A")
+    - refresh Nerdster and check. You should A but not B.
+    - revoke at always and check. You should see neither A nor B.
+    - un-revoke. You should see both A and B again.
 
 -  Trust a stranger, use Amotz
   - Scan QR from the https://nerdster.web.app
-  - (Trusting from both the main screen or the trusts screen should be tested, maybe test a different one each time.)
-  - Exit app and restart.
-  - Trust Amotz again. App should should show existing trust
-    - edit trust
-    - block
-    - clear
+    - (Trusting from both the main screen or the trusts screen should be tested, maybe test a different one each time.)
+    - Exit app and restart.
+    - Trust Amotz again. App should should show existing trust
+      - edit trust
+      - block
+      - clear
 
 -  Claim an existing key, use Yotam's
   - Use menu State => {replace}
