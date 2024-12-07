@@ -1,17 +1,21 @@
-# Notes, thoughts
+# Discussion
 ## Challenges
 - I haven't successfully run the Firebase emulator with an actual phone (with a camera) (I probably just need to change a local host setting somewhere).
 - Copy/paste is funky between emulator / Linux / emacs.
 - Firebase seems to cache on the phone.
 
-### 2 phones not required
+## 2 phones not required
 - I own my own Android but don't want to mess with it.
 - I own a designated testing phone (Moto G Play) for this.
 - The Android Emulator phone is fine for much but can't be used to scan QR codes, and it can't open website links, 
   which do need to be tested.
 
-### PROD. Fake, too
-Using prod is required for some stuff
+## Firestore: Production or Fake
+Using prod is required for some stuff. Easiest to just use it across the board.
+
+## Nerdster bugs
+Do note these.
+Email me or submit at: https://github.com/YotamAviv/nerdster/issues
 
 # Test Plan
 
