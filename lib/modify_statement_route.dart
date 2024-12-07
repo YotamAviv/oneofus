@@ -9,6 +9,7 @@ import 'package:oneofus/main.dart';
 import 'package:oneofus/oneofus/ui/alert.dart';
 import 'package:oneofus/oneofus/ui/linky.dart';
 import 'package:oneofus/oneofus_revoke_at_editor.dart';
+import 'package:oneofus/prefs.dart';
 import 'package:oneofus/text_editor.dart';
 import 'package:oneofus/widgets/key_widget.dart';
 

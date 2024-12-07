@@ -9,6 +9,7 @@ import 'package:oneofus/oneofus/fire_factory.dart';
 import 'package:oneofus/oneofus/fire_util.dart';
 import 'package:oneofus/oneofus/trust_statement.dart';
 import 'package:oneofus/oneofus/ui/my_checkbox.dart';
+import 'package:oneofus/prefs.dart';
 import 'package:oneofus/share.dart';
 import 'package:oneofus/widgets/demo_statement_route.dart';
 
@@ -18,10 +19,6 @@ import '../misc/import_export.dart';
 import '../oneofus_keys_route.dart';
 import '../trusts_route.dart';
 import 'my_keys.dart';
-
-class Prefs {
-  static ValueNotifier<bool> skipLgtm = ValueNotifier<bool>(false);
-}
 
 /// Catch-all that should be called before doing anything.
 Future<void> prepareX(BuildContext context) async {
