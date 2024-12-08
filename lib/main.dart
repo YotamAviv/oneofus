@@ -16,9 +16,9 @@ enum FireChoice {
   prod;
 }
 
-const FireChoice _fire = FireChoice.fake;
+const FireChoice _fire = FireChoice.prod;
 const int? slowPushMillis = null;
-const bool kDev = true;
+const bool kDev = false;
 const bool exceptionWhenTryingToPush = false;
 // TODO: also simulate slow fetch.
 
