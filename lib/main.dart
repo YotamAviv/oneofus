@@ -47,6 +47,16 @@ void main() async {
   await MyKeys.init();
 
   runApp(
-    GlobalLoaderOverlay(child: const MaterialApp(title: 'ONE-OF-US.NET', home: const Base())),
+    GlobalLoaderOverlay(
+        child: const MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'ONE-OF-US.NET',
+            home: const Base())),
   );
 }
+
+var yotam = {
+  "crv": "Ed25519",
+  "kty": "OKP",
+  "x": "Fenc6ziXKt69EWZY-5wPxbJNX9rk3CDRVSAEnA8kJVo"
+};
