@@ -1,73 +1,93 @@
-## Testing challenges
+# Discussion
+## Challenges
 - I haven't successfully run the Firebase emulator with an actual phone (with a camera) (I probably just need to change a local host setting somewhere).
 - Copy/paste is funky between emulator / Linux / emacs.
 - Firebase seems to cache on the phone.
 
-### 2 phones?
+## 2 phones not required
 - I own my own Android but don't want to mess with it.
 - I own a designated testing phone (Moto G Play) for this.
-- The Android Emulator phone is fine for much but can't scan QR codes, and it can't open website links, 
+- The Android Emulator phone is fine for much but can't be used to scan QR codes, and it can't open website links, 
   which do need to be tested.
 
-### PROD. Fake, too
-Using prod is required for some stuff
+## Firestore: Production or Fake
+Using prod is required for some stuff. Easiest to just use it across the board.
 
-## Test Plan
+## Nerdster bugs
+Do note these.
+Email me or submit at: https://github.com/YotamAviv/nerdster/issues
 
-- Start
-    - wipe
-    - create new key
-  - QR web sign-in using phone scanner, without creating a delegate key
-    - create delegate: NO
-    - verify
-      - Phone: Use menu /etc => Import / export private keys => Export, verify that you only see the one-of-us.net key.
-      - Web: centered (not centered as Yotam) but not with delegate. On the Nerdster, turn on menu => Prefs +> everything. In the tree view, verify that "Me" has no children. 
-  - QR web sign-in again, create delegate
-    - create delegate yes
-    - verify
-      - Phone: Use menu /etc => Import / export private keys => Export, verify that you only see the one-of-us.net key.
-      - Web: centered and signed in. On the Nerdster, turn on menu => Prefs +> everything. In the tree view, verify that "Me" has a delegate key and a a delegate statement.
+# Test Plan
+
+- Wipe app data on Android (or use the Dev menu if compiled in Dev mode)
+  - Create new key
+
+- QR web sign-in using phone scanner, without creating a delegate key
+  - create delegate: NO
+  - Verify
+    - Phone: Use menu /etc => Import / export private keys => Export, verify that you only see the one-of-us.net key.
+    - Web: centered (not centered as Yotam) but not with delegate. On the Nerdster, turn on menu => Prefs +> everything. In the tree view, verify that "Me" has no children. 
+
+- QR web sign-in again, create delegate
+  - create delegate: YES
+  - Verify
+    - Phone: Use menu /etc => Import / export private keys => Export, verify that you only see the one-of-us.net key.
+    - Web: centered and signed in. On the Nerdster, turn on menu => Prefs +> everything. In the tree view, verify that "Me" has a delegate key and a a delegate statement.
 
 - Submit 2 things, verify revokeAt 
   - submit subject "A"
-  - submit subject "B"
-  - revoke delegate at 1'st (the earlier of the 2, "A")
-    - 
-      - refresh Nerdster and check. You should A but not B.
-      - revoke at always.
-      - un-revoke
+    - submit subject "B"
+    - revoke delegate at first (the earlier of the 2, "A")
+    - refresh Nerdster and check. You should A but not B.
+    - revoke at always and check. You should see neither A nor B.
+    - un-revoke. You should see both A and B again.
 
-- trust a stranger, use Amotz
-  - (QR code or copy/paste), (main screen or trusts screen)
-  - restart app, trust Amotz again using person_add, should show existing trust
-    - edit trust
-    - block
-    - clear
+- Trust a stranger, use Amotz
+  - Scan QR from the https://nerdster.web.app
+    - (Trusting from both the main screen or the trusts screen should be tested, maybe test a different one each time.)
+    - Exit app and restart.
+    - Trust Amotz again. App should should show existing trust
+      - edit trust
+      - block
+      - clear
 
-- claim an existing key, use Yotam's
-    - (3a okay or Moto, okay, still PROD)
-    - verify see options for last statement token
-  - trust yourself and fail gracefully
+- Claim an existing key, use Yotam's
+  - Use menu State => {replace}
+  - Scan Yotam's key from https://nerdster.web.app/?showJson=true&showStatements=true&showKeys=true&skipVerify=true
+  - Verify that you see options related to last statement token
+  - Trust yourself and fail gracefully (Use a trust method to trust these below)
     - Yotam
     - Yotam's delegate
-    - yourself
-  - Verify: should show Yotam's not-local delegate key
+    - Yourself (You'll need to QR sign into the Nerdster to see your own QR code)
+  - Verify: The app should show Yotam's not-local delegate key uner menu State => {delegate}
 
-- claim a delegate
-  - fail gracefully on equiv key, use Yotam's
-  - fail gracefully on existing delegate key, use Yotam's delegate
-  - fail gracefully on my own Oneofus key.
+- Claim a delegate
+  - fail gracefully on these below:
+    - equivalent key, use Yotam's
+    - one of your existing delegate keys, use Yotam's
+    - your own Oneofus key.
+  - Hmmm.. try claiming Andrew's delegate key (I haven't tried this but should)
 
-- started again (wipe), probably not necessary, can probably optimize
+- Start again (wipe) (probably not necessary, can probably optimize)
 
-- claim Yotam's from the start
-  - replace Yotam's key revoking a few statements back
-- sign in
-  - should offer to create delegate key
+- Claim Yotam's key from the start
+  - Replace Yotam's key revoking a few statements back
 
-- replace my key
-  - replace my key
-    - re-state trust in Amotz with my key
+- QR sign in
+  - App should offer to create delegate key
+
+- Replace my key (State menu => {replace})
+  - Replace my key
+    - re-state trust in Amotz with the new replacement key
+  
+- Check all hyperlinks
+  - menu => ?
+    - Keys
+    - Statements
+    - About
+  - If there are any others, make sure they work
+
+- Rotate phone, d'oh!
 
 ## List of functionality to test
 - Clean start

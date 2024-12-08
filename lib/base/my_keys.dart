@@ -168,6 +168,10 @@ class MyKeys {
       await crypto.parseKeyPair(keyJson);
     }
 
+    if (!json.keys.contains(kOneofusDomain)) {
+      throw Exception('missing key for $kOneofusDomain');
+    }
+
     _useExportNotifier.value = json;
     await _private2public();
     await _write();
@@ -190,12 +194,9 @@ class MyKeys {
 
   MyKeys._();
 
-  static Future<void> wipe(BuildContext context) async {
-    String? okay = await alert('Wipe all data? Really?', '', ['Okay', 'Cancel'], context);
-    if (b(okay) && okay! == 'Okay') {
-      await _storage.deleteAll();
-      _exportNotifier.value = {};
-      publicExportNotifier.value = {};
-    }
+  static Future<void> wipe() async {
+    await _storage.deleteAll();
+    _exportNotifier.value = {};
+    publicExportNotifier.value = {};
   }
 }

@@ -67,10 +67,11 @@ class NoKeys extends StatelessWidget {
               onPressed: () async {
                 await Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => Import(),
+                    builder: (context) => ImportExport(),
                   ),
                 );
                 // TODO: This "if (context.mounted)" seems wrong. Same elsewhere.
+                // BUG: MINOR: prepareX throws exception if nothing was imported and back was chosen.
                 if (context.mounted) await prepareX(context);
                 if (context.mounted) await encourageDelegateRepInvariant(context);
               },
@@ -80,12 +81,12 @@ class NoKeys extends StatelessWidget {
               onPressed: () async {
                 await alert(
                     'Claim your lost key',
-                    '''1) Choose create a new key now
-2) Next use menu / one-of-us.net keys and choose: 'Claim a different key' where you'll be asked to identify your lost key
-4) Finally, inform those who who signed off on your old key and ask them to trust your new key.
-https://RTFM#replace
-                      ''',
-                    ['Okay'], context);
+                    '''1) Choose "Create a new key" for now.
+2) Next, use menu => State => "My equivalent one-of-us keys: {replace}". This is where you'll be asked to identify your lost key and state that your new key replaces it.
+3) Finally, inform your comrades and associates who one-of-us trusted your old key and ask them to trust your new key.
+https://RTFM#replace''',
+                    ['Okay'],
+                    context);
               },
               child: const Text('Claim lost key')),
           const Spacer(),
@@ -97,12 +98,16 @@ https://RTFM#replace
           OutlinedButton(
               onPressed: () async {
                 OouKeyPair newKeyPair = await crypto.createKeyPair();
-                await alert('Congratulations', '''You're about to posses a public/private cryptographic key pair!
+                await alert(
+                    'Congratulations',
+                    '''You're about to posses a public/private cryptographic key pair!
 
 - Your public key is displayed in both QR and text on the main screen. Other folks with the app can scan that to one-of-us trust you as a responsible human.
 
 - Use the person_add icon to scan other folks' screens to trust them. Doing so will use your private key to sign trust statements and publish them to form your and our trust network of responsible humans. 
-''', ['Okay'], context);
+''',
+                    ['Okay'],
+                    context);
                 await MyKeys.storeOneofusKey(newKeyPair);
               },
               child: const Text('Create new key')),

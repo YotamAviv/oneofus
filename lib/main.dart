@@ -22,6 +22,9 @@ const bool kDev = false;
 const bool exceptionWhenTryingToPush = false;
 // TODO: also simulate slow fetch.
 
+// TODO: Phone rotation, d'oh!
+// Try: https://stackoverflow.com/questions/49418332/flutter-how-to-prevent-device-orientation-changes-and-force-portrait
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 

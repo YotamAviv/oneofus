@@ -4,6 +4,7 @@ import 'package:oneofus/base/menus.dart';
 import 'package:oneofus/base/my_keys.dart';
 import 'package:oneofus/oneofus/ui/linky.dart';
 import 'package:oneofus/oneofus/ui/my_checkbox.dart';
+import 'package:oneofus/prefs.dart';
 
 import 'oneofus/jsonish.dart';
 

@@ -27,16 +27,16 @@ class FancySplash extends StatelessWidget {
       Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          if (kDev) FloatingActionButton(
-              heroTag: 'Copy',
-              tooltip: 'Copy',
-              child: const Icon(Icons.copy),
-              onPressed: () async {
-                await Clipboard.setData(
-                    ClipboardData(text: encoder.convert(MyKeys.oneofusPublicKey)));
-              }),
           if (kDev)
-            const SizedBox(width: 8),
+            FloatingActionButton(
+                heroTag: 'Copy',
+                tooltip: 'Copy',
+                child: const Icon(Icons.copy),
+                onPressed: () async {
+                  await Clipboard.setData(
+                      ClipboardData(text: encoder.convert(MyKeys.oneofusPublicKey)));
+                }),
+          if (kDev) const SizedBox(width: 8),
           FloatingActionButton(
               heroTag: 'help',
               tooltip: 'Confused?',
@@ -63,7 +63,7 @@ https://one-of-us.net''',
               child: const Icon(Icons.login),
               onPressed: () async {
                 String? scanned =
-                await QrScanner.scan('Scan QR Sign-in', scannerSignInValidate, context);
+                    await QrScanner.scan('Scan QR Sign-in', scannerSignInValidate, context);
                 if (context.mounted) await prepareX(context);
                 if (b(scanned)) {
                   await signIn(scanned!, context);
@@ -93,6 +93,7 @@ class _KeyQrText extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => _KeyQrTextState();
 }
+
 class _KeyQrTextState extends State<_KeyQrText> {
   Json data = {};
 
@@ -126,7 +127,8 @@ class _KeyQrTextState extends State<_KeyQrText> {
     double size = min(availSize.width, availSize.height) * 0.75;
     String dataString = encoder.convert(data);
     return Column(
-      mainAxisSize: MainAxisSize.max,
+      // shrinkWrap: true,
+      // mainAxisSize: MainAxisSize.max,
       children: [
         QrImageView(
           data: dataString,

@@ -9,71 +9,145 @@ import '../oneofus/ok_cancel.dart';
 
 const JsonEncoder _encoder = JsonEncoder.withIndent('  ');
 
-class Export extends StatelessWidget {
-  final dynamic content;
-  const Export(this.content, {super.key});
+class ImportExport extends StatelessWidget {
+  const ImportExport({super.key});
+
   @override
   Widget build(BuildContext context) {
-    ScrollController scrollController = ScrollController();
-    final String text = _encoder.convert(content);
+    TextEditingController controller = TextEditingController()
+      ..text = _encoder.convert(MyKeys.export());
+
     return Scaffold(
-        appBar: AppBar(title: const Text('Export')),
-        body: Stack(alignment: Alignment.bottomRight, children: [
-          Scrollbar(
-              controller: scrollController,
+        appBar: AppBar(title: const Text('Import / Export')),
+        body: Column(children: [
+          Expanded(
               child: TextField(
-                  scrollController: scrollController,
-                  controller: TextEditingController()..text = text,
-                  maxLines: 15,
+                  controller: controller,
+                  maxLines: null,
+                  expands: true,
                   readOnly: true,
                   style: GoogleFonts.courierPrime(fontSize: 14, color: Colors.black))),
-          FloatingActionButton(
-              heroTag: 'Copy',
-              tooltip: 'Copy',
-              child: const Icon(Icons.copy),
-              onPressed: () async {
-                await Clipboard.setData(ClipboardData(text: text));
-              })
+          // ListView(shrinkWrap: true,
+          Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  OutlinedButton(
+                      child: Row(
+                        children: [
+                          const Text('Copy'),
+                          const SizedBox(width: 5),
+                          const Icon(Icons.copy),
+                        ],
+                      ),
+                      onPressed: () async {
+                        await Clipboard.setData(ClipboardData(text: controller.text));
+                      }),
+                  const SizedBox(width: 5),
+                  OutlinedButton(
+                      child: Row(
+                        children: [
+                          const Text('Paste'),
+                          const SizedBox(width: 5),
+                          const Icon(Icons.paste),
+                        ],
+                      ),
+                      onPressed: () async {
+                        ClipboardData? clipboardData = await Clipboard.getData(Clipboard.kTextPlain);
+                        String? clipboardText = clipboardData!.text;
+                        controller.text = clipboardText!;
+                      }),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // CONSIDER: "Revert", "Done", "Back", "Cancel" and helpful enable/disable.
+                  OutlinedButton(
+                      child: Row(
+                        children: [
+                          const Text('Import'),
+                        ],
+                      ),
+                      onPressed: () async {
+                        try {
+                          dynamic content = jsonDecode(controller.text);
+                          await MyKeys.import(content);
+                          await alert('New keys imported', '', ['Okay'], context);
+                          Navigator.pop(context);
+                        } catch (e) {
+                          await alertException(context, e);
+                        }
+                      }),
+                ],
+              ),
+            ],
+          ),
         ]));
   }
 }
 
-class Import extends StatelessWidget {
-  final TextEditingController controller = TextEditingController();
-
-  Import({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(title: const Text('Import')),
-        body: Scrollbar(
-          child: Column(children: [
-            Stack(alignment: Alignment.bottomRight, children: [
-              TextField(
-                  controller: controller,
-                  maxLines: 15,
-                  style: GoogleFonts.courierPrime(fontSize: 14, color: Colors.black)),
-              IconButton(
-                  onPressed: () async {
-                    final clipboardData = await Clipboard.getData(Clipboard.kTextPlain);
-                    String? clipboardText = clipboardData?.text;
-                    print('clipboardText=$clipboardText');
-                    controller.text = clipboardText!;
-                  },
-                  icon: const Icon(Icons.paste, color: Colors.black))
-            ]),
-            const Spacer(flex: 5),
-            OkCancel(() async {
-              try {
-                dynamic content = jsonDecode(controller.text);
-                await MyKeys.import(content);
-                Navigator.pop(context);
-              } catch (e) {
-                await alertException(context, e);
-              }
-            }, 'Import'),
-          ]),
-        ));
+var dummy = {
+  "one-of-us.net": {
+    "crv": "Ed25519",
+    "d": "dS87_gD1ZQ1bzgFYz4DIsCNcdBpQlen1zs7hx32-Mi0",
+    "kty": "OKP",
+    "x": "3EacrkjWVwZQrPHRC1loK_zvwSn5uqh9NI4vMY62Wlc"
+  },
+  "aaa": {
+    "crv": "Ed25519",
+    "d": "vMpQkC8rpweklvmVbhqxYwWJb9mC40-XB2Jf6kVRiOg",
+    "kty": "OKP",
+    "x": "fq1GivyvIA_E5VE0XfZSr5PUdh0glWnJdklxU_wx1JY"
+  },
+  "bbb": {
+    "crv": "Ed25519",
+    "d": "xe0Yvveix_uMD_-bdVgwb_xssnG9L7Ndm_5v4h6071s",
+    "kty": "OKP",
+    "x": "YjZWA7NmmPoObhEUW0xrY965fX6VCj0ImftO1_Ku8eI"
+  },
+  "ccc": {
+    "crv": "Ed25519",
+    "d": "pUplOcZTaxqYwwYRO8G7vaboT4i9E53mJmMf4wGLcaU",
+    "kty": "OKP",
+    "x": "GLfqXm2enD992JkY8Fifgb2by5XoE74zdyZt9bgSuW4"
   }
-}
+};
+
+var dummy2 = {
+  "one-of-us.net": {
+    "crv": "Ed25519",
+    "d": "dS87_gD1ZQ1bzgFYz4DIsCNcdBpQlen1zs7hx32-Mi0",
+    "kty": "OKP",
+    "x": "3EacrkjWVwZQrPHRC1loK_zvwSn5uqh9NI4vMY62Wlc"
+  },
+  "aaa": {
+    "crv": "Ed25519",
+    "d": "vMpQkC8rpweklvmVbhqxYwWJb9mC40-XB2Jf6kVRiOg",
+    "kty": "OKP",
+    "x": "fq1GivyvIA_E5VE0XfZSr5PUdh0glWnJdklxU_wx1JY"
+  }
+};
+
+var dummyMissingOneofus = {
+  "aaa": {
+    "crv": "Ed25519",
+    "d": "vMpQkC8rpweklvmVbhqxYwWJb9mC40-XB2Jf6kVRiOg",
+    "kty": "OKP",
+    "x": "fq1GivyvIA_E5VE0XfZSr5PUdh0glWnJdklxU_wx1JY"
+  },
+  "bbb": {
+    "crv": "Ed25519",
+    "d": "xe0Yvveix_uMD_-bdVgwb_xssnG9L7Ndm_5v4h6071s",
+    "kty": "OKP",
+    "x": "YjZWA7NmmPoObhEUW0xrY965fX6VCj0ImftO1_Ku8eI"
+  },
+  "ccc": {
+    "crv": "Ed25519",
+    "d": "pUplOcZTaxqYwwYRO8G7vaboT4i9E53mJmMf4wGLcaU",
+    "kty": "OKP",
+    "x": "GLfqXm2enD992JkY8Fifgb2by5XoE74zdyZt9bgSuW4"
+  }
+};
+
