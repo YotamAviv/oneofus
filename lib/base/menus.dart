@@ -8,6 +8,7 @@ import 'package:oneofus/oneofus/fetcher.dart';
 import 'package:oneofus/oneofus/fire_factory.dart';
 import 'package:oneofus/oneofus/fire_util.dart';
 import 'package:oneofus/oneofus/trust_statement.dart';
+import 'package:oneofus/oneofus/ui/alert.dart';
 import 'package:oneofus/oneofus/ui/my_checkbox.dart';
 import 'package:oneofus/prefs.dart';
 import 'package:oneofus/share.dart';
@@ -16,6 +17,7 @@ import 'package:oneofus/widgets/demo_statement_route.dart';
 import '../delegate_keys_route.dart';
 import '../misc/backup.dart';
 import '../misc/import_export.dart';
+import '../oneofus/util.dart';
 import '../oneofus_keys_route.dart';
 import '../trusts_route.dart';
 import 'my_keys.dart';
@@ -24,7 +26,6 @@ import 'my_keys.dart';
 Future<void> prepareX(BuildContext context) async {
   try {
     context.loaderOverlay.show();
-
     // TODO: Jsonish.wipeCache(); // With this not commented out, crypto verify is slow all the time.
     Fetcher.clear();
     clearDistinct(); // Redundant? Should this be somewhere deeper?
@@ -38,7 +39,7 @@ String formatVerbs(Iterable<TrustVerb> verbs) {
   return Set.of(verbs.where((v) => v != TrustVerb.clear).map((v) => v.label)).toString();
 }
 
-Widget buildKeysMenu2(context) {
+Widget buildStateMenu(context) {
   return SubmenuButton(menuChildren: <Widget>[
     MenuItemButton(
         onPressed: () async {
@@ -88,32 +89,18 @@ Widget buildEtcMenu(context) {
             },
             child: const Text('JSON text')),
       ], child: const Text('Share my public key')),
-      SubmenuButton(menuChildren: [
-        MenuItemButton(
-            onPressed: () async {
-              await prepareX(context);
-              if (context.mounted) await encourageDelegateRepInvariant(context);
-              await Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => Import(),
-                ),
-              );
-              if (context.mounted) await prepareX(context);
-              if (context.mounted) await encourageDelegateRepInvariant(context);
-            },
-            child: const Text('Import...')),
-        MenuItemButton(
-            onPressed: () async {
-              await prepareX(context);
-              var content = MyKeys.export();
-              await Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => Export(content),
-                ),
-              );
-            },
-            child: const Text('Export...')),
-      ], child: const Text('Import / Export private keys')),
+      MenuItemButton(
+          onPressed: () async {
+            await prepareX(context);
+            await Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => ImportExport(),
+              ),
+            );
+            if (context.mounted) await prepareX(context);
+            if (context.mounted) await encourageDelegateRepInvariant(context);
+          },
+          child: const Text('Import/Export...')),
       SubmenuButton(menuChildren: [
         MyCheckbox(Prefs.skipLgtm, 'Skip statement reviews'),
         // MyCheckbox(Prefs.showDevMenu, 'show DEV menu'),
@@ -183,7 +170,10 @@ Widget buildDevMenu(context) {
         child: const Text('backup')),
     MenuItemButton(
         onPressed: () async {
-          await MyKeys.wipe(context);
+          String? okay = await alert('Wipe all data? Really?', '', ['Okay', 'Cancel'], context);
+          if (b(okay) && okay! == 'Okay') {
+            await MyKeys.wipe();
+          }
         },
         child: const Text('wipe')),
   ], child: const Text('dev'));
@@ -191,9 +181,7 @@ Widget buildDevMenu(context) {
 
 List<Widget> buildMenus(context) {
   return [
-    buildKeysMenu2(context),
-    // buildKeysMenu(context),
-    // buildTrustMenu(context),
+    buildStateMenu(context),
     buildEtcMenu(context),
     // SizedBox(width: 50,),
     // const MenuTitle(['one-', 'of-', 'us.', 'net']),

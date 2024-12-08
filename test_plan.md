@@ -87,6 +87,8 @@ Email me or submit at: https://github.com/YotamAviv/nerdster/issues
     - About
   - If there are any others, make sure they work
 
+- Rotate phone, d'oh!
+
 ## List of functionality to test
 - Clean start
 - QR Sign in
