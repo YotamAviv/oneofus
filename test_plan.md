@@ -31,7 +31,7 @@ Email me or submit at: https://github.com/YotamAviv/nerdster/issues
 - QR web sign-in again, create delegate
   - create delegate: YES
   - Verify
-    - Phone: Use menu /etc => Import / export private keys => Export, verify that you only see the one-of-us.net key.
+    - Phone: Use menu /etc => Import / export private keys => Export, verify that you see both the one-of-us.net key and a nerdster.org key.
     - Web: centered and signed in. On the Nerdster, turn on menu => Prefs +> everything. In the tree view, verify that "Me" has a delegate key and a a delegate statement.
 
 - Submit 2 things, verify revokeAt 
