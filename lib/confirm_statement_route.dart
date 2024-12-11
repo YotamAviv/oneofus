@@ -25,7 +25,7 @@ class ConfirmStatementRoute extends StatelessWidget {
             style: GoogleFonts.courierPrime(
               fontWeight: FontWeight.w700,
               color: Colors.black,
-              fontSize: 14,
+              fontSize: 12,
             ),
             controller: TextEditingController()..text = Jsonish.encoder.convert(json),
             maxLines: null,
