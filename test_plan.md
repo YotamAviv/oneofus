@@ -25,22 +25,26 @@ Email me or submit at: https://github.com/YotamAviv/nerdster/issues
 - QR web sign-in using phone scanner, without creating a delegate key
   - create delegate: NO
   - Verify
-    - Phone: Use menu /etc => Import / export private keys => Export, verify that you only see the one-of-us.net key.
-    - Web: centered (not centered as Yotam) but not with delegate. On the Nerdster, turn on menu => Prefs +> everything. In the tree view, verify that "Me" has no children. 
+    - Phone: Use menu /etc => Import/Export, verify that you only see the one-of-us.net key.
+    - TODO: 
+    - Nerdster on Web: centered (not centered as Yotam) but not with delegate. On the Nerdster, turn on menu => Prefs => everything. In the tree view, verify that "Me" has no children. 
 
 - QR web sign-in again, create delegate
   - create delegate: YES
+  - TODO: Refresh Nerdster after QR sign-in
   - Verify
-    - Phone: Use menu /etc => Import / export private keys => Export, verify that you see both the one-of-us.net key and a nerdster.org key.
+    - Phone: Use menu /etc => Import/Export, verify that you see both the one-of-us.net key and a nerdster.org key.
     - Web: centered and signed in. On the Nerdster, turn on menu => Prefs +> everything. In the tree view, verify that "Me" has a delegate key and a a delegate statement.
 
 - Submit 2 things, verify revokeAt 
   - submit subject "A"
-    - submit subject "B"
-    - revoke delegate at first (the earlier of the 2, "A")
-    - refresh Nerdster and check. You should A but not B.
-    - revoke at always and check. You should see neither A nor B.
-    - un-revoke. You should see both A and B again.
+  - submit subject "B"
+  - revoke delegate at first (the earlier of the 2, "A")
+  - TODO: Display revoked keys on Nerdster with cross out like on the phone.
+  - refresh Nerdster and check. You should A but not B.
+  - TODO: Don't allow submitting with revoked key
+  - revoke at "since always" and check. You should see neither A nor B.
+  - un-revoke. You should see both A and B again.
 
 - Trust a stranger, use Amotz
   - Scan QR from the https://nerdster.web.app
@@ -63,9 +67,10 @@ Email me or submit at: https://github.com/YotamAviv/nerdster/issues
 
 - Claim a delegate
   - fail gracefully on these below:
-    - equivalent key, use Yotam's
-    - one of your existing delegate keys, use Yotam's
     - your own Oneofus key.
+    - your own delegate key.
+    - equivalent Oneofus key, use Yotam's
+    - one of your existing delegate keys, use Yotam's
   - Hmmm.. try claiming Andrew's delegate key (I haven't tried this but should)
 
 - Start again (wipe) (probably not necessary, can probably optimize)

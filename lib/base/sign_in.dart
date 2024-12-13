@@ -60,6 +60,8 @@ Future<void> signIn(String text, BuildContext context) async {
     send['publicKey'] = await myPkePublicKey.json;
     send['delegateCiphertext'] = delegateCiphertext;
   }
+
+  // TODO: HTTP POST instead.
   final sessionCollection = _nerdsterFire.collection('sessions').doc('doc').collection(session);
   await sessionCollection.doc('doc').set(send).then((doc) => print("inserted send"),
       // TODO: Handle in case asynch DB write succeeds or fails.

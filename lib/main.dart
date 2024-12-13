@@ -54,7 +54,7 @@ void main() async {
         child: const MaterialApp(
             debugShowCheckedModeBanner: false,
             title: 'ONE-OF-US.NET',
-            home: const Base())),
+            home: Base())),
   );
 }
 
