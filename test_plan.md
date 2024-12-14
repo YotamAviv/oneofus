@@ -90,7 +90,10 @@ Email me or submit at: https://github.com/YotamAviv/nerdster/issues
     - Keys
     - Statements
     - About
-  - If there are any others, make sure they work
+  - confirmations and warnings contain links, too. In case I missed any, please point them out.
+    - block warning
+    - claim existing key warning
+    - replace my key warning
 
 - Rotate phone, d'oh!
 
