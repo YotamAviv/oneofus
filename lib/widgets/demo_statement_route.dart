@@ -66,7 +66,7 @@ The private key may be available or lost:
           ],
         ),
         space,
-        const Linky('''Read the https://RTFM'''),
+        const Linky('''Read the https://manual'''),
       ]),
     );
   }
@@ -135,7 +135,7 @@ Samples below:'''),
               domain: 'nerdster.org'),
           space,
 
-          const Linky('''Read the https://RTFM'''),
+          const Linky('''Read the https://manual'''),
         ]));
   }
 }

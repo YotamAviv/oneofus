@@ -58,7 +58,7 @@ class _StatementActionPickerState extends State<StatementActionPicker> {
     String? descActive;
     if (activeStatements.isNotEmpty) {
       descActive =
-          '''Below are ${formatVerbs(widget.verbs)} statements signed by your active key. You can click on these to edit (re-state) them with updated fields or to clear (erase) them.''';
+          '''Below are ${formatVerbs(widget.verbs)} statements signed by your active key. Click on these to edit (re-state) them with updated fields or to clear (erase) them.''';
       stuff.add(descActive);
       stuff.addAll(activeStatements);
     }

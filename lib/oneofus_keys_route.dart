@@ -17,7 +17,7 @@ import 'widgets/qr_scanner.dart';
 String _descTop0 =
     '''This app holds your active one-of-us public/private key pair and uses it to sign statements.
 Stuff happens (lost phones, compromised keys, apps reinstalled, ...), and sometimes replacement keys are needed.
-Individuals should maintain their singular identities, and "replace" statements facilitate this (as in: "my new key replaces my lost key, but I remain the same person").''';
+But individuals should maintain their singular identities, and {replace} statements facilitate this (as in, "This new key replaces my lost key").''';
 
 String _descBottom = '''.''';
 
@@ -49,7 +49,7 @@ class OneofusKeysRoute extends StatelessWidget {
 
 But do make sure that you don't accidentally claim somebody else's key (that's the type of act that will get you blocked).
 
-https://RTFM#replace''',
+https://manual#replace''',
                           ['Okay', 'Cancel'],
                           context);
                       if (match(okay, 'Okay')) {
@@ -167,7 +167,7 @@ Future<Jsonish?> stateReplaceKey(Json subjectJson, BuildContext context) async {
           'Replacing an unused key',
           '''No statements made by your current one-of-us key were found,  
 and so it will be revoked since always rather than revoked at a particular, last valid statement.
-https://RTFM#replace''',
+https://manual#replace''',
           ['Okay', 'Cancel'],
           context);
       if (!match(okay, 'Okay')) {
@@ -178,7 +178,7 @@ https://RTFM#replace''',
       String? okay = await alert(
           'Replacing (and revoking) a key',
           '''This key will be replaced and revoked as of the last statement made by it, but you can change that value so that it will be revoked even earlier, at a particular last valid statement.
-https://RTFM#replace''',
+https://manual#replace''',
           ['Okay', 'Cancel'],
           context);
       if (!match(okay, 'Okay')) {

@@ -37,25 +37,6 @@ class FancySplash extends StatelessWidget {
                       ClipboardData(text: encoder.convert(MyKeys.oneofusPublicKey)));
                 }),
           if (kDev) const SizedBox(width: 8),
-          FloatingActionButton(
-              heroTag: 'help',
-              tooltip: 'Confused?',
-              child: const Icon(Icons.help),
-              onPressed: () async {
-                await alert(
-                    'Confused?',
-                    '''The QR code on the main screen is your public key (the gibberish below is the text).
-                    
-Your public/private key pair is stored on your phone and is used to sign and publish trust statements.
-
-Click person_add (bottom right) to scan someone else's public key to one-of-us trust them.
-
-Click login (second from right) to sign in to a partner (the Nerd'ster) as yourself.
-
-https://one-of-us.net''',
-                    ['Okay'],
-                    context);
-              }),
           const Spacer(),
           FloatingActionButton(
               heroTag: 'Partner sign-in',

@@ -243,7 +243,7 @@ You should only block a key in case you have strong reason to believe that the k
 - does not represent a real person
 - or maybe it does represent a person, but that person is not acting in good faith (eg. blocks indiscriminately, trusts fake "Elon", etc..)
 - or maybe that person trusts too carelessly or just doesn't get it (eg. scans QR keys from Instagram)
-https://RTFM#block''',
+https://manual#block''',
           ['Okay', 'Cancel'],
           context);
       return match(okay, 'Okay');
@@ -254,8 +254,8 @@ https://RTFM#block''',
           '''When you clear a replace statement, a key that used to be understood as representing you may no longer  be understood to represent you.
 Folks may be using that key to trust you or follow you.
 If you've used that key to trust others but have not re-stated that trust using your current key, then the path of trust from you to them may be cleared as well.
-https://RTFM#clear-replace
-https://RTFM#revoke-equivalent
+https://manual#clear-replace
+https://manual#revoke-equivalent
 ''',
           ['Okay', 'Cancel'],
           context);
@@ -265,8 +265,8 @@ https://RTFM#revoke-equivalent
       String? okay = await alert(
           'Careful..',
           '''When you clear a delegate statement, a key that used to be understood as representing you may no longer be associated with you.
-https://RTFM#clear-delegate
-https://RTFM#revoke-delegate
+https://manual#clear-delegate
+https://manual#revoke-delegate
 ''',
           ['Okay', 'Cancel'],
           context);

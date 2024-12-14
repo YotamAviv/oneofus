@@ -36,7 +36,8 @@ Future<void> prepareX(BuildContext context) async {
 }
 
 String formatVerbs(Iterable<TrustVerb> verbs) {
-  return Set.of(verbs.where((v) => v != TrustVerb.clear).map((v) => v.label)).toString();
+  return Set.of(verbs.where((v) => v != TrustVerb.clear).map((v) => v.label))
+      .toString();
 }
 
 Widget buildStateMenu(context) {
@@ -45,8 +46,8 @@ Widget buildStateMenu(context) {
         onPressed: () async {
           await prepareX(context);
           if (context.mounted) await encourageDelegateRepInvariant(context);
-          await Navigator.of(context)
-              .push(MaterialPageRoute(builder: (context) => const TrustsRoute()));
+          await Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const TrustsRoute()));
           if (context.mounted) await prepareX(context);
           if (context.mounted) await encourageDelegateRepInvariant(context);
         },
@@ -55,22 +56,24 @@ Widget buildStateMenu(context) {
         onPressed: () async {
           await prepareX(context);
           if (context.mounted) await encourageDelegateRepInvariant(context);
-          await Navigator.of(context)
-              .push(MaterialPageRoute(builder: (context) => const DelegateKeysRoute()));
+          await Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => const DelegateKeysRoute()));
           if (context.mounted) await prepareX(context);
           if (context.mounted) await encourageDelegateRepInvariant(context);
         },
-        child: Text('My authorized services: ${formatVerbs(DelegateKeysRoute.verbs)}')),
+        child: Text(
+            'My authorized services: ${formatVerbs(DelegateKeysRoute.verbs)}')),
     MenuItemButton(
         onPressed: () async {
           await prepareX(context);
           if (context.mounted) await encourageDelegateRepInvariant(context);
-          await Navigator.of(context)
-              .push(MaterialPageRoute(builder: (context) => const OneofusKeysRoute()));
+          await Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => const OneofusKeysRoute()));
           if (context.mounted) await prepareX(context);
           if (context.mounted) await encourageDelegateRepInvariant(context);
         },
-        child: Text('My equivalent one-of-us keys: ${formatVerbs(OneofusKeysRoute.verbs)}')),
+        child: Text(
+            'My equivalent one-of-us keys: ${formatVerbs(OneofusKeysRoute.verbs)}')),
   ], child: const Text('State'));
 }
 
@@ -112,6 +115,21 @@ Widget buildEtcMenu(context) {
 
 Widget buildHelpMenu(context) {
   return SubmenuButton(menuChildren: <Widget>[
+    MenuItemButton(
+        onPressed: () async {
+          await alert(
+              'Main screen',
+              '''The QR code front and center is your public key (the gibberish below is the text).
+                    
+Your public/private key pair is stored on your phone and is used to sign and publish trust statements.
+
+Click the person_add icon (bottom right) to scan someone else's public key to one-of-us trust them.
+
+Click login icon (second from right) to sign in to a partner (the Nerd'ster) as yourself''',
+              ['Okay'],
+              context);
+        },
+        child: const Text('Main screen')),
     MenuItemButton(
         onPressed: () async {
           await showDemoKeys(context);
@@ -170,7 +188,8 @@ Widget buildDevMenu(context) {
         child: const Text('backup')),
     MenuItemButton(
         onPressed: () async {
-          String? okay = await alert('Wipe all data? Really?', '', ['Okay', 'Cancel'], context);
+          String? okay = await alert(
+              'Wipe all data? Really?', '', ['Okay', 'Cancel'], context);
           if (b(okay) && okay! == 'Okay') {
             await MyKeys.wipe();
           }

@@ -84,7 +84,7 @@ class NoKeys extends StatelessWidget {
                     '''1) Choose "Create a new key" for now.
 2) Next, use menu => State => "My equivalent one-of-us keys: {replace}". This is where you'll be asked to identify your lost key and state that your new key replaces it.
 3) Finally, inform your comrades and associates who one-of-us trusted your old key and ask them to trust your new key.
-https://RTFM#replace''',
+https://manual#replace''',
                     ['Okay'],
                     context);
               },

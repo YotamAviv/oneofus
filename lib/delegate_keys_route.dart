@@ -42,7 +42,7 @@ import 'statement_action_picker.dart';
 ///
 
 String _descTop0 = '''Delegate key pairs allow other services (the Nerd'ster) to state stuff as you.
-Revoke these delegates at any time (including retroactively).  
+You can revoke these at any time (including retroactively).  
 ''';
 
 String _descBottom = '''.''';
