@@ -33,8 +33,8 @@ class FancySplash extends StatelessWidget {
                 tooltip: 'Copy',
                 child: const Icon(Icons.copy),
                 onPressed: () async {
-                  await Clipboard.setData(
-                      ClipboardData(text: encoder.convert(MyKeys.oneofusPublicKey)));
+                  await Clipboard.setData(ClipboardData(
+                      text: encoder.convert(MyKeys.oneofusPublicKey)));
                 }),
           if (kDev) const SizedBox(width: 8),
           const Spacer(),
@@ -43,8 +43,8 @@ class FancySplash extends StatelessWidget {
               tooltip: 'Partner sign-in',
               child: const Icon(Icons.login),
               onPressed: () async {
-                String? scanned =
-                    await QrScanner.scan('Scan QR Sign-in', scannerSignInValidate, context);
+                String? scanned = await QrScanner.scan(
+                    'Scan QR Sign-in', scannerSignInValidate, context);
                 if (context.mounted) await prepareX(context);
                 if (b(scanned)) {
                   await signIn(scanned!, context);
@@ -105,24 +105,49 @@ class _KeyQrTextState extends State<_KeyQrText> {
   @override
   Widget build(BuildContext context) {
     Size availSize = MediaQuery.of(context).size;
-    double size = min(availSize.width, availSize.height) * 0.75;
+    double size = min(availSize.width, availSize.height) * 0.80;
     String dataString = encoder.convert(data);
     return Column(
       // shrinkWrap: true,
       // mainAxisSize: MainAxisSize.max,
       children: [
+        SportRow(),
         QrImageView(
           data: dataString,
           version: QrVersions.auto,
           size: size,
         ),
+        SportRow(),
         TextField(
             controller: TextEditingController()..text = dataString,
             maxLines: null,
             readOnly: true,
             style: GoogleFonts.courierPrime(
-                fontWeight: FontWeight.w700, fontSize: 10, color: Colors.black)),
+                fontWeight: FontWeight.w700,
+                fontSize: 10,
+                color: Colors.black)),
       ],
     );
+  }
+}
+
+class SportRow extends StatelessWidget {
+  final String kImage1 = 'assets/images/sportdeath_large.gif';
+  final String kImage2 = 'assets/images/nerd.gif';
+  const SportRow({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // return Row(
+    //   children: List.generate(
+    //       7, (index) => Expanded(child: Image.asset(index == 0 || index == 6 ? kImage1 : kImage2))),
+    // );
+    return Row(children: [
+      Expanded(child: Image.asset(kImage1)),
+      ...List.generate(7, (index) => Expanded(child: SizedBox())),
+      Expanded(child: Image.asset(kImage1)),
+    ]);
   }
 }
