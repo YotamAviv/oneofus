@@ -118,14 +118,32 @@ Widget buildHelpMenu(context) {
     MenuItemButton(
         onPressed: () async {
           await alert(
+              'Congratulations',
+              '''You posses a public/private cryptographic key pair!
+
+- Your public key is displayed in both QR and text on the main screen. Other folks with the app can scan that to one-of-us trust you as a responsible human.
+
+- Click the QR icon to scan other folks' keys to trust them. Doing so will use your private key to sign a trust statement and publish it to grow your (and our) trust network of responsible humans.
+
+- Click the QR icon to sign in to a delegate partner.
+
+https://one-of-us.net 
+''',
+              ['Okay'],
+              context);
+        },
+        child: const Text('Congratulations')),
+    MenuItemButton(
+        onPressed: () async {
+          await alert(
               'Main screen',
               '''The QR code front and center is your public key (the gibberish below is the text).
                     
 Your public/private key pair is stored on your phone and is used to sign and publish trust statements.
 
-Click the person_add icon (bottom right) to scan someone else's public key to one-of-us trust them.
+Click the QR icon (bottom right) to scan someone else's public key to one-of-us trust them.
 
-Click login icon (second from right) to sign in to a partner (the Nerd'ster) as yourself''',
+Click the QR icon (bottom right) to sign in to a delegate partner (the Nerd'ster) as yourself''',
               ['Okay'],
               context);
         },

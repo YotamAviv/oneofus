@@ -13,7 +13,7 @@ import '../oneofus/util.dart';
 
 final FirebaseFirestore _nerdsterFire = NerdsterFire.nerdsterFirestore;
 
-Future<bool> scannerSignInValidate(String text) async {
+Future<bool> validateSignIn(String text) async {
   try {
     Json received = jsonDecode(text);
     String session = received['session']!;

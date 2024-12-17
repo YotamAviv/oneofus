@@ -104,7 +104,11 @@ https://manual#replace''',
 
 - Your public key is displayed in both QR and text on the main screen. Other folks with the app can scan that to one-of-us trust you as a responsible human.
 
-- Use the person_add icon to scan other folks' screens to trust them. Doing so will use your private key to sign a trust statement and publish it to grow your (and our) trust network of responsible humans. 
+- Click the QR icon to scan other folks' keys to trust them. Doing so will use your private key to sign a trust statement and publish it to grow your (and our) trust network of responsible humans.
+
+- Click the QR icon to sign in to a delegate partner.
+
+https://one-of-us.net
 ''',
                     ['Okay'],
                     context);

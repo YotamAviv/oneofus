@@ -70,7 +70,7 @@ https://manual#replace''',
 
 Future<Jsonish?> claimKey(BuildContext context) async {
   String? scanned =
-      await QrScanner.scan('public key QR code to replace', validatePublicKeyJson, context);
+      await QrScanner.scan('public key QR code to replace', validateKey, context);
   if (b(scanned)) {
     Json subjectKeyJson = await parsePublicKey(scanned!);
     // NOTE: The check for context.mounted (see below) breaks things.

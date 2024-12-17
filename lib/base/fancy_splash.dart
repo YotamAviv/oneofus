@@ -39,34 +39,34 @@ class FancySplash extends StatelessWidget {
           if (kDev) const SizedBox(width: 8),
           const Spacer(),
           FloatingActionButton(
-              heroTag: 'Partner sign-in',
-              tooltip: 'Partner sign-in',
-              child: const Icon(Icons.login),
+              tooltip: '''Scan someone's key QR to trust or a delegate site's QR to sign-in''',
+              child: const Icon(Icons.qr_code_2),
               onPressed: () async {
                 String? scanned = await QrScanner.scan(
-                    'Scan QR Sign-in', scannerSignInValidate, context);
-                if (context.mounted) await prepareX(context);
+                    'Scan key QR to trust or Delegate QR sign-in', validateKeyOrSignIn, context);
                 if (b(scanned)) {
-                  await signIn(scanned!, context);
+                  if (context.mounted) await prepareX(context);
+                  if (await validateKey(scanned!)) {
+                    Json jsonPublicKey = await parsePublicKey(scanned);
+                    Jsonish? jsonish = await startTrust(jsonPublicKey, context);
+                  } else {
+                    assert(await validateSignIn(scanned));
+                    await signIn(scanned, context);
+                  }
                 }
-              }),
-          const SizedBox(width: 8),
-          FloatingActionButton(
-              heroTag: 'New Trust',
-              tooltip: 'New Trust',
-              child: const Icon(Icons.person_add),
-              onPressed: () async {
-                Json? jsonPublicKey = await QrScanner.scanPublicKey(context);
-                if (!b(jsonPublicKey)) return;
-                if (!context.mounted) return;
-                if (context.mounted) await prepareX(context);
-                Jsonish? jsonish = await startTrust(jsonPublicKey!, context);
               }),
         ],
       ),
     ]);
   }
 }
+
+Future<bool> validateKeyOrSignIn(String s) async {
+  bool key = await validateKey(s);
+  bool signIn = await validateSignIn(s);
+  return key || signIn;
+}
+
 
 class _KeyQrText extends StatefulWidget {
   const _KeyQrText({super.key});

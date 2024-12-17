@@ -13,6 +13,7 @@ class QrScanner extends StatefulWidget {
   final String? text;
   final Future<bool> Function(String) validator;
 
+  // TODO: make title fit on screen.
   const QrScanner(this.title, this.validator, {super.key, this.text});
 
   @override
@@ -33,10 +34,10 @@ class QrScanner extends StatefulWidget {
   }
 
   static Future<Json?> scanPublicKey(BuildContext context) async {
-    String? string = await QrScanner.scan('Scan a public key QR Code', validatePublicKeyJson, context);
-    if (b(string)) {
+    String? scanned = await QrScanner.scan('Scan a public key QR code', validateKey, context);
+    if (b(scanned)) {
       if (!context.mounted) return null;
-      Json json = await parsePublicKey(string!);
+      Json json = await parsePublicKey(scanned!);
       return json;
     }
     return null;
@@ -158,7 +159,7 @@ class _QrScannerState extends State<QrScanner> {
   }
 }
 
-Future<bool> validatePublicKeyJson(String string) async {
+Future<bool> validateKey(String string) async {
   try {
     Json publicKeyJson = jsonDecode(string);
     await crypto.parsePublicKey(publicKeyJson);
