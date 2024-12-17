@@ -9,13 +9,34 @@ import '../oneofus/ok_cancel.dart';
 
 const JsonEncoder _encoder = JsonEncoder.withIndent('  ');
 
-class ImportExport extends StatelessWidget {
+class ImportExport extends StatefulWidget {
   const ImportExport({super.key});
 
   @override
+  State<StatefulWidget> createState() => ImportExportState();
+}
+
+class ImportExportState extends State<ImportExport> {
+  final TextEditingController controller = TextEditingController()
+    ..text = _encoder.convert(MyKeys.export());
+
+  ImportExportState();
+
+  @override
   Widget build(BuildContext context) {
-    TextEditingController controller = TextEditingController()
-      ..text = _encoder.convert(MyKeys.export());
+    VoidCallback? onPaste;
+    if (controller.text != _encoder.convert(MyKeys.export())) {
+      onPaste = () async {
+        try {
+          dynamic content = jsonDecode(controller.text);
+          await MyKeys.import(content);
+          await alert('New keys imported', '', ['Okay'], context);
+          Navigator.pop(context);
+        } catch (e) {
+          await alertException(context, e);
+        }
+      };
+    }
 
     return Scaffold(
         appBar: AppBar(title: const Text('Import / Export')),
@@ -26,7 +47,8 @@ class ImportExport extends StatelessWidget {
                   maxLines: null,
                   expands: true,
                   readOnly: true,
-                  style: GoogleFonts.courierPrime(fontSize: 14, color: Colors.black))),
+                  style: GoogleFonts.courierPrime(
+                      fontSize: 14, color: Colors.black))),
           // ListView(shrinkWrap: true,
           Column(
             children: [
@@ -42,7 +64,8 @@ class ImportExport extends StatelessWidget {
                         ],
                       ),
                       onPressed: () async {
-                        await Clipboard.setData(ClipboardData(text: controller.text));
+                        await Clipboard.setData(
+                            ClipboardData(text: controller.text));
                       }),
                   const SizedBox(width: 5),
                   OutlinedButton(
@@ -54,9 +77,12 @@ class ImportExport extends StatelessWidget {
                         ],
                       ),
                       onPressed: () async {
-                        ClipboardData? clipboardData = await Clipboard.getData(Clipboard.kTextPlain);
+                        ClipboardData? clipboardData =
+                            await Clipboard.getData(Clipboard.kTextPlain);
                         String? clipboardText = clipboardData!.text;
-                        controller.text = clipboardText!;
+                        setState(() {
+                          controller.text = clipboardText!;
+                        });
                       }),
                 ],
               ),
@@ -65,21 +91,12 @@ class ImportExport extends StatelessWidget {
                 children: [
                   // CONSIDER: "Revert", "Done", "Back", "Cancel" and helpful enable/disable.
                   OutlinedButton(
+                      onPressed: onPaste,
                       child: Row(
                         children: [
                           const Text('Import'),
                         ],
-                      ),
-                      onPressed: () async {
-                        try {
-                          dynamic content = jsonDecode(controller.text);
-                          await MyKeys.import(content);
-                          await alert('New keys imported', '', ['Okay'], context);
-                          Navigator.pop(context);
-                        } catch (e) {
-                          await alertException(context, e);
-                        }
-                      }),
+                      )),
                 ],
               ),
             ],
@@ -150,4 +167,3 @@ var dummyMissingOneofus = {
     "x": "GLfqXm2enD992JkY8Fifgb2by5XoE74zdyZt9bgSuW4"
   }
 };
-
