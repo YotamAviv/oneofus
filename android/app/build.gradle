@@ -11,7 +11,7 @@ plugins {
 android {
     namespace = "net.one_of_us.app"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = "26.1.10909125"
+    ndkVersion = "27.0.12077973"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -44,4 +44,11 @@ android {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    // Import the BoM for the Firebase platform
+    implementation platform('com.google.firebase:firebase-bom:33.7.0')
+    // Declare the dependencies for the desired Firebase products without specifying versions
+    implementation 'com.google.firebase:firebase-firestore'
 }
