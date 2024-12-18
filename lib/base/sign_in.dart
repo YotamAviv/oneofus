@@ -63,9 +63,10 @@ Future<void> signIn(String text, BuildContext context) async {
 
   // TODO: HTTP POST instead.
   final sessionCollection = _nerdsterFire.collection('sessions').doc('doc').collection(session);
-  await sessionCollection.doc('doc').set(send).then((doc) => print("inserted send"),
-      // TODO: Handle in case asynch DB write succeeds or fails.
-      onError: (e) => print("signIn error: $e"));
+  await sessionCollection.doc('doc').set(send);
+  print("signIn: inserted send");
+  // Bag: This DB write fails often (especially on my Android, on Wifi).
+  // OLD: onError: (e) => print("signIn error: $e"));
 
   Navigator.popUntil(context, ModalRoute.withName(Navigator.defaultRouteName));
 }

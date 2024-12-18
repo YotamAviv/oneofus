@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:oneofus/oneofus/ui/linky.dart';
+import 'package:oneofus/prefs.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 class About extends StatelessWidget {
@@ -15,6 +16,7 @@ class About extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    int taps = 0;
     return Scaffold(
         appBar: AppBar(title: const Text('ONE-OF-US.NET')),
         body: SafeArea(
@@ -27,7 +29,15 @@ class About extends StatelessWidget {
             const SizedBox(height: 10),
             Text('Package name: ${_packageInfo.packageName}'),
             Text('Version: ${_packageInfo.version}'),
-            Text('Build number: ${_packageInfo.buildNumber}'),
+            GestureDetector(
+                onTap: () {
+                  taps++;
+                  if (taps >= 7) {
+                    Prefs.dev.value = true;
+                    print('You are now a developer.');
+                  }
+                },
+                child: Text('Build number: ${_packageInfo.buildNumber}')),
           ]),
         ));
   }

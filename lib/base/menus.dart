@@ -30,14 +30,17 @@ Future<void> prepareX(BuildContext context) async {
     Fetcher.clear();
     clearDistinct(); // Redundant? Should this be somewhere deeper?
     await MyStatements.load();
+  } catch (e) {
+    // BUG: I've never caught the exception, only see it in the logs. Firebase seems to revert to a cache.
+    print('**************** $e');
+    await alertException(context, e);
   } finally {
     context.loaderOverlay.hide();
   }
 }
 
 String formatVerbs(Iterable<TrustVerb> verbs) {
-  return Set.of(verbs.where((v) => v != TrustVerb.clear).map((v) => v.label))
-      .toString();
+  return Set.of(verbs.where((v) => v != TrustVerb.clear).map((v) => v.label)).toString();
 }
 
 Widget buildStateMenu(context) {
@@ -46,8 +49,8 @@ Widget buildStateMenu(context) {
         onPressed: () async {
           await prepareX(context);
           if (context.mounted) await encourageDelegateRepInvariant(context);
-          await Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const TrustsRoute()));
+          await Navigator.of(context)
+              .push(MaterialPageRoute(builder: (context) => const TrustsRoute()));
           if (context.mounted) await prepareX(context);
           if (context.mounted) await encourageDelegateRepInvariant(context);
         },
@@ -56,24 +59,22 @@ Widget buildStateMenu(context) {
         onPressed: () async {
           await prepareX(context);
           if (context.mounted) await encourageDelegateRepInvariant(context);
-          await Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => const DelegateKeysRoute()));
+          await Navigator.of(context)
+              .push(MaterialPageRoute(builder: (context) => const DelegateKeysRoute()));
           if (context.mounted) await prepareX(context);
           if (context.mounted) await encourageDelegateRepInvariant(context);
         },
-        child: Text(
-            'My authorized services: ${formatVerbs(DelegateKeysRoute.verbs)}')),
+        child: Text('My authorized services: ${formatVerbs(DelegateKeysRoute.verbs)}')),
     MenuItemButton(
         onPressed: () async {
           await prepareX(context);
           if (context.mounted) await encourageDelegateRepInvariant(context);
-          await Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => const OneofusKeysRoute()));
+          await Navigator.of(context)
+              .push(MaterialPageRoute(builder: (context) => const OneofusKeysRoute()));
           if (context.mounted) await prepareX(context);
           if (context.mounted) await encourageDelegateRepInvariant(context);
         },
-        child: Text(
-            'My equivalent one-of-us keys: ${formatVerbs(OneofusKeysRoute.verbs)}')),
+        child: Text('My equivalent one-of-us keys: ${formatVerbs(OneofusKeysRoute.verbs)}')),
   ], child: const Text('State'));
 }
 
@@ -167,47 +168,114 @@ Click the QR icon (bottom right) to sign in to a delegate partner (the Nerd'ster
   ], child: const Text('?'));
 }
 
-// TODO: Add functionality: 7 clicks to be a developer.
-Widget buildDevMenu(context) {
+class DevMenu extends StatefulWidget {
+  const DevMenu({super.key});
+
+  @override
+  State<StatefulWidget> createState() => DevMenuState();
+}
+
+class DevMenuState extends State<DevMenu> {
+  @override
+  void initState() {
+    super.initState();
+    Prefs.dev.addListener(listener);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    Prefs.dev.removeListener(listener);
+  }
+
+  void listener() {
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (Prefs.dev.value) {
+      return buildDevMenu(context);
+    } else {
+      return SizedBox();
+    }
+  }
+}
+
+String display(List l) {
+  return l.map((x) => x is DateTime ? formatUiDatetime(x) : x.toString()).join('\n');
+}
+
+Widget buildDevMenu(BuildContext context) {
   const String kOneofusCol = 'firecheck: phone:oneofus';
   const String kNerdsterCol = 'firecheck: phone:nerdster';
   return SubmenuButton(menuChildren: <Widget>[
     SubmenuButton(menuChildren: [
       MenuItemButton(
           onPressed: () async {
-            await checkRead(FireFactory.find(kOneofusDomain), kOneofusCol);
+            try {
+              context.loaderOverlay.show();
+              List out = await checkRead(FireFactory.find(kOneofusDomain), kOneofusCol);
+              context.loaderOverlay.hide();
+              await alert('Fire check', display(out), ['okay'], context);
+            } catch (e) {
+              await alertException(context, e);
+            } finally {
+              context.loaderOverlay.hide();
+            }
           },
           child: const Text('oneofus read')),
       MenuItemButton(
           onPressed: () async {
-            await checkWrite(FireFactory.find(kOneofusDomain), kOneofusCol);
+            try {
+              context.loaderOverlay.show();
+              List out = await checkWrite(FireFactory.find(kOneofusDomain), kOneofusCol);
+              context.loaderOverlay.hide();
+              await alert('Fire check', display(out), ['okay'], context);
+            } catch (e) {
+              await alertException(context, e);
+            } finally {
+              context.loaderOverlay.hide();
+            }
           },
           child: const Text('oneofus write')),
       MenuItemButton(
           onPressed: () async {
-            await checkRead(FireFactory.find(kNerdsterDomain), kNerdsterCol);
+            try {
+              context.loaderOverlay.show();
+              List out = await checkRead(FireFactory.find(kNerdsterDomain), kNerdsterCol);
+              context.loaderOverlay.hide();
+              await alert('Fire check', display(out), ['okay'], context);
+            } catch (e) {
+              await alertException(context, e);
+            } finally {
+              context.loaderOverlay.hide();
+            }
           },
           child: const Text('nerdster read')),
       MenuItemButton(
           onPressed: () async {
-            await checkWrite(FireFactory.find(kNerdsterDomain), kNerdsterCol);
+            try {
+              context.loaderOverlay.show();
+              List out = await checkWrite(FireFactory.find(kNerdsterDomain), kNerdsterCol);
+              context.loaderOverlay.hide();
+              await alert('Fire check', display(out), ['okay'], context);
+            } catch (e) {
+              await alertException(context, e);
+            } finally {
+              context.loaderOverlay.hide();
+            }
           },
           child: const Text('nerdster write')),
     ], child: const Text('Firebase check')),
     MenuItemButton(
         onPressed: () async {
-          try {
-            context.loadingOverlay.show();
-            await backup();
-          } finally {
-            context.loadingOverlay.hide();
-          }
+          await backup();
         },
         child: const Text('backup')),
     MenuItemButton(
         onPressed: () async {
-          String? okay = await alert(
-              'Wipe all data? Really?', '', ['Okay', 'Cancel'], context);
+          String? okay = await alert('Wipe all data? Really?', '', ['Okay', 'Cancel'], context);
           if (b(okay) && okay! == 'Okay') {
             await MyKeys.wipe();
           }
@@ -222,7 +290,7 @@ List<Widget> buildMenus(context) {
     buildEtcMenu(context),
     // SizedBox(width: 50,),
     // const MenuTitle(['one-', 'of-', 'us.', 'net']),
-    if (kDev) buildDevMenu(context),
+    DevMenu(),
     buildHelpMenu(context),
   ];
 }

@@ -4,16 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:oneofus/base/menus.dart';
-import 'package:oneofus/main.dart';
 import 'package:oneofus/oneofus/ui/alert.dart';
+import 'package:oneofus/prefs.dart';
 import 'package:oneofus/trusts_route.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
-import 'my_keys.dart';
 import '../oneofus/jsonish.dart';
 import '../oneofus/util.dart';
-import 'sign_in.dart';
 import '../widgets/qr_scanner.dart';
+import 'my_keys.dart';
+import 'sign_in.dart';
 
 class FancySplash extends StatelessWidget {
   const FancySplash({
@@ -27,7 +27,7 @@ class FancySplash extends StatelessWidget {
       Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          if (kDev)
+          if (Prefs.dev.value)
             FloatingActionButton(
                 heroTag: 'Copy',
                 tooltip: 'Copy',
@@ -36,7 +36,7 @@ class FancySplash extends StatelessWidget {
                   await Clipboard.setData(ClipboardData(
                       text: encoder.convert(MyKeys.oneofusPublicKey)));
                 }),
-          if (kDev) const SizedBox(width: 8),
+          if (Prefs.dev.value) const SizedBox(width: 8),
           const Spacer(),
           FloatingActionButton(
               tooltip: '''Scan someone's key QR to trust or a delegate site's QR to sign-in''',
@@ -51,7 +51,13 @@ class FancySplash extends StatelessWidget {
                     Jsonish? jsonish = await startTrust(jsonPublicKey, context);
                   } else {
                     assert(await validateSignIn(scanned));
-                    await signIn(scanned, context);
+                    try {
+                      // BUG: I've had issues here but have never caught an exception, only seen it in the logs.
+                      await signIn(scanned, context);
+                    } catch(e) {
+                      print('**************** signIn(..): $e');
+                      await alertException(context, e);
+                    }
                   }
                 }
               }),
@@ -117,7 +123,6 @@ class _KeyQrTextState extends State<_KeyQrText> {
           version: QrVersions.auto,
           size: size,
         ),
-        SportRow(),
         TextField(
             controller: TextEditingController()..text = dataString,
             maxLines: null,
@@ -132,9 +137,10 @@ class _KeyQrTextState extends State<_KeyQrText> {
 }
 
 class SportRow extends StatelessWidget {
-  final String kImage1 = 'assets/images/sportdeath_large.gif';
-  final String kImage2 = 'assets/images/nerd.gif';
-  const SportRow({
+  final random = Random();
+  final String kImageSport = 'assets/images/sportdeath_large.gif';
+  final String kImageNerd = 'assets/images/nerd.gif';
+  SportRow({
     super.key,
   });
 
@@ -144,10 +150,12 @@ class SportRow extends StatelessWidget {
     //   children: List.generate(
     //       7, (index) => Expanded(child: Image.asset(index == 0 || index == 6 ? kImage1 : kImage2))),
     // );
-    return Row(children: [
-      Expanded(child: Image.asset(kImage1)),
-      ...List.generate(7, (index) => Expanded(child: SizedBox())),
-      Expanded(child: Image.asset(kImage1)),
-    ]);
+    return SizedBox(height: 20);
+    // return Row(children: [
+    //   ...List.generate(6, (index) => Expanded(child: SizedBox(height: 20,))),
+    //   // Expanded(child: Image.asset(kImageNerd)),
+    //   // ...List.generate(2, (index) => Expanded(child: SizedBox())),
+    //   // Expanded(child: Image.asset(random.nextInt(100) <= 90 ? kImageNerd : kImageSport)),
+    // ]);
   }
 }
