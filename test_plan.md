@@ -38,6 +38,7 @@ Email me or submit at: https://github.com/YotamAviv/nerdster/issues
 
 - Submit 2 things, verify revokeAt 
   - submit subject "A"
+  - BUG: I had to refresh the nerdster. I think that after signing in again with a delegate, it didn't load my delegate statement.
   - submit subject "B"
   - revoke delegate at first (the earlier of the 2, "A")
   - TODO: Display revoked keys on Nerdster with cross out like on the phone.
@@ -71,7 +72,12 @@ Email me or submit at: https://github.com/YotamAviv/nerdster/issues
     - your own delegate key.
     - equivalent Oneofus key, use Yotam's
     - one of your existing delegate keys, use Yotam's
-  - Hmmm.. try claiming Andrew's delegate key (I haven't tried this but should)
+  - Claiming Andrew's delegate key (complicated...)
+    - type in "nerdster.org", yes, overwrite my key.
+    - refresh the Nerdter and check it out.. 
+    - Problems:
+      - BUG: Between refreshes and signing in as the new phone key again, I ended up with a tree view in the content view.
+      - BUG: I see 2 for recommend, both by my 2 delegate keys, should be 1 (I think)
 
 - Start again (wipe) (probably not necessary, can probably optimize)
 
@@ -80,6 +86,7 @@ Email me or submit at: https://github.com/YotamAviv/nerdster/issues
 
 - QR sign in
   - App should offer to create delegate key
+  - Verify Nerdster seems okay with me using Yotam's key..
 
 - Replace my key (State menu => {replace})
   - Replace my key
