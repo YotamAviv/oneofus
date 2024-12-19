@@ -159,13 +159,12 @@ class _QrScannerState extends State<QrScanner> {
   }
 }
 
-Future<bool> validateKey(String string) async {
+Future<bool> validateKey(String scanned) async {
   try {
-    Json publicKeyJson = jsonDecode(string);
-    await crypto.parsePublicKey(publicKeyJson);
+    Json json = jsonDecode(scanned);
+    await crypto.parsePublicKey(json);
     return true;
   } catch (e) {
-    print('scannerJsonValidate($string) returning: false');
     return false;
   }
 }

@@ -2,31 +2,37 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:oneofus/delegate_keys_route.dart';
+import 'package:http/http.dart' as http;
 import 'package:oneofus/base/menus.dart';
+import 'package:oneofus/delegate_keys_route.dart';
+import 'package:oneofus/main.dart';
 
-import 'my_keys.dart';
 import '../fire/nerdster_fire.dart';
 import '../oneofus/crypto/crypto.dart';
 import '../oneofus/jsonish.dart';
 import '../oneofus/util.dart';
+import 'my_keys.dart';
 
+// TODO: Eliminate Nerdster fire. Sign in using HTTP POST only.
 final FirebaseFirestore _nerdsterFire = NerdsterFire.nerdsterFirestore;
+
+const Map<String, String> _headers = {
+  'Content-Type': 'application/json; charset=UTF-8',
+};
 
 Future<bool> validateSignIn(String text) async {
   try {
     Json received = jsonDecode(text);
-    String session = received['session']!;
-    Json pkePublicKeyJson = received['publicKey']!;
+    return received.containsKey('method') &&
+        received.containsKey('session') &&
+        received.containsKey('publicKey');
   } catch (e) {
-    print(e);
     return false;
   }
-  return true;
 }
 
-Future<void> signIn(String text, BuildContext context) async {
-  Json received = jsonDecode(text);
+Future<void> signIn(String scanned, BuildContext context) async {
+  Json received = jsonDecode(scanned);
   print(received);
   String session = received['session']!;
   String domain = received['domain']!;
@@ -61,12 +67,24 @@ Future<void> signIn(String text, BuildContext context) async {
     send['delegateCiphertext'] = delegateCiphertext;
   }
 
-  // TODO: HTTP POST instead.
-  final sessionCollection = _nerdsterFire.collection('sessions').doc('doc').collection(session);
-  await sessionCollection.doc('doc').set(send);
-  print("signIn: inserted send");
-  // Bag: This DB write fails often (especially on my Android, on Wifi).
-  // OLD: onError: (e) => print("signIn error: $e"));
+  if (received['method'] == 'Firestore') {
+    final sessionCollection = _nerdsterFire.collection('sessions').doc('doc').collection(session);
+    await sessionCollection.doc('doc').set(send);
+  } else {
+    assert(received['method'] == 'POST');
+    send['session'] = session;
+    Uri uri = Uri.parse(received['uri']);
+    if (kFireChoice == FireChoice.emulator) {
+      uri = uri.replace(port: 5001, host: '10.0.2.2', path: '/nerdster/us-central1/signin');
+    }
+    // DEFER: Enforce that POST domain URI matches delegate domain.
+    // As we're POSTing to cloudfunctions.net, we'd have to forward something from our domain to
+    // pass this check.
+    print('uri=$uri');
+    print('send=$send');
+    http.Response response = await http.post(uri, headers: _headers, body: jsonEncode(send));
+    print('response.statusCode: ${response.statusCode}'); // (201 expected)
+  }
 
   Navigator.popUntil(context, ModalRoute.withName(Navigator.defaultRouteName));
 }

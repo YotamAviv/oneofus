@@ -3,29 +3,15 @@ git tag PROD-v`date2`
 
 
 
+# POST sign in notes
 
-2008  history
- 2009  firebase login
- 2010  dart pub global activate flutterfire_cli
- 2011  flutterfire configure
- 2012  flutter pub add firebase_core
- 2013  flutterfire configure
- 
-
-
-
-
-# BUGS:
-
-- Andrew bug (fixed)
-  - don't see that I already trust Andrew when I person_add.
-  - see clear twice when I try and re-trust Andrew (or anyone), but not always.
-    Before displaying my trust/blocks, I don't see trust twice.
-
-
-- Huh? delegate confusion after importing keys
+- TODO: might have to add something to iOS entitlements to make the
+  HTTP POST, see
+  https://docs.flutter.dev/cookbook/networking/send-data
 
 # TODO:
+
+
 
 
 # Testing..
@@ -33,10 +19,6 @@ git tag PROD-v`date2`
   - getEquiv... returns mine too, maybe test, definitely doc and/or rename
   - simulate MyKeys (secure storage)
 
-## Doc:
-- manual
-  - explain lost, yours, equiv...
-    - lost key: can't clear (erase) or overwrite equivalent statements 
 
 ** delegates **
   - DEFER:

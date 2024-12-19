@@ -52,10 +52,10 @@ class FancySplash extends StatelessWidget {
                   } else {
                     assert(await validateSignIn(scanned));
                     try {
-                      // BUG: I've had issues here but have never caught an exception, only seen it in the logs.
                       await signIn(scanned, context);
-                    } catch(e) {
-                      print('**************** signIn(..): $e');
+                    } catch(e, stackTrace) {
+                      print('*** signIn exception: $e');
+                      print(stackTrace);
                       await alertException(context, e);
                     }
                   }

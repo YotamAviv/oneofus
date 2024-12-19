@@ -16,7 +16,7 @@ enum FireChoice {
   prod;
 }
 
-const FireChoice _fire = FireChoice.prod;
+const FireChoice kFireChoice = FireChoice.prod;
 const int? slowPushMillis = null;
 const bool exceptionWhenTryingToPush = false;
 // TODO: also simulate slow fetch.
@@ -27,10 +27,10 @@ const bool exceptionWhenTryingToPush = false;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  if (_fire != FireChoice.fake) {
+  if (kFireChoice != FireChoice.fake) {
     await oneofusFireInit();
     await nerdsterFireInit();
-    if (_fire == FireChoice.emulator) {
+    if (kFireChoice == FireChoice.emulator) {
       NerdsterFire.nerdsterFirestore.useFirestoreEmulator('localhost', 8080);
       // (Just using 192.168.1.97 for emulator didn't work.)
       // $ firebase --project=nerdster emulators:start
