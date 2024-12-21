@@ -54,7 +54,7 @@ Widget buildStateMenu(context) {
           if (context.mounted) await prepareX(context);
           if (context.mounted) await encourageDelegateRepInvariant(context);
         },
-        child: Text('My network: ${formatVerbs(TrustsRoute.verbs)}')),
+        child: Text('My network: ${formatVerbs(TrustsRoute.spec.verbs)}')),
     MenuItemButton(
         onPressed: () async {
           await prepareX(context);
@@ -64,7 +64,7 @@ Widget buildStateMenu(context) {
           if (context.mounted) await prepareX(context);
           if (context.mounted) await encourageDelegateRepInvariant(context);
         },
-        child: Text('My authorized services: ${formatVerbs(DelegateKeysRoute.verbs)}')),
+        child: Text('My authorized services: ${formatVerbs(DelegateKeysRoute.spec.verbs)}')),
     MenuItemButton(
         onPressed: () async {
           await prepareX(context);
@@ -74,7 +74,7 @@ Widget buildStateMenu(context) {
           if (context.mounted) await prepareX(context);
           if (context.mounted) await encourageDelegateRepInvariant(context);
         },
-        child: Text('My equivalent one-of-us keys: ${formatVerbs(OneofusKeysRoute.verbs)}')),
+        child: Text('My equivalent one-of-us keys: ${formatVerbs(OneofusKeysRoute.spec.verbs)}')),
   ], child: const Text('State'));
 }
 

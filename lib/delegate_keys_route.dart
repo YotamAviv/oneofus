@@ -41,30 +41,30 @@ import 'statement_action_picker.dart';
 ///   'You currently have a delegate key pair for $domain on this device, but it is not associated with you. Claim it or delete it?'
 ///
 
-String _descTop0 = '''Delegate key pairs allow other services (the Nerd'ster) to state stuff as you.
+const String _descTop = '''Delegate key pairs allow other services (the Nerd'ster) to state stuff as you.
 You can revoke these at any time (including retroactively).  
 ''';
 
-String _descBottom = '''.''';
+const String _descBottom = '''.''';
 
 class DelegateKeysRoute extends StatelessWidget {
-  static const Set<TrustVerb> verbs = {TrustVerb.delegate};
+  static const RouteSpec spec = RouteSpec([TrustVerb.delegate], _descTop);
 
   const DelegateKeysRoute({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text(formatVerbs(verbs))),
+        appBar: AppBar(title: Text(formatVerbs(spec.verbs))),
         body: SafeArea(
             child: ListView(
                 shrinkWrap: true,
                 physics: const AlwaysScrollableScrollPhysics(),
                 children: [
-              Linky(_descTop0),
-              const Divider(height: 10, thickness: 2),
-              const StatementActionPicker(verbs),
-              const Divider(height: 10, thickness: 2),
+              Linky(_descTop),
+              kDivider,
+              const StatementActionPicker(spec),
+              kDivider,
               Linky(_descBottom),
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 OutlinedButton(
@@ -94,7 +94,7 @@ Future<Jsonish?> createNewDelegateKey(String? domain, BuildContext context) asyn
     if (b(domain)) "with": {"domain": domain}
   };
   TrustStatement ts = TrustStatement(Jsonish(statementStarterJson));
-  Jsonish? jsonish = await ModifyStatementRoute.show(ts, const [TrustVerb.delegate], context);
+  Jsonish? jsonish = await ModifyStatementRoute.show(ts, DelegateKeysRoute.spec, context);
   if (b(jsonish)) {
     ts = Statement.make(jsonish!) as TrustStatement;
     assert(ts.domain!.length > 1);
@@ -159,7 +159,7 @@ Future<Jsonish?> stateClaimDelegateKey(Json subjectJson, BuildContext context,
     TrustStatement prototype = TrustStatement(Jsonish(prototypeJson));
 
     assert(prototype.subjectToken == subjectToken);
-    Jsonish? jsonish = await ModifyStatementRoute.show(prototype, [TrustVerb.delegate], context);
+    Jsonish? jsonish = await ModifyStatementRoute.show(prototype, DelegateKeysRoute.spec, context);
     return jsonish;
   } catch (e, stackTrace) {
     if (context.mounted) {

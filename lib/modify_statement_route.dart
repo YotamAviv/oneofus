@@ -40,20 +40,30 @@ import 'widgets/statement_widget.dart';
 /// Consider: Pass in the help per choice. Sounds good, but this is called by
 /// StatementActionPicker in a generic way, and so the help would have to be passed to that.
 /// Would that be more spaghetti or less?
+
+const Divider kDivider = Divider(height: 10, thickness: 2);
+
+class RouteSpec {
+  final List<TrustVerb> verbs;
+  final String descTop;
+  const RouteSpec(this.verbs, this.descTop);
+}
+
 class ModifyStatementRoute extends StatefulWidget {
   final TrustStatement statement;
+  final RouteSpec spec;
+  final KeyWidget? subjectKeyDemo;
   late final List<TrustVerb> verbs;
   late final bool fresh;
-  final KeyWidget? subjectKeyDemo;
 
-  ModifyStatementRoute(this.statement, List<TrustVerb> verbsIn, {this.subjectKeyDemo, super.key}) {
-    this.fresh = statement.iToken == MyKeys.oneofusToken &&
+  ModifyStatementRoute(this.statement, this.spec, {this.subjectKeyDemo, super.key}) {
+    fresh = statement.iToken == MyKeys.oneofusToken &&
         !(MyStatements.getByI(MyKeys.oneofusToken)
             .any((s) => s.subjectToken == statement.subjectToken));
     if (fresh) {
-      this.verbs = [...verbsIn];
+      verbs = [...spec.verbs];
     } else {
-      this.verbs = [...verbsIn, TrustVerb.clear];
+      verbs = [...spec.verbs, TrustVerb.clear];
     }
   }
 
@@ -62,11 +72,11 @@ class ModifyStatementRoute extends StatefulWidget {
 
   // CODE: Understand what a "MaterialPageRoute" is and consider getting rid of these "show" helpers.
   static Future<Jsonish?> show(
-      TrustStatement statement, List<TrustVerb> choices, BuildContext context,
+      TrustStatement statement, RouteSpec spec, BuildContext context,
       {KeyWidget? subjectKeyDemo}) async {
     Jsonish? out = await Navigator.of(context).push(MaterialPageRoute(
         builder: (context) =>
-            ModifyStatementRoute(statement, choices, subjectKeyDemo: subjectKeyDemo)));
+            ModifyStatementRoute(statement, spec, subjectKeyDemo: subjectKeyDemo)));
     return out;
   }
 }
@@ -145,7 +155,10 @@ class _ModifyStatementRouteState extends State<ModifyStatementRoute> {
     return Scaffold(
         appBar: AppBar(title: Text(title)),
         body: ListView(children: [
-          Text(desc1),
+          Linky(widget.spec.descTop),
+          kDivider,
+          Linky(desc1),
+          kDivider,
           if (widget.statement.iToken != MyKeys.oneofusToken) const Linky('''NOTE:
 The statement below was signed by one of your replaced, equivalent keys, not by your current, active key.            
 If you restate this statement with your active key, the old statement signed by your old key cannot be overwritten but should be understood to be stale.'''),

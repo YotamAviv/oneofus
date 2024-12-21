@@ -14,9 +14,9 @@ import 'widgets/statement_widget.dart';
 // TODO(2): Show the statements with different colors for shadowed and conflicting blocks.
 
 class StatementActionPicker extends StatefulWidget {
-  final Set<TrustVerb> verbs;
+  final RouteSpec spec;
 
-  const StatementActionPicker(this.verbs, {super.key});
+  const StatementActionPicker(this.spec, {super.key});
 
   @override
   State<StatefulWidget> createState() => _StatementActionPickerState();
@@ -46,19 +46,20 @@ class _StatementActionPickerState extends State<StatementActionPicker> {
   @override
   Widget build(BuildContext context) {
     List stuff = [];
-    List<TrustStatement> activeStatements = MyStatements.getByVerbsActive(widget.verbs);
-    List<TrustStatement> equivStatements = MyStatements.getByVerbsEquiv(widget.verbs);
+    List<TrustStatement> activeStatements =
+        MyStatements.getByVerbsActive(Set.of(widget.spec.verbs));
+    List<TrustStatement> equivStatements = MyStatements.getByVerbsEquiv(Set.of(widget.spec.verbs));
 
     String? desc;
     if (activeStatements.isEmpty && equivStatements.isEmpty) {
-      desc = '''You haven't issued any ${formatVerbs(widget.verbs)} statements.''';
+      desc = '''You haven't issued any ${formatVerbs(widget.spec.verbs)} statements.''';
       stuff.add(desc);
     }
 
     String? descActive;
     if (activeStatements.isNotEmpty) {
       descActive =
-          '''Below are ${formatVerbs(widget.verbs)} statements signed by your active key. Click on these to edit (re-state) them with updated fields or to clear (erase) them.''';
+          '''Below are ${formatVerbs(widget.spec.verbs)} statements signed by your active key. Click on these to edit (re-state) them with updated fields or to clear (erase) them.''';
       stuff.add(descActive);
       stuff.addAll(activeStatements);
     }
@@ -66,7 +67,7 @@ class _StatementActionPickerState extends State<StatementActionPicker> {
     String? descEquiv;
     if (equivStatements.isNotEmpty) {
       descEquiv =
-          '''Below are ${formatVerbs(widget.verbs)} statements signed by your equivalent keys. You can't edit or delete these (because you don't posses those replaced keys) but you can still re-state them and probably override them with your current key.''';
+          '''Below are ${formatVerbs(widget.spec.verbs)} statements signed by your equivalent keys. You can't edit or delete these (because you don't posses those replaced keys) but you can still re-state them and probably override them with your current key.''';
       stuff.add(descEquiv);
       stuff.addAll(equivStatements);
     }
@@ -77,7 +78,7 @@ class _StatementActionPickerState extends State<StatementActionPicker> {
         rows.add(Text(thing));
       } else if (thing is TrustStatement) {
         onTap() async {
-          Jsonish? jsonish = await ModifyStatementRoute.show(thing, [...widget.verbs], context);
+          Jsonish? jsonish = await ModifyStatementRoute.show(thing, widget.spec, context);
           if (context.mounted) {
             await prepareX(context); // redundant?
             setState(() {});

@@ -14,31 +14,31 @@ import 'oneofus/util.dart';
 import 'statement_action_picker.dart';
 import 'widgets/qr_scanner.dart';
 
-String _descTop0 =
+const String _descTop =
     '''This app holds your active one-of-us public/private key pair and uses it to sign statements.
 Stuff happens (lost phones, compromised keys, apps reinstalled, ...), and sometimes replacement keys are needed.
 But individuals should maintain their singular identities, and {replace} statements facilitate this (as in, "This new key replaces my lost key").''';
 
-String _descBottom = '''.''';
+const String _descBottom = '''.''';
 
 class OneofusKeysRoute extends StatelessWidget {
-  static const Set<TrustVerb> verbs = {TrustVerb.replace};
+  static const RouteSpec spec = RouteSpec([TrustVerb.replace], _descTop);
 
   const OneofusKeysRoute({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text(formatVerbs(verbs))),
+        appBar: AppBar(title: Text(formatVerbs(spec.verbs))),
         body: SafeArea(
             child: ListView(
                 shrinkWrap: true,
                 physics: const AlwaysScrollableScrollPhysics(),
                 children: [
-              Linky(_descTop0),
-              const Divider(height: 10, thickness: 2),
-              const StatementActionPicker(verbs),
-              const Divider(height: 10, thickness: 2),
+              Linky(_descTop),
+              kDivider,
+              const StatementActionPicker(spec),
+              kDivider,
               Linky(_descBottom),
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 OutlinedButton(
@@ -198,7 +198,7 @@ https://manual#replace''',
     TrustStatement prototype = TrustStatement(Jsonish(prototypeJson));
 
     assert(prototype.subjectToken == subjectToken);
-    Jsonish? jsonish = await ModifyStatementRoute.show(prototype, [TrustVerb.replace], context,
+    Jsonish? jsonish = await ModifyStatementRoute.show(prototype, OneofusKeysRoute.spec, context,
         subjectKeyDemo: myEquivalentKey);
     return jsonish;
   } catch (e, stackTrace) {

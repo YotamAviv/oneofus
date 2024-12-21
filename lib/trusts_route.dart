@@ -14,31 +14,32 @@ import 'oneofus/util.dart';
 import 'statement_action_picker.dart';
 import 'widgets/qr_scanner.dart';
 
-String _descTop0 = '''You reference other folks' public keys in {trust, block} statements: 
+const String _descTop = '''You reference other folks' public keys in {trust, block} statements: 
 Trust: [human, capable, acting in good faith]
 Block: [bots, spammers, bad actors, careless, confused, ...]
-These statements form your (and our) one-of-us network.''';
+These statements form your (and our) one-of-us network.
+''';
+const String _descBottom = '''.''';
 
-String _descBottom = '''.''';
+const RouteSpec trustRouteSpec = RouteSpec([TrustVerb.trust, TrustVerb.block], _descTop);
 
 class TrustsRoute extends StatelessWidget {
-  static const Set<TrustVerb> verbs = {TrustVerb.trust, TrustVerb.block};
-
   const TrustsRoute({super.key});
+  static const spec = trustRouteSpec;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text(formatVerbs(verbs))),
+        appBar: AppBar(title: Text(formatVerbs(spec.verbs))),
         body: SafeArea(
             child: ListView(
                 shrinkWrap: true,
                 physics: const AlwaysScrollableScrollPhysics(),
                 children: [
-              Linky(_descTop0),
-              const Divider(height: 10, thickness: 2),
-              const StatementActionPicker(verbs),
-              const Divider(height: 10, thickness: 2),
+              Linky(spec.descTop),
+              kDivider,
+              StatementActionPicker(spec),
+              kDivider,
               Linky(_descBottom),
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 OutlinedButton(
@@ -103,8 +104,7 @@ If you need to clear or change that, go to menu => Keys => Delegates... and clea
     }
 
     // Shouldn't need to check for clear (distincter)
-    Jsonish? jsonish = await ModifyStatementRoute.show(
-        prototype, const [TrustVerb.trust, TrustVerb.block], context);
+    Jsonish? jsonish = await ModifyStatementRoute.show(prototype, TrustsRoute.spec, context);
     return jsonish;
   } catch (e) {
     await alertException(context, e);
