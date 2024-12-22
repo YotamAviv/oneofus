@@ -74,10 +74,11 @@ Email me or submit at: https://github.com/YotamAviv/nerdster/issues
     - one of your existing delegate keys, use Yotam's
   - Claiming Andrew's delegate key (complicated...)
     - type in "nerdster.org", yes, overwrite my key.
-    - refresh the Nerdter and check it out.. 
+    - refresh the Nerdster and check it out.. 
     - Problems:
       - BUG: Between refreshes and signing in as the new phone key again, I ended up with a tree view in the content view.
       - BUG: I see 2 for recommend, both by my 2 delegate keys, should be 1 (I think)
+      - BUG: Trying to recommend again or to clear my reaction is screwy
 
 - Start again (wipe) (probably not necessary, can probably optimize)
 
