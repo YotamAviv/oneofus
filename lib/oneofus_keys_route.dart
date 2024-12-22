@@ -18,11 +18,16 @@ const String _descTop =
     '''This app holds your active one-of-us public/private key pair and uses it to sign statements.
 Stuff happens (lost phones, compromised keys, apps reinstalled, ...), and sometimes replacement keys are needed.
 But individuals should maintain their singular identities, and {replace} statements facilitate this (as in, "This new key replaces my lost key").''';
-
-const String _descBottom = '''.''';
+const String _descVerbs = '''replace: Claim this key as a former identity (one-of-us) key of yours.
+clear: disassociate yourself from this key.''';
+const Map<TrustVerb, String> _descVerb = {
+  TrustVerb.replace: '''revokeAt: Pick the last valid statement you made using this key.
+comment: A note (probably to yourself) about this key and why your replacing it.''',
+  TrustVerb.clear: '''No fields to fill out (you're erasing after all).''',
+};
 
 class OneofusKeysRoute extends StatelessWidget {
-  static const RouteSpec spec = RouteSpec([TrustVerb.replace], _descTop);
+  static const RouteSpec spec = RouteSpec([TrustVerb.replace], _descTop, _descVerbs, _descVerb);
 
   const OneofusKeysRoute({super.key});
 
@@ -39,7 +44,6 @@ class OneofusKeysRoute extends StatelessWidget {
               kDivider,
               const StatementActionPicker(spec),
               kDivider,
-              Linky(_descBottom),
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 OutlinedButton(
                     onPressed: () async {
@@ -69,8 +73,7 @@ https://manual#replace''',
 }
 
 Future<Jsonish?> claimKey(BuildContext context) async {
-  String? scanned =
-      await QrScanner.scan('public key QR code to replace', validateKey, context);
+  String? scanned = await QrScanner.scan('public key QR code to replace', validateKey, context);
   if (b(scanned)) {
     Json subjectKeyJson = await parsePublicKey(scanned!);
     // NOTE: The check for context.mounted (see below) breaks things.

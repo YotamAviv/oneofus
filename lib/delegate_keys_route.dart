@@ -41,14 +41,20 @@ import 'statement_action_picker.dart';
 ///   'You currently have a delegate key pair for $domain on this device, but it is not associated with you. Claim it or delete it?'
 ///
 
-const String _descTop = '''Delegate key pairs allow other services (the Nerd'ster) to state stuff as you.
-You can revoke these at any time (including retroactively).  
-''';
-
-const String _descBottom = '''.''';
+const String _descTop =
+    '''Delegate key pairs allow other services (eg. the Nerd'ster) to state stuff as you.
+You can revoke these at any time (including retroactively).''';
+const String _descVerbs = '''delegate: Claim this delegate key as yours (revoked or not).
+clear: disassociate yourself from this key.''';
+const Map<TrustVerb, String> _descVerb = {
+  TrustVerb.delegate: '''domain: The partner service's domain name (eg. nerdster.org).
+revokeAt: Choose among: <not revoked>, revoked <since always>, or revoked at a particular past statement.
+comment: Optional note.''',
+  TrustVerb.clear: '''No fields to fill out (you're erasing after all).''',
+};
 
 class DelegateKeysRoute extends StatelessWidget {
-  static const RouteSpec spec = RouteSpec([TrustVerb.delegate], _descTop);
+  static const RouteSpec spec = RouteSpec([TrustVerb.delegate], _descTop, _descVerbs, _descVerb);
 
   const DelegateKeysRoute({super.key});
 
@@ -65,7 +71,6 @@ class DelegateKeysRoute extends StatelessWidget {
               kDivider,
               const StatementActionPicker(spec),
               kDivider,
-              Linky(_descBottom),
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 OutlinedButton(
                     onPressed: () async {
@@ -105,8 +110,7 @@ Future<Jsonish?> createNewDelegateKey(String? domain, BuildContext context) asyn
 }
 
 Future<Jsonish?> claimDelegateKey(BuildContext context) async {
-  String? scanned =
-      await QrScanner.scan('Scan a public key QR code', validateKey, context);
+  String? scanned = await QrScanner.scan('Scan a public key QR code', validateKey, context);
   if (b(scanned)) {
     Json subjectKeyJson = await parsePublicKey(scanned!);
     return await stateClaimDelegateKey(subjectKeyJson, context);

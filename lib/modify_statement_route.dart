@@ -46,7 +46,9 @@ const Divider kDivider = Divider(height: 10, thickness: 2);
 class RouteSpec {
   final List<TrustVerb> verbs;
   final String descTop;
-  const RouteSpec(this.verbs, this.descTop);
+  final String descState;
+  final Map<TrustVerb, String>? descStateVerb;
+  const RouteSpec(this.verbs, this.descTop, this.descState, this.descStateVerb);
 }
 
 class ModifyStatementRoute extends StatefulWidget {
@@ -71,8 +73,7 @@ class ModifyStatementRoute extends StatefulWidget {
   State<StatefulWidget> createState() => _ModifyStatementRouteState();
 
   // CODE: Understand what a "MaterialPageRoute" is and consider getting rid of these "show" helpers.
-  static Future<Jsonish?> show(
-      TrustStatement statement, RouteSpec spec, BuildContext context,
+  static Future<Jsonish?> show(TrustStatement statement, RouteSpec spec, BuildContext context,
       {KeyWidget? subjectKeyDemo}) async {
     Jsonish? out = await Navigator.of(context).push(MaterialPageRoute(
         builder: (context) =>
@@ -155,9 +156,9 @@ class _ModifyStatementRouteState extends State<ModifyStatementRoute> {
     return Scaffold(
         appBar: AppBar(title: Text(title)),
         body: ListView(children: [
-          Linky(widget.spec.descTop),
-          kDivider,
           Linky(desc1),
+          kDivider,
+          Linky(b(choice) ? widget.spec.descStateVerb[choice!]! : widget.spec.descState),
           kDivider,
           if (widget.statement.iToken != MyKeys.oneofusToken) const Linky('''NOTE:
 The statement below was signed by one of your replaced, equivalent keys, not by your current, active key.            

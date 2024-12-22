@@ -14,14 +14,20 @@ import 'oneofus/util.dart';
 import 'statement_action_picker.dart';
 import 'widgets/qr_scanner.dart';
 
-const String _descTop = '''You reference other folks' public keys in {trust, block} statements: 
-Trust: [human, capable, acting in good faith]
-Block: [bots, spammers, bad actors, careless, confused, ...]
-These statements form your (and our) one-of-us network.
-''';
-const String _descBottom = '''.''';
+const String _descTop = '''You reference other folks' public keys in {trust, block} statements. 
+These form your (and our) one-of-us network.''';
+const String _descVerbs = '''trust: human, capable, acting in good faith.
+block: bots, spammers, bad actors, careless, confused, ...''';
+const Map<TrustVerb, String> _descVerb = {
+  TrustVerb.trust: '''moniker: First name is a typical choice.
+comment: Optional, could be about your relationship or the circumstances.''',
+  TrustVerb.block:
+      '''comment: Recommended but not required. Why are you choosing to block this key?''',
+  TrustVerb.clear: '''No fields to fill out (you're erasing after all).''',
+};
 
-const RouteSpec trustRouteSpec = RouteSpec([TrustVerb.trust, TrustVerb.block], _descTop);
+const RouteSpec trustRouteSpec =
+    RouteSpec([TrustVerb.trust, TrustVerb.block], _descTop, _descVerbs, _descVerb);
 
 class TrustsRoute extends StatelessWidget {
   const TrustsRoute({super.key});
@@ -40,7 +46,6 @@ class TrustsRoute extends StatelessWidget {
               kDivider,
               StatementActionPicker(spec),
               kDivider,
-              Linky(_descBottom),
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 OutlinedButton(
                     onPressed: () async {
