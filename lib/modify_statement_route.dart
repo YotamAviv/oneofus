@@ -47,7 +47,7 @@ class RouteSpec {
   final List<TrustVerb> verbs;
   final String descTop;
   final String descState;
-  final Map<TrustVerb, String>? descStateVerb;
+  final Map<TrustVerb, String> descStateVerb;
   const RouteSpec(this.verbs, this.descTop, this.descState, this.descStateVerb);
 }
 
