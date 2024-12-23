@@ -35,7 +35,7 @@ class DemoKeysRoute extends StatelessWidget {
 Your keys (private/public pairs) are stored on your phone. 
 Public keys can be 
   - your active one-of-us identity key (green)
-  - your active one delegate key (blue)
+  - your active one delegate keys (blue)
   - someone else's key (gray)'''),
         Row(
           children: [
