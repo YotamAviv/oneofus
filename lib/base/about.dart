@@ -23,6 +23,7 @@ class About extends StatelessWidget {
           child: ListView(padding: const EdgeInsets.all(20.0), children: [
             Linky('''Home: https://one-of-us.net'''),
             Linky('''Contact: contact@one-of-us.net'''),
+            Linky('''Abuse: abuse@one-of-us.net'''),
             const SizedBox(height: 10),
             Linky('Privacy policy: https://www.one-of-us.net/policy'),
             Linky('Terms and conditions: https://www.one-of-us.net/terms'),
