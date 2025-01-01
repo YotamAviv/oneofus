@@ -61,8 +61,8 @@ The private key may be available or lost:
   - lost (this app does not have the private key - light color)'''),
         Row(
           children: [
-            myEquivalentKey,
-            myLostDelegateKey,
+            myActiveDelegateKey,
+            myLostDelegateKey
           ],
         ),
         space,
