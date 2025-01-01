@@ -41,8 +41,8 @@ Email me or submit at: https://github.com/YotamAviv/nerdster/issues
   - BUG: I had to refresh the nerdster. I think that after signing in again with a delegate, it didn't load my delegate statement.
   - submit subject "B"
   - revoke delegate at first (the earlier of the 2, "A")
-  - TODO: Display revoked keys on Nerdster with cross out like on the phone.
   - refresh Nerdster and check. You should A but not B.
+    - (Nerdster should display revoked key cross out like on the phone.)
   - TODO: Don't allow submitting with revoked key
   - revoke at "since always" and check. You should see neither A nor B.
   - un-revoke. You should see both A and B again.
@@ -76,9 +76,7 @@ Email me or submit at: https://github.com/YotamAviv/nerdster/issues
     - type in "nerdster.org", yes, overwrite my key.
     - refresh the Nerdster and check it out.. 
     - Problems:
-      - BUG: Between refreshes and signing in as the new phone key again, I ended up with a tree view in the content view.
-      - BUG: I see 2 for recommend, both by my 2 delegate keys, should be 1 (I think)
-      - BUG: Trying to recommend again or to clear my reaction is screwy
+      - BUG: Clear my reaction doesn't completely work (2 delegates, might be in wrong order..)
 
 - Start again (wipe) (probably not necessary, can probably optimize)
 
@@ -86,8 +84,8 @@ Email me or submit at: https://github.com/YotamAviv/nerdster/issues
   - Replace Yotam's key revoking a few statements back
 
 - QR sign in
-  - App should offer to create delegate key
-  - Verify Nerdster seems okay with me using Yotam's key..
+  - App should offer to create delegate key, YES
+  - Verify Nerdster seems okay with me using Yotam's Oneofus key..
 
 - Replace my key (State menu => {replace})
   - Replace my key
