@@ -33,7 +33,6 @@ Future<bool> validateSignIn(String text) async {
 
 Future<void> signIn(String scanned, BuildContext context) async {
   Json received = jsonDecode(scanned);
-  print(received);
   String session = received['session']!;
   String domain = received['domain']!;
 
@@ -59,12 +58,20 @@ Future<void> signIn(String scanned, BuildContext context) async {
     'date': clock.nowIso, // time so that I can delete these at some point in the future.
     'one-of-us.net': MyKeys.oneofusPublicKey,
   };
+
   String? delegateCleartext;
   if (b(delegateKeyPairJson)) {
-    delegateCleartext = encoder.convert(delegateKeyPairJson);
-    String delegateCiphertext = await myPkeKeyPair.encrypt(delegateCleartext, webPkePublicKey);
     send['publicKey'] = await myPkePublicKey.json;
-    send['delegateCiphertext'] = delegateCiphertext;
+
+    // Don't encrypt on iOS
+    bool isIOS = Theme.of(context).platform == TargetPlatform.iOS;
+    delegateCleartext = encoder.convert(delegateKeyPairJson);
+    if (isIOS) {
+      send['delegateCleartext'] = delegateCleartext;
+    } else {
+      String delegateCiphertext = await myPkeKeyPair.encrypt(delegateCleartext, webPkePublicKey);
+      send['delegateCiphertext'] = delegateCiphertext;
+    }
   }
 
   if (received['method'] == 'Firestore') {

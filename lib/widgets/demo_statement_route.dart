@@ -131,7 +131,7 @@ Samples below:'''),
 
           const Linky(
               '''I've delegated this disposable key for nerdster.org to make statements on my behalf.'''),
-          make(myOneofusKey, TrustVerb.ste, myActiveDelegateKey,
+          make(myOneofusKey, TrustVerb.delegate, myActiveDelegateKey,
               domain: 'nerdster.org'),
           space,
 
