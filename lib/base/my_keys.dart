@@ -9,7 +9,7 @@ import '../oneofus/jsonish.dart';
 import '../oneofus/trust_statement.dart';
 import '../oneofus/util.dart';
 
-/// CONSIDER: Switch delegate storge key from domain to token
+/// CONSIDER: Switch delegate storage key from domain to token
 /// CONSIDER: Oneofus key changes? We'll still need to store the key you use as that's where it
 /// all starts, and so only change if it simplifies.
 /// Without change, we have {'one-of-us.org' : keyPair}
@@ -46,7 +46,7 @@ import '../oneofus/util.dart';
 /// - block
 /// - create new
 
-/// TODO(5): Save last statement tokens for statements made on this device
+/// CONSIDER: Save last statement tokens for statements made on this device
 
 class MyKeys {
   static const FlutterSecureStorage _storage = FlutterSecureStorage();
