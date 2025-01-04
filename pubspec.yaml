@@ -2,7 +2,7 @@ name: oneofus
 description: "A new Flutter project."
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 1.0.41+41
+version: 1.0.42+42
 
 environment:
   sdk: '>=3.4.3 <4.0.0'
