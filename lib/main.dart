@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:oneofus/base/about.dart';
-import 'package:oneofus/fire/nerdster_fire.dart';
+import 'package:oneofus/fire/firebase_options.dart';
 import 'package:oneofus/prefs.dart';
 
 import 'base/base.dart';
@@ -29,20 +30,16 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   if (kFireChoice != FireChoice.fake) {
-    await oneofusFireInit();
-    await nerdsterFireInit();
+    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
     if (kFireChoice == FireChoice.emulator) {
-      NerdsterFire.nerdsterFirestore.useFirestoreEmulator('localhost', 8080);
-      // (Just using 192.168.1.97 for emulator didn't work.)
-      // $ firebase --project=nerdster emulators:start
-      FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8081);
       // $ firebase --project=one-of-us-net -config=oneofus-nerdster.firebase.json emulators:start
+      // $ firebase --project=nerdster emulators:start
+      // (Just using 192.168.1.97 for emulator didn't work for accessing emulator fromm real phone.)
+      FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8081);
     }
     FireFactory.registerFire(kOneofusDomain, FirebaseFirestore.instance);
-    FireFactory.registerFire('nerdster.org', NerdsterFire.nerdsterFirestore);
   } else {
     FireFactory.registerFire(kOneofusDomain, FakeFirebaseFirestore());
-    FireFactory.registerFire('nerdster.org', FakeFirebaseFirestore());
   }
 
   await About.init();
@@ -53,14 +50,8 @@ void main() async {
   runApp(
     GlobalLoaderOverlay(
         child: const MaterialApp(
-            debugShowCheckedModeBanner: false,
-            title: 'ONE-OF-US.NET',
-            home: Base())),
+            debugShowCheckedModeBanner: false, title: 'ONE-OF-US.NET', home: Base())),
   );
 }
 
-var yotam = {
-  "crv": "Ed25519",
-  "kty": "OKP",
-  "x": "Fenc6ziXKt69EWZY-5wPxbJNX9rk3CDRVSAEnA8kJVo"
-};
+var yotam = {"crv": "Ed25519", "kty": "OKP", "x": "Fenc6ziXKt69EWZY-5wPxbJNX9rk3CDRVSAEnA8kJVo"};

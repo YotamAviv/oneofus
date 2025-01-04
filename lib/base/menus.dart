@@ -208,7 +208,6 @@ String display(List l) {
 
 Widget buildDevMenu(BuildContext context) {
   const String kOneofusCol = 'firecheck: phone:oneofus';
-  const String kNerdsterCol = 'firecheck: phone:nerdster';
   return SubmenuButton(menuChildren: <Widget>[
     SubmenuButton(menuChildren: [
       MenuItemButton(
@@ -239,34 +238,6 @@ Widget buildDevMenu(BuildContext context) {
             }
           },
           child: const Text('oneofus write')),
-      MenuItemButton(
-          onPressed: () async {
-            try {
-              context.loaderOverlay.show();
-              List out = await checkRead(FireFactory.find(kNerdsterDomain), kNerdsterCol);
-              context.loaderOverlay.hide();
-              await alert('Fire check', display(out), ['okay'], context);
-            } catch (e) {
-              await alertException(context, e);
-            } finally {
-              context.loaderOverlay.hide();
-            }
-          },
-          child: const Text('nerdster read')),
-      MenuItemButton(
-          onPressed: () async {
-            try {
-              context.loaderOverlay.show();
-              List out = await checkWrite(FireFactory.find(kNerdsterDomain), kNerdsterCol);
-              context.loaderOverlay.hide();
-              await alert('Fire check', display(out), ['okay'], context);
-            } catch (e) {
-              await alertException(context, e);
-            } finally {
-              context.loaderOverlay.hide();
-            }
-          },
-          child: const Text('nerdster write')),
     ], child: const Text('Firebase check')),
     MenuItemButton(
         onPressed: () async {
