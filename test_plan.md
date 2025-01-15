@@ -26,7 +26,6 @@ Email me or submit at: https://github.com/YotamAviv/nerdster/issues
   - create delegate: NO
   - Verify
     - Phone: Use menu /etc => Import/Export, verify that you only see the one-of-us.net key.
-    - TODO: 
     - Nerdster on Web: centered (not centered as Yotam) but not with delegate. On the Nerdster, turn on menu => Prefs => everything. In the tree view, verify that "Me" has no children. 
 
 - QR web sign-in again, create delegate
@@ -37,9 +36,8 @@ Email me or submit at: https://github.com/YotamAviv/nerdster/issues
     - Web: centered and signed in. On the Nerdster, turn on menu => Prefs +> everything. In the tree view, verify that "Me" has a delegate key and a a delegate statement.
 
 - Submit 2 things, verify revokeAt 
-  - submit subject "A"
-  - BUG: I had to refresh the nerdster. I think that after signing in again with a delegate, it didn't load my delegate statement.
-  - submit subject "B"
+  - submit (and recommend) subject "A"
+  - submit (and recommend) subject "B"
   - revoke delegate at first (the earlier of the 2, "A")
   - refresh Nerdster and check. You should A but not B.
     - (Nerdster should display revoked key cross out like on the phone.)
@@ -76,6 +74,7 @@ Email me or submit at: https://github.com/YotamAviv/nerdster/issues
     - type in "nerdster.org", yes, overwrite my key.
     - refresh the Nerdster and check it out.. 
     - Problems:
+      - BUG: I see that Andrew still has his own delegate key even though it's now claimed by me and seems to be mine, too. 
       - BUG: Clear my reaction doesn't completely work (2 delegates, might be in wrong order..)
 
 - Start again (wipe) (probably not necessary, can probably optimize)
@@ -85,7 +84,7 @@ Email me or submit at: https://github.com/YotamAviv/nerdster/issues
 
 - QR sign in
   - App should offer to create delegate key, YES
-  - Verify Nerdster seems okay with me using Yotam's Oneofus key..
+  - Verify Nerdster seems okay with me using Yotam's Oneofus key.. Just submit something.
 
 - Replace my key (State menu => {replace})
   - Replace my key
