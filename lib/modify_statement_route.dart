@@ -183,8 +183,9 @@ If you restate this statement with your active key, the old statement signed by 
 
     if (choice == null) {
       // Special case: Disable clear when can't.
-      if (thisChoice == TrustVerb.clear && widget.statement.iToken != MyKeys.oneofusToken)
+      if (thisChoice == TrustVerb.clear && widget.statement.iToken != MyKeys.oneofusToken) {
         return null;
+      }
       return () async {
         if (await _checkChoice(thisChoice)) {
           choice = thisChoice;
@@ -359,7 +360,7 @@ https://manual#revoke-delegate
         ];
       case TrustVerb.block:
         editorWidgets = [
-          TextEditor('comment', statement.comment, maxLines: 3),
+          TextEditor('comment', statement.comment, maxLines: 3, minLength: 5),
         ];
       case TrustVerb.replace:
         editorWidgets = [
@@ -374,12 +375,7 @@ https://manual#revoke-delegate
           ];
         } else {
           editorWidgets = [
-            TextEditor(
-              'domain',
-              statement.domain,
-              minLength: 3,
-              lowercase: true,
-            ),
+            TextEditor('domain', statement.domain, minLength: 3, lowercase: true),
             TextEditor('comment', statement.comment, maxLines: 3),
             DelegateRevokeAtEditor(statement),
           ];
