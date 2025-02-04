@@ -76,11 +76,12 @@ Future<void> signIn(String scanned, BuildContext context) async {
   if (kFireChoice == FireChoice.emulator) {
     uri = uri.replace(port: 5001, host: '10.0.2.2', path: '/nerdster/us-central1/signin');
   }
-  // DEFER: Enforce that POST domain URI matches delegate domain.
-  // As we're POSTing to cloudfunctions.net, we'd have to forward something from our domain to
-  // pass this check.
-  print('uri=$uri');
-  print('send=$send');
+  // Enforce that POST domain URI matches delegate domain.
+  if (kFireChoice == FireChoice.prod) {
+    List<String> ss = uri.host.split('.');
+    String uriDomain = '${ss[ss.length - 2]}.${ss[ss.length - 1]}';
+    if (uriDomain != domain) throw Exception('$uriDomain != $domain');
+  }
   http.Response response = await http.post(uri, headers: _headers, body: jsonEncode(send));
   print('response.statusCode: ${response.statusCode}'); // (201 expected)
 
@@ -131,3 +132,15 @@ In case you don't, you can continue by:
     },
   );
 }
+
+var sampleSignIn = {
+  "domain": "nerdster.org",
+  "publicKey": {
+    "crv": "X25519",
+    "kty": "OKP",
+    "x": "vVGxbPqAwNpGUCuYio5c2WHVuG3rCeP2WaoIQtsIGxE"
+  },
+  "session": "05167cbeaa42acb5e680961648afd24ddf15a3ec",
+  "method": "POST",
+  "uri": "https://signin.nerdster.org/signin"
+};
