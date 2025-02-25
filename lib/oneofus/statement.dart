@@ -14,7 +14,7 @@ abstract class Statement {
 
   static registerFactory(String type, StatementFactory factory) {
     if(_type2factory.containsKey(type)) {
-      // assert(_type2factory[type] == factory);
+      // xssert(_type2factory[type] == factory);
     }
     _type2factory[type] = factory;
   }
@@ -28,7 +28,7 @@ abstract class Statement {
 
   Statement(this.jsonish, this.subject) :
       time = parseIso(jsonish.json['time']),
-      iToken = Jsonish(jsonish.json['I']).token,
+      iToken = getToken(jsonish.json['I']),
       comment = jsonish.json['comment'];
 
   String get subjectToken {

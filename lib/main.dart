@@ -26,6 +26,10 @@ const bool exceptionWhenTryingToPush = false;
 // TODO: Phone rotation, d'oh!
 // Try: https://stackoverflow.com/questions/49418332/flutter-how-to-prevent-device-orientation-changes-and-force-portrait
 
+
+const domain2statementType = {
+  kOneofusDomain: kOneofusType,
+};
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -37,9 +41,9 @@ void main() async {
       // (Just using 192.168.1.97 for emulator didn't work for accessing emulator fromm real phone.)
       FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8081);
     }
-    FireFactory.registerFire(kOneofusDomain, FirebaseFirestore.instance);
+    FireFactory.registerFire(kOneofusDomain, FirebaseFirestore.instance, null);
   } else {
-    FireFactory.registerFire(kOneofusDomain, FakeFirebaseFirestore());
+    FireFactory.registerFire(kOneofusDomain, FakeFirebaseFirestore(), null);
   }
 
   await About.init();

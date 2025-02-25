@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import 'crypto/crypto.dart';
 import 'jsonish.dart';
+import 'util.dart';
 
 class OouSigner implements StatementSigner {
   final OouKeyPair _keyPair;
@@ -17,7 +18,7 @@ class OouSigner implements StatementSigner {
 
   @override
   Future<String> sign(Map<String, dynamic> json, String string) async {
-    assert(mapEquals(json['I'], _publicKeyJson));
+    xssert(mapEquals(json['I'], _publicKeyJson));
     String out = await _keyPair.sign(string);
     return out;
   }

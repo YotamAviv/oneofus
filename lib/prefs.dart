@@ -14,7 +14,7 @@ class Prefs {
 
   // Not persisted
   static ValueNotifier<bool> dev = ValueNotifier<bool>(false);
-
+  static ValueNotifier<bool> cloudFetchDistinct = ValueNotifier<bool>(false);
 
   static Future<void> init() async {
     try {
