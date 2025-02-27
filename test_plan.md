@@ -26,14 +26,14 @@ Email me or submit at: https://github.com/YotamAviv/nerdster/issues
   - create delegate: NO
   - Verify
     - Phone: Use menu /etc => Import/Export, verify that you only see the one-of-us.net key.
-    - Nerdster on Web: centered (not centered as Yotam) but not with delegate. On the Nerdster, turn on menu => Prefs => everything. In the tree view, verify that "Me" has no children. 
+    - Nerdster on Web: centered (not centered as Yotam) but not with delegate. On the Nerdster, turn on menu => Settings => everything. In the tree view, verify that "Me" has no children. 
 
 - QR web sign-in again, create delegate
   - create delegate: YES
   - TODO: Refresh Nerdster after QR sign-in
   - Verify
     - Phone: Use menu /etc => Import/Export, verify that you see both the one-of-us.net key and a nerdster.org key.
-    - Web: centered and signed in. On the Nerdster, turn on menu => Prefs +> everything. In the tree view, verify that "Me" has a delegate key and a a delegate statement.
+    - Web: centered and signed in. On the Nerdster, turn on menu => Settings +> everything. In the tree view, verify that "Me" has a delegate key and a a delegate statement.
 
 - Submit 2 things, verify revokeAt 
   - submit (and recommend) subject "A"
