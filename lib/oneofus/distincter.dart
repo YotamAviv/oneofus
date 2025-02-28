@@ -34,7 +34,7 @@ List<Statement> distinct(Iterable<Statement> source, {Transformer? transformer})
     String key = s.getDistinctSignature(transformer: transformer);
     if (!already.contains(key)) {
       already.add(key);
-      if (!s.isClear) distinct.add(s);
+      if (!s.isClear) distinct.add(s); // QUESTIONABLE. TODO: At least doc that distinct also clears.
     }
   }
   _cache[(source, transformer)] = distinct;

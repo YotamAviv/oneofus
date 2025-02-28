@@ -34,6 +34,7 @@ Future<void> prepareX(BuildContext context) async {
     // BUG: I've never caught the exception, only see it in the logs. Firebase seems to revert to a cache.
     print('**************** $e');
     await alertException(context, e);
+    rethrow;
   } finally {
     context.loaderOverlay.hide();
   }

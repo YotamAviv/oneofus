@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:oneofus/base/menus.dart';
 import 'package:oneofus/base/my_keys.dart';
-import 'package:oneofus/oneofus/jsonish.dart';
+import 'package:oneofus/oneofus/statement.dart';
 
 import 'base/my_statements.dart';
 import 'modify_statement_route.dart';
@@ -67,7 +67,7 @@ class _StatementActionPickerState extends State<StatementActionPicker> {
     String? descEquiv;
     if (equivStatements.isNotEmpty) {
       descEquiv =
-          '''Below are ${formatVerbs(widget.spec.verbs)} statements signed by your equivalent keys. You can't edit or delete these (because you don't posses those replaced keys) but you can still re-state them and probably override them with your current key.''';
+          '''Below are ${formatVerbs(widget.spec.verbs)} statements signed by your equivalent keys. You can't clear these (because you don't posses those replaced keys) but you can re-state and override them with your current key.''';
       stuff.add(descEquiv);
       stuff.addAll(equivStatements);
     }
@@ -78,7 +78,7 @@ class _StatementActionPickerState extends State<StatementActionPicker> {
         rows.add(Text(thing));
       } else if (thing is TrustStatement) {
         onTap() async {
-          Jsonish? jsonish = await ModifyStatementRoute.show(thing, widget.spec, context);
+          TrustStatement? statement = await ModifyStatementRoute.show(thing, widget.spec, context);
           if (context.mounted) {
             await prepareX(context); // redundant?
             setState(() {});

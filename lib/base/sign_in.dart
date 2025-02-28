@@ -1,11 +1,12 @@
 import 'dart:convert';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:oneofus/base/menus.dart';
 import 'package:oneofus/delegate_keys_route.dart';
 import 'package:oneofus/main.dart';
+import 'package:oneofus/oneofus/statement.dart';
+import 'package:oneofus/oneofus/trust_statement.dart';
 
 import '../oneofus/crypto/crypto.dart';
 import '../oneofus/jsonish.dart';
@@ -42,8 +43,8 @@ Future<void> signIn(String scanned, BuildContext context) async {
   if (!b(delegateKeyPairJson)) {
     bool create = (await createDelegateOrNot(domain, context))!;
     if (create) {
-      Jsonish? jsonish = await createNewDelegateKey(domain, context);
-      if (b(jsonish)) {
+      TrustStatement? statement = await createNewDelegateKey(domain, context);
+      if (b(statement)) {
         if (context.mounted) await prepareX(context); // redundant?
         delegateKeyPairJson = MyKeys.getDelegateKeyPair(domain);
       }

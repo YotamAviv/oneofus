@@ -6,6 +6,7 @@ import 'package:oneofus/base/my_statements.dart';
 import 'package:oneofus/delegate_revoke_at_editor.dart';
 import 'package:oneofus/field_editor.dart';
 import 'package:oneofus/main.dart';
+import 'package:oneofus/oneofus/statement.dart';
 import 'package:oneofus/oneofus/ui/alert.dart';
 import 'package:oneofus/oneofus/ui/linky.dart';
 import 'package:oneofus/oneofus_revoke_at_editor.dart';
@@ -73,9 +74,9 @@ class ModifyStatementRoute extends StatefulWidget {
   State<StatefulWidget> createState() => _ModifyStatementRouteState();
 
   // CODE: Understand what a "MaterialPageRoute" is and consider getting rid of these "show" helpers.
-  static Future<Jsonish?> show(TrustStatement statement, RouteSpec spec, BuildContext context,
+  static Future<TrustStatement?> show(TrustStatement statement, RouteSpec spec, BuildContext context,
       {KeyWidget? subjectKeyDemo}) async {
-    Jsonish? out = await Navigator.of(context).push(MaterialPageRoute(
+    TrustStatement? out = await Navigator.of(context).push(MaterialPageRoute(
         builder: (context) =>
             ModifyStatementRoute(statement, spec, subjectKeyDemo: subjectKeyDemo)));
     return out;
@@ -215,8 +216,8 @@ If you restate this statement with your active key, the old statement signed by 
             pushInitiated = true;
           });
           if (mounted) {
-            Jsonish? jsonish = await _state(json, context);
-            Navigator.pop(context, jsonish);
+            TrustStatement? statement = await _state(json, context);
+            Navigator.pop(context, statement);
           }
         }
       };
@@ -309,14 +310,14 @@ https://manual#revoke-delegate
     return json;
   }
 
-  Future<Jsonish?> _state(json, BuildContext context) async {
+  Future<TrustStatement?> _state(json, BuildContext context) async {
     String token = MyKeys.oneofusToken;
     Fetcher f = Fetcher(token, kOneofusDomain);
     await f.fetch();
     OouKeyPair oneofusKeyPair = await crypto.parseKeyPair(MyKeys.oneofusKeyPair);
     OouSigner signer = await OouSigner.make(oneofusKeyPair);
 
-    Jsonish? jsonish;
+    TrustStatement? statement;
     try {
       context.loaderOverlay.show();
 
@@ -331,7 +332,7 @@ https://manual#revoke-delegate
         throw Exception('bogus, intentional');
       }
 
-      jsonish = await f.push(json, signer);
+      statement = await f.push(json, signer) as TrustStatement;
     } catch (e) {
       print('caught Exception: $e.');
       // DEFER: Report back to me.
@@ -341,7 +342,7 @@ https://manual#revoke-delegate
     }
 
     if (context.mounted) await prepareX(context); // redundant?
-    return jsonish;
+    return statement;
   }
 
   void _makeEditors(TrustStatement statement, TrustVerb verb) {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:oneofus/base/menus.dart';
 import 'package:oneofus/base/my_statements.dart';
 import 'package:oneofus/oneofus/fetcher.dart';
+import 'package:oneofus/oneofus/statement.dart';
 import 'package:oneofus/oneofus/ui/linky.dart';
 import 'package:oneofus/widgets/demo_statement_route.dart';
 
@@ -63,8 +64,8 @@ https://manual#replace''',
                     child: const Text('Claim existing one-of-us key')),
                 OutlinedButton(
                     onPressed: () async {
-                      Jsonish? jsonish;
-                      if (context.mounted) jsonish = await replaceMyKey(context);
+                      TrustStatement? statement;
+                      if (context.mounted) statement = await replaceMyKey(context);
                     },
                     child: const Text('Replace my current one-of-us key')),
               ]),
@@ -72,7 +73,7 @@ https://manual#replace''',
   }
 }
 
-Future<Jsonish?> claimKey(BuildContext context) async {
+Future<TrustStatement?> claimKey(BuildContext context) async {
   String? scanned = await QrScanner.scan('public key QR code to replace', validateKey, context);
   if (b(scanned)) {
     Json subjectKeyJson = await parsePublicKey(scanned!);
@@ -105,16 +106,16 @@ Future<Jsonish?> claimKey(BuildContext context) async {
 /// LGTM those. Might be nice to do the same here. But I won't; it's too complicated and will
 /// confuse the user. Instead:
 /// TODO: Warn the user when he clears an 'replace' statement that he's going to abandon keys.
-Future<Jsonish?> replaceMyKey(BuildContext context) async {
+Future<TrustStatement?> replaceMyKey(BuildContext context) async {
   try {
     Json current = MyKeys.oneofusPublicKey;
     await MyKeys.setContingentOneofus(await crypto.createKeyPair());
     if (context.mounted) {
-      Jsonish? jsonish = await stateReplaceKey(current, context);
-      if (b(jsonish)) {
+      TrustStatement? statement = await stateReplaceKey(current, context);
+      if (b(statement)) {
         await MyKeys.confirmContingentOneofus();
       }
-      return jsonish;
+      return statement;
     }
   } catch (e) {
     // TODO: Check if this catch is necessary. Should probably have one higher up the stack.
@@ -125,7 +126,7 @@ Future<Jsonish?> replaceMyKey(BuildContext context) async {
   return null;
 }
 
-Future<Jsonish?> stateReplaceKey(Json subjectJson, BuildContext context) async {
+Future<TrustStatement?> stateReplaceKey(Json subjectJson, BuildContext context) async {
   try {
     String subjectToken = getToken(subjectJson);
 
@@ -201,9 +202,9 @@ https://manual#replace''',
     TrustStatement prototype = TrustStatement(Jsonish(prototypeJson));
 
     assert(prototype.subjectToken == subjectToken);
-    Jsonish? jsonish = await ModifyStatementRoute.show(prototype, OneofusKeysRoute.spec, context,
+    TrustStatement? statement = await ModifyStatementRoute.show(prototype, OneofusKeysRoute.spec, context,
         subjectKeyDemo: myEquivalentKey);
-    return jsonish;
+    return statement;
   } catch (e, stackTrace) {
     if (context.mounted) {
       await alertException(context, e, stackTrace: stackTrace);

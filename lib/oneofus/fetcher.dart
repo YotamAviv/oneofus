@@ -142,10 +142,11 @@ class Fetcher {
 
   static const Map fetchParamsProto = {
     "includeId": true, // BUG: See index.js. If we don't ask for id's, then we don't get lastId.
-    "checkPrevious": true, // CONSIDER: rename to bNotarize or validateNotarize (It doesn't validate signatures)
+    "checkPrevious": true,
     "distinct": true,
     // "clearClear", true, // I'm leaning against this. If changed, make sure to keep
     // !clouddistinct code path is same.
+    "orderStatements": "false",
     "omit": ['statement', 'I'], // EXPERIMENTAL: 'signature', 'previous']
     // EXPERIMENTAL: "omit": ['statement', 'I', 'signature', 'previous']
   };
@@ -268,7 +269,7 @@ class Fetcher {
 
   // TODO: Why return value Jsonish and not Statement?
   // Side effects: add 'previous', 'signature'
-  Future<Jsonish> push(Json json, StatementSigner? signer) async {
+  Future<Statement> push(Json json, StatementSigner? signer) async {
     assert(_revokeAt == null);
     changeNotify();
 
@@ -277,6 +278,7 @@ class Fetcher {
     // add 'previous', verify time is later than last statement
     Statement? previous;
     if (_cached!.isNotEmpty) {
+      // BUG: I don't necessarily have previous now that cache has removed clear..
       previous = _cached!.first;
 
       // assert time is after last statement time
@@ -307,33 +309,33 @@ class Fetcher {
     _lastToken = jsonish.token;
 
     final fireStatements = fire.collection(token).doc('statements').collection('statements');
-    // NOTE: We don't 'await'.. Ajax!.. Bad idea now that others call this, like tests.
-    // DEFER: In case this seems slow, try Ajax after all.
-    await fireStatements
-        .doc(jsonish.token)
-        .set(jsonish.json)
-        .then((doc) {}, onError: (e) => print("Error: $e"));
-    // CONSIDER: Handle in case async DB write succeeds or fails.
+    // DEFER: Don't 'await'.. Ajax!.. Bad idea now that others call this, like tests.
+    await fireStatements.doc(jsonish.token).set(jsonish.json).then((doc) {}, onError: (e) {
+      throw e;
+    });
 
-    // Now fetch to check our optimistic concurrency.
+    // Now fetch to verify our optimistic concurrency.
     Query<Json> query = fireStatements.orderBy('time', descending: true);
     QuerySnapshot<Json> snapshots = await query.get();
     final docSnapshot0 = snapshots.docs.elementAt(0);
     if (docSnapshot0.id != jsonish.token) {
-      print('${docSnapshot0.id} != ${jsonish.token}');
-      // TODO: Make this exception reach the user, not just in the stack trace in Developer Tools
-      throw Exception('${docSnapshot0.id} != ${jsonish.token}');
+      String error =
+          'Optimistic concurrency failed, corruption possible: ${docSnapshot0.id} != ${jsonish.token}';
+      print(error);
+      throw Exception(error);
     }
     if (previous != null) {
       final docSnapshot1 = snapshots.docs.elementAt(1);
       if (docSnapshot1.id != previous.token) {
-        print('${docSnapshot1.id} != ${previous.token}');
-        // TODO: Make this exception reach the user, not just in the stack trace in Developer Tools
-        throw Exception('${docSnapshot1.id} != ${previous.token}');
+        String error =
+            'Optimistic concurrency failed, corruption possible: ${docSnapshot1.id} != ${previous.token}';
+        print(error);
+        throw Exception(error);
       }
     }
 
-    return jsonish;
+    Statement statement = Statement.make(jsonish);
+    return statement;
   }
 
   Future<Iterable<Statement>> fetchAllNoVerify() async {

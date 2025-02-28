@@ -74,12 +74,12 @@ class DelegateKeysRoute extends StatelessWidget {
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 OutlinedButton(
                     onPressed: () async {
-                      Jsonish? jsonish = await createNewDelegateKey(null, context);
+                      await createNewDelegateKey(null, context);
                     },
                     child: const Text('Create new delegate key')),
                 OutlinedButton(
                     onPressed: () async {
-                      Jsonish? jsonish = await claimDelegateKey(context);
+                      await claimDelegateKey(context);
                     },
                     child: const Text('Claim existing delegate key')),
               ]),
@@ -87,7 +87,7 @@ class DelegateKeysRoute extends StatelessWidget {
   }
 }
 
-Future<Jsonish?> createNewDelegateKey(String? domain, BuildContext context) async {
+Future<TrustStatement?> createNewDelegateKey(String? domain, BuildContext context) async {
   OouKeyPair delegateKeyPair = await crypto.createKeyPair();
   OouPublicKey delegatePublicKey = await delegateKeyPair.publicKey;
   Json delegatePublicKeyJson = await delegatePublicKey.json;
@@ -99,17 +99,16 @@ Future<Jsonish?> createNewDelegateKey(String? domain, BuildContext context) asyn
     if (b(domain)) "with": {"domain": domain}
   };
   TrustStatement ts = TrustStatement(Jsonish(statementStarterJson));
-  Jsonish? jsonish = await ModifyStatementRoute.show(ts, DelegateKeysRoute.spec, context);
-  if (b(jsonish)) {
-    ts = Statement.make(jsonish!) as TrustStatement;
-    assert(ts.domain!.length > 1);
-    await MyKeys.storeDelegateKey(delegateKeyPair, ts.domain!);
-    assert(MyKeys.getDelegateToken(ts.domain!) == getToken(delegatePublicKeyJson));
+  TrustStatement? ts2 = await ModifyStatementRoute.show(ts, DelegateKeysRoute.spec, context);
+  if (ts2 != null) {
+    assert(ts2.domain!.length > 1);
+    await MyKeys.storeDelegateKey(delegateKeyPair, ts2.domain!);
+    assert(MyKeys.getDelegateToken(ts2.domain!) == getToken(delegatePublicKeyJson));
   }
-  return jsonish;
+  return ts2;
 }
 
-Future<Jsonish?> claimDelegateKey(BuildContext context) async {
+Future<TrustStatement?> claimDelegateKey(BuildContext context) async {
   String? scanned = await QrScanner.scan('Scan a public key QR code', validateKey, context);
   if (b(scanned)) {
     Json subjectKeyJson = await parsePublicKey(scanned!);
@@ -118,7 +117,7 @@ Future<Jsonish?> claimDelegateKey(BuildContext context) async {
   return null;
 }
 
-Future<Jsonish?> stateClaimDelegateKey(Json subjectJson, BuildContext context,
+Future<TrustStatement?> stateClaimDelegateKey(Json subjectJson, BuildContext context,
     {String? domain}) async {
   try {
     String subjectToken = getToken(subjectJson);
@@ -163,8 +162,8 @@ Future<Jsonish?> stateClaimDelegateKey(Json subjectJson, BuildContext context,
     TrustStatement prototype = TrustStatement(Jsonish(prototypeJson));
 
     assert(prototype.subjectToken == subjectToken);
-    Jsonish? jsonish = await ModifyStatementRoute.show(prototype, DelegateKeysRoute.spec, context);
-    return jsonish;
+    TrustStatement? statement = await ModifyStatementRoute.show(prototype, DelegateKeysRoute.spec, context);
+    return statement;
   } catch (e, stackTrace) {
     if (context.mounted) {
       await alertException(context, e, stackTrace: stackTrace);
@@ -203,7 +202,7 @@ Claim it or Delete it?''',
       if (b(claimOdelete)) {
         if (claimOdelete == 'Claim') {
           if (context.mounted) {
-            Jsonish? jsonish = await stateClaimDelegateKey(publicKeyJson, domain: domain, context);
+            TrustStatement? statement = await stateClaimDelegateKey(publicKeyJson, domain: domain, context);
           }
         } else if (claimOdelete == 'Delete') {
           await MyKeys.deleteDelegateKey(domain);

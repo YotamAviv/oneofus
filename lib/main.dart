@@ -18,7 +18,7 @@ enum FireChoice {
   prod;
 }
 
-const FireChoice kFireChoice = FireChoice.prod;
+const FireChoice kFireChoice = FireChoice.emulator;
 const int? slowPushMillis = null;
 const bool exceptionWhenTryingToPush = false;
 // TODO: also simulate slow fetch.

@@ -1,13 +1,12 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:oneofus/base/menus.dart';
-import 'package:oneofus/oneofus/ui/linky.dart';
+import 'package:oneofus/oneofus/statement.dart';
 import 'package:oneofus/oneofus/ui/alert.dart';
+import 'package:oneofus/oneofus/ui/linky.dart';
 
 import 'base/my_keys.dart';
-import 'modify_statement_route.dart';
 import 'base/my_statements.dart';
+import 'modify_statement_route.dart';
 import 'oneofus/jsonish.dart';
 import 'oneofus/trust_statement.dart';
 import 'oneofus/util.dart';
@@ -52,7 +51,7 @@ class TrustsRoute extends StatelessWidget {
                       Json? jsonPublicKey = await QrScanner.scanPublicKey(context);
                       if (!b(jsonPublicKey)) return;
                       if (!context.mounted) return;
-                      Jsonish? jsonish = await startTrust(jsonPublicKey!, context);
+                      await startTrust(jsonPublicKey!, context);
                     },
                     child: const Text('New Trust or block')),
               ]),
@@ -60,7 +59,7 @@ class TrustsRoute extends StatelessWidget {
   }
 }
 
-Future<Jsonish?> startTrust(Json subjectJson, context) async {
+Future<TrustStatement?> startTrust(Json subjectJson, context) async {
   try {
     String subjectToken = Jsonish(subjectJson).token;
 
@@ -109,8 +108,8 @@ If you need to clear or change that, go to menu => Keys => Delegates... and clea
     }
 
     // Shouldn't need to check for clear (distincter)
-    Jsonish? jsonish = await ModifyStatementRoute.show(prototype, TrustsRoute.spec, context);
-    return jsonish;
+    TrustStatement? statement = await ModifyStatementRoute.show(prototype, TrustsRoute.spec, context);
+    return statement;
   } catch (e) {
     await alertException(context, e);
     return null;

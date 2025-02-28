@@ -48,7 +48,7 @@ class FancySplash extends StatelessWidget {
                   if (context.mounted) await prepareX(context);
                   if (await validateKey(scanned!)) {
                     Json jsonPublicKey = await parsePublicKey(scanned);
-                    Jsonish? jsonish = await startTrust(jsonPublicKey, context);
+                    await startTrust(jsonPublicKey, context);
                   } else {
                     assert(await validateSignIn(scanned));
                     try {
