@@ -103,7 +103,8 @@ class MyStatements {
     Fetcher fetcher = Fetcher(token, kOneofusDomain);
     if (b(revokeAt)) fetcher.setRevokeAt(revokeAt!);
     await fetcher.fetch();
-    _statements[token] = distinct(fetcher.statements).cast<TrustStatement>();
+    _statements[token] =
+        distinct(fetcher.statements).cast<TrustStatement>().where((s) => s.verb != TrustVerb.clear);
     // DFS
     for (TrustStatement s in _statements[token]!) {
       if (s.verb == TrustVerb.replace) {

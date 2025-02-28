@@ -41,7 +41,7 @@ Email me or submit at: https://github.com/YotamAviv/nerdster/issues
   - revoke delegate at first (the earlier of the 2, "A")
   - refresh Nerdster and check. You should A but not B.
     - (Nerdster should display revoked key cross out like on the phone.)
-  - TODO: Don't allow submitting with revoked key
+  - TODO: Don't allow submitting with revoked key. Looks like I'm halfway there - an assertion fires.
   - revoke at "since always" and check. You should see neither A nor B.
   - un-revoke. You should see both A and B again.
 
@@ -71,11 +71,10 @@ Email me or submit at: https://github.com/YotamAviv/nerdster/issues
     - equivalent Oneofus key, use Yotam's
     - one of your existing delegate keys, use Yotam's
   - Claiming Andrew's delegate key (complicated...)
-    - type in "nerdster.org", yes, overwrite my key.
-    - refresh the Nerdster and check it out.. 
-    - Problems:
-      - BUG: I see that Andrew still has his own delegate key even though it's now claimed by me and seems to be mine, too. 
-      - BUG: Clear my reaction doesn't completely work (2 delegates, might be in wrong order..)
+    - type in "nerdster.org", yes, overwrite my key. BUG: Why is this overwriting a key?
+    - refresh the Nerdster and check it out if you want to test the Nerd'ster:
+      - Andrew should no longer have a delegate key 
+      - Clear my reaction completely works as expected regardless (impressive in cases where Yotam and Andrew rated)
 
 - Start again (wipe) (probably not necessary, can probably optimize)
 

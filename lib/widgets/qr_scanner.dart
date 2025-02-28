@@ -133,17 +133,10 @@ class _QrScannerState extends State<QrScanner> {
                 children: [
                   Expanded(
                     child: Center(
-                        child: Text(
-                      barcodeDisplay,
-                      overflow: TextOverflow.fade,
-                      style: textStyle,
-                    )),
+                        child: Text(barcodeDisplay, overflow: TextOverflow.fade, style: textStyle)),
                   ),
                   const Spacer(),
-                  const Text(
-                    'Or paste',
-                    style: textStyle,
-                  ),
+                  const Text('Or paste', style: textStyle),
                   IconButton(
                       onPressed: () {
                         handlePaste();
@@ -168,4 +161,3 @@ Future<bool> validateKey(String scanned) async {
     return false;
   }
 }
-

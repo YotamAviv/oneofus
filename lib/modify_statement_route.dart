@@ -229,6 +229,7 @@ If you restate this statement with your active key, the old statement signed by 
 
 // return true if okay to continue.
   Future<bool> _prePush(Json json) async {
+    // BUG: In case I claim a delegate, I wouldn't be overwriting my key pair, but I still see this warning.
     // Check if user will overwrite a local delegate key pair.
     if (choice == TrustVerb.delegate) {
       TrustStatement contingentStatement = TrustStatement(Jsonish(json));

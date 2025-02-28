@@ -145,7 +145,7 @@ class Fetcher {
     "checkPrevious": true,
     "distinct": true,
     // "clearClear", true, // I'm leaning against this. If changed, make sure to keep
-    // !clouddistinct code path is same.
+    // !clouddistinct code path is same. TODO: Remove from index.js, shouldn't need lastToken
     "orderStatements": "false",
     "omit": ['statement', 'I'], // EXPERIMENTAL: 'signature', 'previous']
     // EXPERIMENTAL: "omit": ['statement', 'I', 'signature', 'previous']
@@ -278,7 +278,6 @@ class Fetcher {
     // add 'previous', verify time is later than last statement
     Statement? previous;
     if (_cached!.isNotEmpty) {
-      // BUG: I don't necessarily have previous now that cache has removed clear..
       previous = _cached!.first;
 
       // assert time is after last statement time
