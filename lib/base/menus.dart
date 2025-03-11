@@ -28,7 +28,6 @@ Future<void> prepareX(BuildContext context) async {
     context.loaderOverlay.show();
     // TODO: Jsonish.wipeCache(); // With this not commented out, crypto verify is slow all the time.
     Fetcher.clear();
-    clearDistincterCache(); // Redundant? Should this be somewhere deeper?
     await MyStatements.load();
   } catch (e) {
     // BUG: I've never caught the exception, only see it in the logs. Firebase seems to revert to a cache.

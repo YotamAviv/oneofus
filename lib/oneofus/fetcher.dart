@@ -1,9 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:flutter/material.dart';
 
 import '../main.dart';
-import '../prefs.dart'; // CODE: Kludgey way to include, but might work for phone codebase.
+import '../prefs.dart'; // CODE: Kludgey way to include, but works with phone codebase.
 import 'distincter.dart';
 import 'fire_factory.dart';
 import 'jsonish.dart';
@@ -14,12 +13,29 @@ import 'util.dart';
 
 /// Cloud Functions distinct, order, tokens, checkPervious...
 ///
+/// The only reason we use Firebase Cloud Functions is performance.
+/// - distinct: send the client less data over
+/// - omit [I, statement]: send the client less data
+/// - (EXPERIMENTAL: send tokens, omit [signature, previous]:  measurably faster)
+///
+/// The Cloud Functions distinct is currently not complete (does not consider "other"), and so
+/// for
+///
+/// Developing using Cloud Functions is challenging, espeically on Linux, and so I want to keep
+/// the other path alive and for use with unit testing use FakeFirebase which can't Cloud Functions.
+///
 /// Integration Testing:
 /// With non-trivial code in JavaScript cloud functions, integration testing is required.
 /// As Firebase does not support Linux, this necessarily requires running in Chrome or Android (emulator).
 /// I'm partway there with some tests implemented in demotest/cases. I don't want to re-implement
 /// a test framework, and so I expect to end up somewhere in the middle (and yes, I have and will
 /// always have bugs;)
+///
+/// Testing issues: cloud functions options, assert checka, previous token checks, revokedAt, etc...
+/// Cloud functions require "includeId" for "checkPrevious"
+/// I have a Fetcher integration test for checkPrevious
+/// Fetcher irl needs neither checkPrevious nor includeId.
+/// I don't want to slow the code down just so that I can test the code. But i am (not by much)
 ///
 /// DEFER: filters (ex, past month)
 ///
@@ -49,13 +65,12 @@ import 'util.dart';
 
 final DateTime date0 = DateTime.fromMicrosecondsSinceEpoch(0);
 
+abstract class Corruptor {
+    void corrupt(String token, String error);
+}
+
 class Fetcher {
-  static int? testingCrashIn;
-
   static final OouVerifier _verifier = OouVerifier();
-
-  // (I've lost track of the reasoning behind having a final VoidCallback for this.)
-  static final VoidCallback changeNotify = clearDistincterCache;
 
   static final Map<String, Fetcher> _fetchers = <String, Fetcher>{};
 
@@ -74,7 +89,7 @@ class Fetcher {
   // - blocked : any string that isn't a statement token makes this blocked (revokedAt might be "since forever")
   String? _revokeAt; // set by others to let this object know
   DateTime? _revokeAtTime; // set by this object after querying the db
-  // TODO: Make cloud and non-cloud path use _cached similary ({distinct, revoked}).
+  // MAINTAIN: Cloud Functions and FakeFirestore paths should use _cached similary ({distinct, revoked}).
   List<Statement>? _cached;
   String? _lastToken;
 
@@ -91,7 +106,6 @@ class Fetcher {
         f._revokeAtTime = null;
       }
     }
-    changeNotify();
   }
 
   factory Fetcher(String token, String domain, {bool testingNoVerify = false}) {
@@ -131,7 +145,6 @@ class Fetcher {
     _revokeAt = revokeAt;
     _revokeAtTime = null;
     _cached = null;
-    changeNotify();
   }
 
   String? get revokeAt => _revokeAt;
@@ -141,137 +154,144 @@ class Fetcher {
   bool get isCached => b(_cached);
 
   static const Map fetchParamsProto = {
-    "includeId": true, // BUG: See index.js. If we don't ask for id's, then we don't get lastId.
-    "checkPrevious": true,
     "distinct": true,
-    // "clearClear", true, // I'm leaning against this. If changed, make sure to keep
-    // !clouddistinct code path is same. TODO: Remove from index.js, shouldn't need lastToken
+    "omit": ['statement', 'I'],
     "orderStatements": "false",
-    "omit": ['statement', 'I'], // EXPERIMENTAL: 'signature', 'previous']
+
+    "checkPrevious": true,
+    "includeId": true, // includeId required for checkPrevious, not needed but tested and liked.
+
+    // EXPERIMENTAL: "includeId": true,
     // EXPERIMENTAL: "omit": ['statement', 'I', 'signature', 'previous']
   };
 
   Future<void> fetch() async {
-    if (b(testingCrashIn) && testingCrashIn! > 0) {
-      testingCrashIn = testingCrashIn! - 1;
-      if (testingCrashIn == 0) {
-        testingCrashIn = null;
-        throw Exception('testing Exception');
-      }
-    }
-
     if (b(_cached)) return;
-    _cached = <Statement>[];
 
-    DateTime? time;
-    if (functions != null && Prefs.cloudFetchDistinct.value) {
-      Map params = Map.of(fetchParamsProto);
-      params["token"] = token;
-      if (_revokeAt != null) params["revokeAt"] = revokeAt;
-      final result = await mFire.mAsync(() {
-        return functions!.httpsCallable('clouddistinct').call(params);
-      });
-      List statements = result.data["statements"];
-      if (statements.isEmpty) return; // QUESTIONABLE
-      if (_revokeAt != null) {
-        assert(statements.first['id'] == _revokeAt);
-        _revokeAtTime = parseIso(statements.first['time']);
-      }
-      final Json iKey = result.data['I'];
-      final String iKeyToken = getToken(iKey);
-      assert(iKeyToken == token);
-      _lastToken = result.data["lastToken"];
-      for (Json j in statements) {
-        DateTime jTime = parseIso(j['time']);
-        if (time != null) assert(jTime.isBefore(time));
-        time = jTime;
-        j['statement'] = domain2statementType[domain]!;
-        j['I'] = iKey; // PERFORMANCE: Allow token in 'I' in statements; we might be already.
-        String serverToken = j['id'];
-        j.remove('id');
-
-        // EXPERIMENTAL: Jsonish jsonish = mVerify.mSync(() => Jsonish(j, serverToken));
-        Jsonish jsonish = mVerify.mSync(() => Jsonish(j));
-        assert(jsonish.token == serverToken);
-        Statement statement = Statement.make(jsonish);
-        assert(statement.token == serverToken);
-        _cached!.add(statement);
-      }
-    } else {
-      final CollectionReference<Map<String, dynamic>> collectionRef =
-          fire.collection(token).doc('statements').collection('statements');
-
-      // query _revokeAtTime
-      if (_revokeAt != null && _revokeAtTime == null) {
-        DocumentReference<Json> doc = collectionRef.doc(_revokeAt);
-        final DocumentSnapshot<Json> docSnap = await mFire.mAsync(doc.get);
-        if (b(docSnap.data())) {
-          final Json data = docSnap.data()!;
-          _revokeAtTime = parseIso(data['time']);
-        } else {
-          _revokeAtTime = DateTime(0); // "since always" (or any unknown token)
-        }
-      }
-
-      Query<Json> query = collectionRef.orderBy('time', descending: true);
-      if (_revokeAtTime != null) {
-        query = query.where('time', isLessThanOrEqualTo: formatIso(_revokeAtTime!));
-      }
-      QuerySnapshot<Json> snapshots = await mFire.mAsync(query.get);
-      bool first = true;
-      String? previousToken;
-      DateTime? previousTime;
-      for (final docSnapshot in snapshots.docs) {
-        final Json data = docSnapshot.data();
-        Jsonish jsonish;
-        if (Prefs.skipVerify.value || testingNoVerify) {
-          jsonish = mVerify.mSync(() => Jsonish(data));
-        } else {
-          jsonish = await mVerify.mAsync(() => Jsonish.makeVerify(data, _verifier));
-        }
-
-        // newest to oldest
-        // First: previousToken is null
-        // middles: statement.token = previousToken
-        // Last: statement.token = null
-        DateTime time = parseIso(jsonish['time']);
-        if (first) {
-          first = false;
-        } else {
-          if (jsonish.token != previousToken) {
-            String error =
-                'Notarization violation: ($domain/$token): ${jsonish.token} != $previousToken';
-            print(error);
-            throw error;
-          }
-          if (!time.isBefore(previousTime!)) {
-            String error = '!Descending: ($domain/$token): $time >= $previousTime';
-            print(error);
-            throw error;
+    try {
+      _cached = <Statement>[];
+      DateTime? time;
+      if (functions != null && Prefs.cloudFetchDistinct.value) {
+        Map params = Map.of(fetchParamsProto);
+        params["token"] = token;
+        if (_revokeAt != null) params["revokeAt"] = revokeAt;
+        final result = await mFire.mAsync(() {
+          return functions!.httpsCallable('clouddistinct').call(params);
+        });
+        List statements = result.data["statements"];
+        if (_revokeAt != null) {
+          if (statements.isNotEmpty) {
+            assert(statements.first['id'] == _revokeAt);
+            // without includeId, this might work:
+            // assert(getToken(statements.first) == _revokeAt);
+            _revokeAtTime = parseIso(statements.first['time']);
+          } else {
+            _revokeAtTime = DateTime(0); // "since always" (or any unknown token);
           }
         }
-        previousToken = data['previous'];
-        previousTime = time;
+        if (statements.isEmpty) return; // QUESTIONABLE
+        final Json iKey = result.data['I'];
+        final String iKeyToken = getToken(iKey);
+        assert(iKeyToken == token);
+        for (Json j in statements) {
+          DateTime jTime = parseIso(j['time']);
+          if (time != null) assert(jTime.isBefore(time));
+          time = jTime;
+          j['statement'] = domain2statementType[domain]!;
+          j['I'] = iKey; // PERFORMANCE: Allow token in 'I' in statements; we might be already.
+          j.remove('id');
 
-        _cached!.add(Statement.make(jsonish));
+          // EXPERIMENTAL: "EXPERIMENTAL" tagged where the code allows us to not compute the tokens
+          // but just use the stored values, which allows us to not ask for [signature, previous].
+          // The changes worked, but the performance hardly changed. And with this, we wouldn't have
+          // [signature, previous] locally, couldn't verify statements, and there'd be more code
+          // paths. So, no.
+          // Jsonish jsonish = mVerify.mSync(() => Jsonish(j, serverToken));
+          // String serverToken = j['id'];
+          // j.remove('id');
+          // assert(jsonish.token == serverToken);
+
+          Jsonish jsonish = mVerify.mSync(() => Jsonish(j));
+          Statement statement = Statement.make(jsonish);
+          _cached!.add(statement);
+        }
+      } else {
+        final CollectionReference<Map<String, dynamic>> collectionRef =
+            fire.collection(token).doc('statements').collection('statements');
+
+        // query _revokeAtTime
+        if (_revokeAt != null && _revokeAtTime == null) {
+          DocumentReference<Json> doc = collectionRef.doc(_revokeAt);
+          final DocumentSnapshot<Json> docSnap = await mFire.mAsync(doc.get);
+          if (b(docSnap.data())) {
+            final Json data = docSnap.data()!;
+            _revokeAtTime = parseIso(data['time']);
+          } else {
+            _revokeAtTime = DateTime(0); // "since always" (or any unknown token)
+          }
+        }
+
+        Query<Json> query = collectionRef.orderBy('time', descending: true);
+        if (_revokeAtTime != null) {
+          query = query.where('time', isLessThanOrEqualTo: formatIso(_revokeAtTime!));
+        }
+        QuerySnapshot<Json> snapshots = await mFire.mAsync(query.get);
+        bool first = true;
+        String? previousToken;
+        DateTime? previousTime;
+        for (final docSnapshot in snapshots.docs) {
+          final Json data = docSnapshot.data();
+          Jsonish jsonish;
+          if (Prefs.skipVerify.value || testingNoVerify) {
+            jsonish = mVerify.mSync(() => Jsonish(data));
+          } else {
+            jsonish = await mVerify.mAsync(() => Jsonish.makeVerify(data, _verifier));
+          }
+
+          // newest to oldest
+          // First: previousToken is null
+          // middles: statement.token = previousToken
+          // Last: statement.token = null
+          DateTime time = parseIso(jsonish['time']);
+          if (first) {
+            first = false;
+          } else {
+            if (jsonish.token != previousToken) {
+              String error =
+                  'Notarization violation: ($domain/$token): ${jsonish.token} != $previousToken';
+              print(error);
+              throw error;
+            }
+            if (!time.isBefore(previousTime!)) {
+              String error = '!Descending: ($domain/$token): $time >= $previousTime';
+              print(error);
+              throw error;
+            }
+          }
+          previousToken = data['previous'];
+          previousTime = time;
+
+          _cached!.add(Statement.make(jsonish));
+        }
       }
+
+      // Maintain Cloud Functions or not behave similarly.
+      // Callilng distinct(..) on the Cloud Functions is required for that as the Cloud impl is not 
+      // complete, and I wouldn't want to rely on it anyway as it can't be tested using our 
+      // FakeFirebase unit tests.
+      assert(fetchParamsProto.containsKey('distinct'));
+      _cached = distinct(_cached!);
       if (_cached!.isNotEmpty) _lastToken = _cached!.first.token;
-      // Be like clouddistinct
-      // - DEFER: clearClear
-      if (fetchParamsProto.containsKey('distinct')) {
-        _cached = distinct(_cached!);
-      }
+    } catch (e) {
+      corruptor.corrupt(token, e.toString());
     }
-    // print('fetched: $fire, $token');
   }
 
   List<Statement> get statements => _cached!;
 
-  // TODO: Why return value Jsonish and not Statement?
   // Side effects: add 'previous', 'signature'
   Future<Statement> push(Json json, StatementSigner? signer) async {
     assert(_revokeAt == null);
-    changeNotify();
 
     if (_cached == null) await fetch(); // Was green.
 
@@ -281,19 +301,16 @@ class Fetcher {
       previous = _cached!.first;
 
       // assert time is after last statement time
-      // This is a little confusing with clouddistinct, but I think this is okay.
       DateTime prevTime = previous.time;
       DateTime thisTime = parseIso(json['time']!);
       assert(thisTime.isAfter(prevTime));
 
-      if (json.containsKey('previous')) {
-        // for load dump
-        assert(json['previous'] == _lastToken);
-      }
+      // for load dump
+      if (json.containsKey('previous')) assert(json['previous'] == _lastToken);
     }
     if (_lastToken != null) json['previous'] = _lastToken;
 
-    // sign (or verify) statement
+    // sign (verify)
     String? signature = json['signature'];
     Jsonish jsonish;
     if (signer != null) {
@@ -304,7 +321,9 @@ class Fetcher {
       jsonish = await Jsonish.makeVerify(json, _verifier);
     }
 
-    _cached!.insert(0, Statement.make(jsonish));
+    Statement statement = Statement.make(jsonish);
+    _cached!.insert(0, statement);
+    _cached = distinct(_cached!);
     _lastToken = jsonish.token;
 
     final fireStatements = fire.collection(token).doc('statements').collection('statements');
@@ -333,7 +352,6 @@ class Fetcher {
       }
     }
 
-    Statement statement = Statement.make(jsonish);
     return statement;
   }
 

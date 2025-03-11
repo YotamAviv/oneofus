@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:oneofus/base/about.dart';
 import 'package:oneofus/fire/firebase_options.dart';
+import 'package:oneofus/oneofus/fetcher.dart';
 import 'package:oneofus/prefs.dart';
 
 import 'base/base.dart';
@@ -26,6 +27,11 @@ const bool exceptionWhenTryingToPush = false;
 // TODO: Phone rotation, d'oh!
 // Try: https://stackoverflow.com/questions/49418332/flutter-how-to-prevent-device-orientation-changes-and-force-portrait
 
+class PrintNotifications implements Corruptor {
+  @override
+  void corrupt(String token, String error) => print('Corrupt!: $token, $error');
+}
+final Corruptor corruptor  = PrintNotifications();
 
 const domain2statementType = {
   kOneofusDomain: kOneofusType,
@@ -41,9 +47,9 @@ void main() async {
       // (Just using 192.168.1.97 for emulator didn't work for accessing emulator fromm real phone.)
       FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8081);
     }
-    FireFactory.registerFire(kOneofusDomain, FirebaseFirestore.instance, null);
+    FireFactory.register(kOneofusDomain, FirebaseFirestore.instance, null);
   } else {
-    FireFactory.registerFire(kOneofusDomain, FakeFirebaseFirestore(), null);
+    FireFactory.register(kOneofusDomain, FakeFirebaseFirestore(), null);
   }
 
   await About.init();
