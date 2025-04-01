@@ -2,25 +2,33 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
-/// I'm thinking about 2 things:
-///
-/// 1) Instrumentation to investigate what's slow. My time would probably be better spent learning about the tools.
-/// Some progress made, see [Measure] uses
-///
-/// 2) A fancy progress bar
-/// We don't know how long it will take, and so it won't be 0-100%.
-/// Would be nice:
-/// - All skipping/cancelling whatever it's doing:
-///   - while loading network, see how many degrees and which tokens, cancel any time?
-///   - while loading content, see how many oneofus and delegates have been fetched, cancel any time?
+import 'util.dart';
+
+/// I had ambitions but did not achieve them. This is not well planned, well documented, or well
+/// excuted. See both Measure and Progress.
+
+/// 1) Instrumentation to investigate what's slow, how slow, ...
+/// Fire fetching is what's slow, and the performance seems to vary depending on cloud functions
+/// number of calls, ?after=<after>, ?distinct, etc...
 /// (I don't think computing takes time, just loading)
+
+/// Progress dialog is related to this, and I was optimistic about combining the 2, but didn't.
+
+/// Probably not: Stack push / pop?
+/// I believe that only Fire fetching is slow.
+/// Would be nice to know more about that. Oneofus costs, FollowNet costs, per user or token costs..
+/// Future work on fetch?after=<time> or fetch?limit=<limit> would be affected by the ability to measure.
 ///
+/// Both of these:
+/// - Data structure output (probably JSON)
+/// - Progress dialog
 
 /// DEFER: Look for someone else's one of these instead of working on this one more.
 /// DEFER: Consider doing something smart when 2 timers are running, like maybe suspend the outer
 /// ones which inner ones are running; this would allow measure OneofusNet time minus Fire time.
+
 class Measure with ChangeNotifier {
-  static List<Measure> _instances = <Measure>[];
+  static final List<Measure> _instances = <Measure>[];
 
   factory Measure(String name) {
     Measure out = Measure._internal(name);
@@ -31,7 +39,7 @@ class Measure with ChangeNotifier {
   static void dump() {
     print('Measures:');
     for (Measure m in _instances) {
-      print('- ${m._name}: ${m.elapsed}');
+      m._dump();
     }
   }
 
@@ -45,9 +53,18 @@ class Measure with ChangeNotifier {
 
   final Stopwatch _stopwatch = Stopwatch();
   final String _name;
+  final List<(String, Duration)> token2time = [];
+
+  void _dump() {
+    print('- ${_name}: ${elapsed}');
+    for (var pair in token2time) { // .sorted((e1, e2) => e1.value < e2.value ? 1 : -1)) {
+      print('  ${pair.$1} (${pair.$2})');
+    }
+  }
 
   void _reset() {
     _stopwatch.reset();
+    token2time.clear();
   }
 
   void start() {
@@ -64,14 +81,22 @@ class Measure with ChangeNotifier {
 
   bool get isRunning => _stopwatch.isRunning;
 
-  Future mAsync(func) async {
+  Future mAsync(func, {String? note}) async {
+    Duration d = _stopwatch.elapsed;
     try {
       assert(!_stopwatch.isRunning);
+      d = _stopwatch.elapsed;
       _stopwatch.start();
       final out = await func();
       return out;
     } finally {
       _stopwatch.stop();
+      if (b(note)) {
+        Duration dd = _stopwatch.elapsed - d;
+        // BUG: FIRES and is really hard to find in stack trace in Chrome assert(!token2time.containsKey(token));
+        // Fetcher fetches once to find revokedAtTime and then again to get all earlier statements.
+        token2time.add((note!, dd));
+      }
     }
   }
 

@@ -9,16 +9,23 @@ import 'jsonish.dart';
 import 'measure.dart';
 import 'oou_verifier.dart';
 import 'statement.dart';
+import 'trust_statement.dart';
 import 'util.dart';
 
+///
+/// DEFER: Remove "I" (and {"statements": ...}) from cloud function results and just return statements straight up.
+/// I believe that the only reason "I" was needed was when we come at a Nerdster link with oneofus=token, and so change that to oneofus={key}
+
 /// BUG: 3/12/25: Mr. Burner Phone revoked, signed in, still managed to clear, and caused data corruption.
+/// I wasn't able to reproduce that bug (lost the private key), and I've changed the code since
+/// by adding transactions, and so that bug might be fixed.
+/// Regardless, the Fetcher factoy CTOR seems dangerous and sloppy.
 ///
-/// The Fetcher factoy ctor is dangerous.
-///
-/// OneofusNet / GreedyBfsTrust should be able to create Fetchers that retain their expired state
+/// OneofusNet / GreedyBfsTrust should be able to create and manage their own Fetchers.
+/// Those Fetchers could retain their expired state for their lifetimes.
+/// But I'm not sure that helps in any way.
 /// - created expired at a token and will stay that way
 /// - created not expired and will stay that way.
-///
 /// Same for FollowNet and its Nerdster Fetchers
 ///
 /// Now we want to change network center or settings and not re-fetch what we don't have to.
@@ -50,8 +57,11 @@ import 'util.dart';
 /// FollowNet:
 ///
 /// While I'm at it:
-/// - actual transactions (check previous then push next statement)
-/// - refresh fetchers, maybe
+/// - DONE: actual transactions (transactionally check previous and push next statement)
+/// - refresh fetchers, maybe. That'd mean calling fetch() again (or refresh()) on a non-revoked fetcher
+///   to get only newer statements.
+///   That'd make the demo a bit quicker, allow leaving the window open and just re-fetching.
+///   - Measure first, make sure it's worth the hassle.
 ///
 ///
 
@@ -117,15 +127,17 @@ class Fetcher {
   static final OouVerifier _verifier = OouVerifier();
 
   static final Map<String, Fetcher> _fetchers = <String, Fetcher>{};
-
+  static Map<String, Json> batchFetched = {};
   static final Measure mFire = Measure('fire');
   static final Measure mVerify = Measure('verify');
+
+  // DEFER: This is a placeholder for time measuremeants, not the mechanism used by Fetchers to refresh.
+  static final Duration recentDuration = const Duration(days: 30);
 
   final FirebaseFirestore fire;
   final FirebaseFunctions? functions;
   final String domain;
   final String token;
-  final bool testingNoVerify;
 
   // 3 states:
   // - not revoked : null
@@ -137,9 +149,12 @@ class Fetcher {
   List<Statement>? _cached;
   String? _lastToken;
 
-  static void clear() => _fetchers.clear();
+  static void clear() {
+    _fetchers.clear();
+    batchFetched.clear();
+  }
 
-  // 3/12/25: BUG: Corruption, Burner Phone pushed using a revoked delegate, not sure how (couldn't 
+  // 3/12/25: BUG: Corruption, Burner Phone pushed using a revoked delegate, not sure how (couldn't
   // reproduce), but there is much be careful of here.
   // One possible danger is: use the Factory constructor to create an un-revoked fetcher, which
   // should be revoked and would be revoked had FollowNet or OneofusNet created it.
@@ -154,26 +169,28 @@ class Fetcher {
         f._revokeAtTime = null;
       }
     }
+    // Any of these could have been revoked.
+    batchFetched.clear();
   }
 
-  factory Fetcher(String token, String domain, {bool testingNoVerify = false}) {
-    String key = '$token$domain';
+  factory Fetcher(String token, String domain) {
+    String key = _key(token, domain);
     FirebaseFirestore fire = FireFactory.find(domain);
     FirebaseFunctions? functions = FireFactory.findFunctions(domain);
     Fetcher out;
     if (_fetchers.containsKey(key)) {
       out = _fetchers[key]!;
       assert(out.fire == fire);
-      assert(out.testingNoVerify == testingNoVerify);
     } else {
-      out = Fetcher.internal(token, domain, fire, functions, testingNoVerify: testingNoVerify);
+      out = Fetcher.internal(token, domain, fire, functions);
       _fetchers[key] = out;
     }
     return out;
   }
 
-  Fetcher.internal(this.token, this.domain, this.fire, this.functions,
-      {this.testingNoVerify = false});
+  static _key(String token, String domain) => '$token$domain';
+
+  Fetcher.internal(this.token, this.domain, this.fire, this.functions);
 
   // Oneofus trust does not allow 2 different keys replace a key (that's a conflict).
   // Fetcher isn't responsible for implementing that, but I am going to assume that
@@ -203,7 +220,7 @@ class Fetcher {
 
   bool get isCached => b(_cached);
 
-  static const Map fetchParamsProto = {
+  static const Json paramsProto = {
     "distinct": true,
     "omit": ['statement', 'I'],
     "orderStatements": "false",
@@ -215,23 +232,95 @@ class Fetcher {
     // EXPERIMENTAL: "omit": ['statement', 'I', 'signature', 'previous']
   };
 
+  // BUG: I think I batchFetch over and over when nothing's changed. Note that to re-compute BFS,
+  // cached Fetchers work, but there is no "cached batch fetcher". The different BFS layers
+  // will pre-fetch different tokens, and so considering only the last one won't help.
+  //
+  // Skip cached fetchers?
+  // - or make that the caller's responsibility?
+  // Futhermore, I think that I batch fetch everyone when I'm just missing Amotz.
+  static Future<void> batchFetch(Map<String, String?> token2revokeAt, String domain,
+      {String? mName}) async {
+    FirebaseFunctions? functions = FireFactory.findFunctions(domain);
+    if (!b(functions)) return;
+    if (!Prefs.batchFetch.value) return;
+
+    // skip cached fetchers
+    Map<String, String?> tmp = Map.of(token2revokeAt)
+      ..removeWhere((k, v) => Fetcher(k, domain).isCached && Fetcher(k, domain).revokeAt == v);
+    if (tmp.length != token2revokeAt.length) {
+      print('skipping ${token2revokeAt.length - tmp.length}');
+    }
+    token2revokeAt = tmp;
+
+    Json params = Map.of(paramsProto);
+    params["token2revokeAt"] = token2revokeAt;
+    final results = await Fetcher.mFire.mAsync(() async {
+      return await functions!.httpsCallable('mclouddistinct').call(params);
+    }, note: mName ?? '?');
+
+    // Weave tokens from token2revoked and results
+    Set<String> returned = {};
+    for (Json rd in results.data) {
+      List statements = rd["statements"];
+      Json? i = rd['I'];
+      if (b(i)) {
+        String token = getToken(i);
+        returned.add(token);
+        batchFetched[_key(token, domain)] = {"statements": statements, "I": i};
+      }
+    }
+    // In case a token had no statements, make it clear that it's been fetched but is just empty.
+    for (String token in token2revokeAt.keys) {
+      if (!returned.contains(token)) {
+        batchFetched[_key(token, domain)] = {"statements": [], "I": null};
+      }
+    }
+
+    print('batchFetch: ${token2revokeAt.keys.map((t) => t)}');
+
+    if (Prefs.slowFetch.value) {
+      await Future.delayed(Duration(milliseconds: token2revokeAt.length * 100));
+    }
+  }
+
   Future<void> fetch() async {
     if (b(_cached)) return;
 
     try {
       _cached = <Statement>[];
       DateTime? time;
-      if (functions != null && Prefs.cloudFetchDistinct.value) {
-        Map params = Map.of(fetchParamsProto);
-        params["token"] = token;
-        if (_revokeAt != null) params["revokeAt"] = revokeAt;
-        final result = await mFire.mAsync(() {
-          return functions!.httpsCallable('clouddistinct').call(params);
-        });
-        List statements = result.data["statements"];
+      if (Prefs.cloudFunctionsFetch.value && functions != null) {
+        Json params = Map.of(paramsProto);
+        params["token2revokeAt"] = {token: _revokeAt};
+        // EXPERIMENTA: Refresh - only reload what we need to.
+        if (Prefs.fetchRecent.value && domain != kOneofusDomain) {
+          // DEFER: Actually make Fetcher refresh incrementally (not fully reload). It is faster (not linearly, but still..)
+          DateTime recent = DateTime.now().subtract(recentDuration);
+          params['after'] = formatIso(recent);
+        }
+
+        List statements;
+        Json? iKey;
+        if (Prefs.batchFetch.value && b(batchFetched[_key(token, domain)])) {
+          Json fetched = batchFetched[_key(token, domain)]!;
+          statements = fetched["statements"];
+          iKey = fetched["I"];
+        } else {
+          print('batcher miss $domain');
+          if (Prefs.slowFetch.value) {
+            await Future.delayed(Duration(milliseconds: 300));
+          }
+          final result = await mFire.mAsync(() async {
+            return await functions!.httpsCallable('xclouddistinct').call(params);
+          }, note: token);
+          statements = result.data["statements"];
+          iKey = result.data['I'];
+        }
+
         if (_revokeAt != null) {
           if (statements.isNotEmpty) {
-            assert(statements.first['id'] == _revokeAt);
+            assert(statements.first['id'] == _revokeAt, '${statements.first['id']} == $_revokeAt');
             // without includeId, this might work:
             // assert(getToken(statements.first) == _revokeAt);
             _revokeAtTime = parseIso(statements.first['time']);
@@ -239,8 +328,7 @@ class Fetcher {
             _revokeAtTime = DateTime(0); // "since always" (or any unknown token);
           }
         }
-        if (statements.isEmpty) return; // QUESTIONABLE
-        final Json iKey = result.data['I'];
+        if (statements.isEmpty) return;
         final String iKeyToken = getToken(iKey);
         assert(iKeyToken == token);
         for (Json j in statements) {
@@ -285,6 +373,11 @@ class Fetcher {
         if (_revokeAtTime != null) {
           query = query.where('time', isLessThanOrEqualTo: formatIso(_revokeAtTime!));
         }
+        // EXPERIMENTA: Refresh - only reload what we need to.
+        if (Prefs.fetchRecent.value && domain != kOneofusDomain) {
+          DateTime recent = DateTime.now().subtract(recentDuration);
+          query = query.where('time', isGreaterThanOrEqualTo: formatIso(recent));
+        }
         QuerySnapshot<Json> snapshots = await mFire.mAsync(query.get);
         bool first = true;
         String? previousToken;
@@ -292,7 +385,8 @@ class Fetcher {
         for (final docSnapshot in snapshots.docs) {
           final Json data = docSnapshot.data();
           Jsonish jsonish;
-          if (Prefs.skipVerify.value || testingNoVerify) {
+          if (Prefs.skipVerify.value) {
+            // DEFER: skipVerify is not necessarily compatible with some cloud functions distinct fetching. 
             jsonish = mVerify.mSync(() => Jsonish(data));
           } else {
             jsonish = await mVerify.mAsync(() => Jsonish.makeVerify(data, _verifier));
@@ -329,10 +423,11 @@ class Fetcher {
       // Callilng distinct(..) on the Cloud Functions is required for that as the Cloud impl is not
       // complete, and I wouldn't want to rely on it anyway as it can't be tested using our
       // FakeFirebase unit tests.
-      assert(fetchParamsProto.containsKey('distinct'));
+      assert(paramsProto.containsKey('distinct'));
       _cached = distinct(_cached!);
       if (_cached!.isNotEmpty) _lastToken = _cached!.first.token;
-    } catch (e) {
+    } catch (e, stackTrace) {
+      // print(stackTrace);
       corruptor.corrupt(token, e.toString());
     }
   }
@@ -378,7 +473,7 @@ class Fetcher {
 
     final fireStatements = fire.collection(token).doc('statements').collection('statements');
     // Transaction!
-    // TODO: TEST: Testing will be easier after the changea away from the factgory ctor.
+    // TODO: TEST: Testing might be easier after the change away from the factory CTOR.
     await fire.runTransaction((_) async {
       Query<Json> query = fireStatements.orderBy('time', descending: true);
       QuerySnapshot<Json> snapshots = await query.get();
@@ -392,7 +487,7 @@ class Fetcher {
           throw Exception(error);
         }
       }
-      // DEFER: Don't 'await', Ajax!
+      // (An old thought: Don't 'await', Ajax!)
       await fireStatements.doc(jsonish.token).set(jsonish.json).then((doc) {}, onError: (e) {
         throw e;
       });
