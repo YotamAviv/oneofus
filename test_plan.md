@@ -30,7 +30,7 @@ Email me or submit at: https://github.com/YotamAviv/nerdster/issues
 
 - QR web sign-in again, create delegate
   - create delegate: YES
-  - TODO: Refresh Nerdster after QR sign-in
+  - Refresh Nerdster after QR sign-in
   - Verify
     - Phone: Use menu /etc => Import/Export, verify that you see both the one-of-us.net key and a nerdster.org key.
     - Web: centered and signed in. On the Nerdster, turn on menu => Settings +> everything. In the tree view, verify that "Me" has a delegate key and a a delegate statement.
@@ -39,7 +39,7 @@ Email me or submit at: https://github.com/YotamAviv/nerdster/issues
   - submit (and recommend) subject "A"
   - submit (and recommend) subject "B"
   - revoke delegate at first (the earlier of the 2, "A")
-  - refresh Nerdster and check. You should A but not B.
+  - refresh Nerdster and check. You should see A but not B.
     - (Nerdster should display revoked key cross out like on the phone.)
   - TODO: Don't allow submitting with revoked key. Looks like I'm halfway there - an assertion fires.
   - revoke at "since always" and check. You should see neither A nor B.
@@ -71,7 +71,7 @@ Email me or submit at: https://github.com/YotamAviv/nerdster/issues
     - equivalent Oneofus key, use Yotam's
     - one of your existing delegate keys, use Yotam's
   - Claiming Andrew's delegate key (complicated...)
-    - type in "nerdster.org", yes, overwrite my key. BUG: Why is this overwriting a key?
+    - type in "nerdster.org", yes, overwrite my key. TODO: BUG: Warns that I'll be overwriting a key.
     - refresh the Nerdster and check it out if you want to test the Nerd'ster:
       - Andrew should no longer have a delegate key 
       - Clear my reaction completely works as expected regardless (impressive in cases where Yotam and Andrew rated)
