@@ -26,7 +26,7 @@ Future<Uint8List> _toQrImageData(String text) async {
   final ui.Image image = await QrPainter(
     data: text,
     version: QrVersions.auto,
-    gapless: false,
+    gapless: true,
   ).toImage(300);
   ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
   return byteData!.buffer.asUint8List();

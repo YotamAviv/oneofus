@@ -19,7 +19,7 @@ enum FireChoice {
   prod;
 }
 
-const FireChoice kFireChoice = FireChoice.prod;
+const FireChoice fireChoice = FireChoice.emulator;
 const int? slowPushMillis = null;
 const bool exceptionWhenTryingToPush = false;
 // TODO: also simulate slow fetch.
@@ -29,19 +29,30 @@ const bool exceptionWhenTryingToPush = false;
 
 class ErrorCorruptor implements Corruptor {
   @override
-  void corrupt(String token, String error) => throw('Corrupt!: $token, $error');
+  void corrupt(String token, String error, String? details) =>
+      throw ('Corrupt!: $token, $error, $details');
 }
-final Corruptor corruptor  = ErrorCorruptor();
+final Corruptor corruptor = ErrorCorruptor();
 
 const domain2statementType = {
   kOneofusDomain: kOneofusType,
 };
+
+const Map<FireChoice, Map<String, (String, String)>> exportUrl = {
+  FireChoice.prod: {
+    kOneofusDomain: ('export.one-of-us.net', '')
+  },
+  FireChoice.emulator: {
+    kOneofusDomain: ('127.0.0.1:5002', 'one-of-us-net/us-central1/export'),
+  },
+};
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  if (kFireChoice != FireChoice.fake) {
+  if (fireChoice != FireChoice.fake) {
     await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-    if (kFireChoice == FireChoice.emulator) {
+    if (fireChoice == FireChoice.emulator) {
       // $ firebase --project=one-of-us-net -config=oneofus-nerdster.firebase.json emulators:start
       // $ firebase --project=nerdster emulators:start
       // (Just using 192.168.1.97 for emulator didn't work for accessing emulator fromm real phone.)

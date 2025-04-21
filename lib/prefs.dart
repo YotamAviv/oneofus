@@ -16,19 +16,17 @@ class Prefs {
   static ValueNotifier<bool> dev = ValueNotifier<bool>(false);
   static ValueNotifier<bool> cloudFunctionsFetch = ValueNotifier<bool>(false);
   static ValueNotifier<bool> batchFetch = ValueNotifier<bool>(false);
+  static ValueNotifier<bool> streamBatchFetch = ValueNotifier<bool>(false);
   static ValueNotifier<bool> fetchRecent = ValueNotifier<bool>(false);
   static ValueNotifier<bool> slowFetch = ValueNotifier<bool>(false);
 
   static Future<void> init() async {
     try {
       String? skipLgtmS = await _storage.read(key: 'skipLgtm');
-      if (b(skipLgtmS)) {
-        skipLgtm.value = bool.parse(skipLgtmS!);
-      }
+      if (b(skipLgtmS)) skipLgtm.value = bool.parse(skipLgtmS!);
     } catch (e) {
-      print (e);
+      print(e);
     }
-
     Prefs.skipLgtm.addListener(listener);
   }
 

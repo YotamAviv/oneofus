@@ -74,11 +74,11 @@ Future<void> signIn(String scanned, BuildContext context) async {
   assert(received['method'] == 'POST');
   send['session'] = session;
   Uri uri = Uri.parse(received['uri']);
-  if (kFireChoice == FireChoice.emulator) {
+  if (fireChoice == FireChoice.emulator) {
     uri = uri.replace(port: 5001, host: '10.0.2.2', path: '/nerdster/us-central1/signin');
   }
   // Enforce that POST domain URI matches delegate domain.
-  if (kFireChoice == FireChoice.prod) {
+  if (fireChoice == FireChoice.prod) {
     List<String> ss = uri.host.split('.');
     String uriDomain = '${ss[ss.length - 2]}.${ss[ss.length - 1]}';
     if (uriDomain != domain) throw Exception('$uriDomain != $domain');
