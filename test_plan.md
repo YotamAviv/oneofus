@@ -26,14 +26,14 @@ Email me or submit at: https://github.com/YotamAviv/nerdster/issues
   - create delegate: NO
   - Verify
     - Phone: Use menu /etc => Import/Export, verify that you only see the one-of-us.net key.
-    - Nerdster on Web: centered (not centered as Yotam) but not with delegate. On the Nerdster, turn on menu => Settings => everything. In the tree view, verify that "Me" has no children. 
+    - Nerdster on Web: centered (not centered as Yotam) but not with delegate. On the Nerdster, turn on menu => Settings => everything. In the tree view, verify that "Me" has no children. Scan QR with phone to verify.
 
 - QR web sign-in again, create delegate
   - create delegate: YES
   - Refresh Nerdster after QR sign-in
   - Verify
     - Phone: Use menu /etc => Import/Export, verify that you see both the one-of-us.net key and a nerdster.org key.
-    - Web: centered and signed in. On the Nerdster, turn on menu => Settings +> everything. In the tree view, verify that "Me" has a delegate key and a a delegate statement.
+    - Web: centered and signed in. On the Nerdster, turn on menu => Settings +> everything. In the tree view, verify that "Me" has a delegate key and a a delegate statement.  Scan QR with phone to verify.
 
 - Submit 2 things, verify revokeAt 
   - submit (and recommend) subject "A"
@@ -46,7 +46,7 @@ Email me or submit at: https://github.com/YotamAviv/nerdster/issues
   - un-revoke. You should see both A and B again.
 
 - Trust a stranger, use Amotz
-  - Scan QR from the https://nerdster.web.app
+  - Scan QR from the https://nerdster.web.app (or use local Nerdster on emulator copy)
     - (Trusting from both the main screen or the trusts screen should be tested, maybe test a different one each time.)
     - Exit app and restart.
     - Trust Amotz again. App should should show existing trust
