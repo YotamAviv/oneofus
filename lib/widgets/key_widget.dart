@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:oneofus/oneofus/jsonish.dart';
 import 'package:oneofus/oneofus/show_qr.dart';
 import 'package:oneofus/oneofus/trust_statement.dart';
 
@@ -44,7 +45,8 @@ class KeyWidget extends StatelessWidget {
       blockStatement = tokenBlockStatements.first;
     }
 
-    bool local = MyKeys.getLocalDelegateKeys().contains(keyToken) || keyToken == MyKeys.oneofusToken;
+    bool local =
+        MyKeys.getLocalDelegateKeys().contains(keyToken) || keyToken == MyKeys.oneofusToken;
     bool revoked;
     KeyType keyType;
     if (keyToken == MyKeys.oneofusToken) {
@@ -98,10 +100,10 @@ class KeyWidget extends StatelessWidget {
     IconData iconData = !revoked ? Icons.key_outlined : Icons.key_off_outlined;
 
     return InkWell(
-        // onTap: (() => {qr.showBig(context)}),
-        onDoubleTap: () {
-          ShowQr(keyToken).show(context);
-        },
+        // Code for onTap below works. Maybe later, especially if we include a translate option
+        // ("Me", "Andrew", "My delegate on nerdster.com", ...)
+        // onTap: () => JsonQrDisplay(Jsonish.find(keyToken)!.json).show(context),
+        onDoubleTap: () => JsonQrDisplay(keyToken).show(context, reduction: 0.9),
         child: Tooltip(
           message: tooltip,
           child: Icon(

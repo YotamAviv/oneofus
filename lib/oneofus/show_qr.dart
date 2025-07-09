@@ -1,63 +1,53 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'json_display.dart';
+import 'jsonish.dart';
+import 'util.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
-class ShowQr extends StatelessWidget {
-  final String text;
-  final Color color;
+/// NEXT: Rename file (maybe class, too)
+/// DEFER: include "Don't show again"
+/// DEFER: Use in qrSignin(..).. (WHY? for sport?, uniformity?)
+class JsonQrDisplay extends StatelessWidget {
+  final dynamic subject; // String (ex. token), Json (ex. key, statement), or null
+  final ValueNotifier<bool> translate = ValueNotifier<bool>(false);
 
-  const ShowQr(this.text, {super.key, this.color = Colors.white});
+  JsonQrDisplay(this.subject, {super.key});
 
   @override
   Widget build(BuildContext context) {
-    Size availSize = MediaQuery.of(context).size;
-    double size = min(availSize.width, availSize.height) / 2;
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        QrImageView(
-          data: text,
-          version: QrVersions.auto,
-          size: size,
-        ),
-        SizedBox(
-            width: size,
-            height: size / 3,
-            child: Stack(
-              children: [
-                Align(
-                    alignment: Alignment.bottomLeft,
-                    child: IntrinsicWidth(
-                        child: TextField(
-                            controller: TextEditingController()..text = text,
-                            maxLines: null,
-                            readOnly: true,
-                            style: GoogleFonts.courierPrime(
-                                fontWeight: FontWeight.w700, fontSize: 10, color: color)))),
-                Align(
-                    alignment: Alignment.bottomRight,
-                    child: FloatingActionButton(
-                        heroTag: 'Copy',
-                        tooltip: 'Copy',
-                        child: const Icon(Icons.copy),
-                        onPressed: () async {
-                          await Clipboard.setData(ClipboardData(text: text));
-                        })),
-              ],
-            )),
-      ],
-    );
+    return LayoutBuilder(builder: (context, constraints) {
+      double qrSize = min(constraints.maxWidth, constraints.maxHeight * (2 / 3));
+      if (b(subject)) {
+        String display = subject is Json ? encoder.convert(subject) : subject;
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            QrImageView(data: display, version: QrVersions.auto, size: qrSize),
+            SizedBox(width: qrSize, height: qrSize / 2, child: JsonDisplay(subject)),
+          ],
+        );
+      } else {
+        return Center(child: (Text('<none>')));
+      }
+    });
   }
 
-  show(BuildContext context) {
-    ShowQr big = ShowQr(text, color: Colors.black);
+  Future<void> show(BuildContext context, {double reduction = 0.6}) async {
+    JsonQrDisplay jq = JsonQrDisplay(subject);
     return showDialog(
         context: context,
-        builder: (BuildContext context) =>
-            Dialog(child: Padding(padding: const EdgeInsets.all(15), child: big)));
+        builder: (context) {
+          return LayoutBuilder(builder: (context, constraints) {
+            double x = min(constraints.maxWidth, constraints.maxHeight * 0.666, ) * reduction;
+            return Dialog(
+                insetPadding: EdgeInsets.zero,
+                child: SizedBox(
+                    width: x,
+                    height: x * 1.5,
+                    child: Padding(padding: const EdgeInsets.all(15), child: jq)));
+          });
+        });
   }
 }
