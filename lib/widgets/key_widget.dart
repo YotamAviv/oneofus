@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:oneofus/oneofus/jsonish.dart';
-import 'package:oneofus/oneofus/show_qr.dart';
+import 'package:oneofus/oneofus/json_qr_display.dart';
 import 'package:oneofus/oneofus/trust_statement.dart';
 
 import '../base/my_keys.dart';
