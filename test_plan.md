@@ -71,7 +71,8 @@ Email me or submit at: https://github.com/YotamAviv/nerdster/issues
     - equivalent Oneofus key, use Yotam's
     - one of your existing delegate keys, use Yotam's
   - Claiming Andrew's delegate key (complicated...)
-    - type in "nerdster.org", yes, overwrite my key. TODO: BUG: Warns that I'll be overwriting a key.
+    - type in "nerdster.org", yes, overwrite my key. 
+      TODO: BUG: Warns that I'll be overwriting a key.
     - refresh the Nerdster and check it out if you want to test the Nerd'ster:
       - Andrew should no longer have a delegate key 
       - Clear my reaction completely works as expected regardless (impressive in cases where Yotam and Andrew rated)
