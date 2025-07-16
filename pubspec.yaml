@@ -27,7 +27,7 @@ dependencies:
   fake_cloud_firestore: ^3.0.2
   url_launcher: ^6.3.0
   flutter_linkify: ^6.0.0
-  share_plus: ^10.0.3
+  share_plus: ^11.0.0
   loader_overlay: ^5.0.0
   package_info_plus: ^8.1.1
   http: ^1.2.2
