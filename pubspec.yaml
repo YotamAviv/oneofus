@@ -20,7 +20,7 @@ dependencies:
   jwk: ^0.2.3
   crypto: ^3.0.3
   flutter_secure_storage: ^9.2.2
-  mobile_scanner: ^7.0.1
+  mobile_scanner: ^6.0.0
   google_fonts: ^6.2.1
   qr_flutter: ^4.1.0
   path_provider: ^2.1.3
