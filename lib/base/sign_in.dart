@@ -7,6 +7,7 @@ import 'package:oneofus/delegate_keys_route.dart';
 import 'package:oneofus/main.dart';
 import 'package:oneofus/oneofus/statement.dart';
 import 'package:oneofus/oneofus/trust_statement.dart';
+import 'package:oneofus/oneofus/ui/alert.dart';
 
 import '../oneofus/crypto/crypto.dart';
 import '../oneofus/jsonish.dart';
@@ -87,6 +88,12 @@ Future<void> signIn(String scanned, BuildContext context) async {
   print('response.statusCode: ${response.statusCode}'); // (201 expected)
 
   Navigator.popUntil(context, ModalRoute.withName(Navigator.defaultRouteName));
+
+  List<String> credentialTypes = ['- identity public key'];
+  if (b(delegateKeyPairJson)) credentialTypes.add(('delegate public/private key pair'));
+  await alert('Credentials sent', '''${credentialTypes.join('\n- ')}
+transmitted to: $domain''',
+      ['Okay'], context);
 }
 
 Future<bool?> createDelegateOrNot(String domain, BuildContext context) async {
@@ -136,11 +143,7 @@ In case you don't, you can continue by:
 
 var sampleSignIn = {
   "domain": "nerdster.org",
-  "publicKey": {
-    "crv": "X25519",
-    "kty": "OKP",
-    "x": "vVGxbPqAwNpGUCuYio5c2WHVuG3rCeP2WaoIQtsIGxE"
-  },
+  "publicKey": {"crv": "X25519", "kty": "OKP", "x": "vVGxbPqAwNpGUCuYio5c2WHVuG3rCeP2WaoIQtsIGxE"},
   "session": "05167cbeaa42acb5e680961648afd24ddf15a3ec",
   "method": "POST",
   "uri": "https://signin.nerdster.org/signin"
