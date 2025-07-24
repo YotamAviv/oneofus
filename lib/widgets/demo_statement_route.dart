@@ -9,13 +9,15 @@ import '../oneofus/trust_statement.dart';
 
 const space = SizedBox(height: 20);
 
-final KeyWidget myOneofusKey = KeyWidget.skip('dummy', true, KeyType.oneofus, false);
-final KeyWidget myEquivalentKey = KeyWidget.skip('dummy', false, KeyType.oneofus, true);
-final KeyWidget myActiveDelegateKey = KeyWidget.skip('dummy', true, KeyType.delegate, false);
-final KeyWidget myLostDelegateKey = KeyWidget.skip('dummy', false, KeyType.delegate, false);
-final KeyWidget myRevokedDelegateKey = KeyWidget.skip('dummy', false, KeyType.delegate, true);
-final KeyWidget keyIBlocked = KeyWidget.skip('dummy', false, KeyType.other, true);
-final KeyWidget keyITrust = KeyWidget.skip('dummy', false, KeyType.other, false);
+const Json dummy = {"dummy" : "dummy"};
+
+final KeyWidget myOneofusKey = KeyWidget.skip(dummy, 'dummy', true, KeyType.oneofus, false);
+final KeyWidget myEquivalentKey = KeyWidget.skip(dummy, 'dummy', false, KeyType.oneofus, true);
+final KeyWidget myActiveDelegateKey = KeyWidget.skip(dummy, 'dummy', true, KeyType.delegate, false);
+final KeyWidget myLostDelegateKey = KeyWidget.skip(dummy, 'dummy', false, KeyType.delegate, false);
+final KeyWidget myRevokedDelegateKey = KeyWidget.skip(dummy, 'dummy', false, KeyType.delegate, true);
+final KeyWidget keyIBlocked = KeyWidget.skip(dummy, 'dummy', false, KeyType.other, true);
+final KeyWidget keyITrust = KeyWidget.skip(dummy, 'dummy', false, KeyType.other, false);
 
 Future<void> showDemoKeys(context) async {
   await Navigator.of(context).push(MaterialPageRoute(builder: (context) => DemoKeysRoute()));

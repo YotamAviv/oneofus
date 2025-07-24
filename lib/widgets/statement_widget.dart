@@ -44,9 +44,9 @@ class _StatementBoxI extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget iKey = b(parent.iKeyDemo) ? parent.iKeyDemo! : KeyWidget(statement.iToken);
+    Widget iKey = b(parent.iKeyDemo) ? parent.iKeyDemo! : KeyWidget(statement.i);
     Widget subjectKey =
-        b(parent.subjectKeyDemo) ? parent.subjectKeyDemo! : KeyWidget(statement.subjectToken);
+        b(parent.subjectKeyDemo) ? parent.subjectKeyDemo! : KeyWidget(statement.subject);
 
     DateTime? revokeAtTime;
     if (b(statement.revokeAt)) {

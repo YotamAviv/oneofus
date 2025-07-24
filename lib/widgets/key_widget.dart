@@ -20,13 +20,15 @@ enum KeyType {
 // NOTE: This app (phone app, only has my statements) doesn't know if someone else's
 // key has been blocked or replaced.
 class KeyWidget extends StatelessWidget {
-  final String keyToken;
+  final Json json;
+  final String token;
   final KeyType keyType;
   final bool local;
   final bool revoked; // ignored for other folks' keys.
   late final String? tooltip;
 
-  factory KeyWidget(String keyToken) {
+  factory KeyWidget(Json json) {
+    String keyToken = getToken(json);
     TrustStatement? delegateStatement;
     List<TrustStatement> delegateStatements = MyStatements.getByVerbs({TrustVerb.delegate});
     Iterable<TrustStatement> tokenDelegateStatements =
@@ -62,10 +64,10 @@ class KeyWidget extends StatelessWidget {
       keyType = KeyType.other;
       revoked = b(blockStatement); // DEFER: blocked or revoked
     }
-    return KeyWidget.skip(keyToken, local, keyType, revoked);
+    return KeyWidget.skip(json, keyToken, local, keyType, revoked);
   }
 
-  KeyWidget.skip(this.keyToken, this.local, this.keyType, this.revoked, {super.key}) {
+  KeyWidget.skip(this.json, this.token, this.local, this.keyType, this.revoked, {super.key}) {
     String activeS = revoked ? 'revoked or blocked' : 'valid';
     if (local) {
       if (keyType == KeyType.oneofus) {
@@ -103,7 +105,7 @@ class KeyWidget extends StatelessWidget {
         // Code for onTap below works. Maybe later, especially if we include a translate option
         // ("Me", "Andrew", "My delegate on nerdster.com", ...)
         // onTap: () => JsonQrDisplay(Jsonish.find(keyToken)!.json).show(context),
-        onDoubleTap: () => JsonQrDisplay(keyToken).show(context, reduction: 0.9),
+        onDoubleTap: () => JsonQrDisplay(json).show(context, reduction: 0.9),
         child: Tooltip(
           message: tooltip,
           child: Icon(

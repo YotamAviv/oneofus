@@ -1,13 +1,12 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+
 import 'json_display.dart';
 import 'jsonish.dart';
 import 'util.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 
-/// DEFER: include "Don't show again"
-/// DEFER: Use in qrSignin(..).. (WHY? for sport?, uniformity?)
 class JsonQrDisplay extends StatelessWidget {
   final dynamic subject; // String (ex. token), Json (ex. key, statement), or null
   final ValueNotifier<bool> translate = ValueNotifier<bool>(false);
@@ -23,8 +22,15 @@ class JsonQrDisplay extends StatelessWidget {
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            QrImageView(data: display, version: QrVersions.auto, size: qrSize),
-            SizedBox(width: qrSize, height: qrSize / 2, child: JsonDisplay(subject)),
+            QrImageView(
+                data: display,
+                version: QrVersions.auto,
+                size: qrSize,
+                padding: kPadding),
+            SizedBox(
+                width: qrSize,
+                height: qrSize / 2,
+                child: Padding(padding: kPadding, child: JsonDisplay(subject))),
           ],
         );
       } else {
@@ -33,19 +39,15 @@ class JsonQrDisplay extends StatelessWidget {
     });
   }
 
-  Future<void> show(BuildContext context, {double reduction = 0.6}) async {
-    JsonQrDisplay jq = JsonQrDisplay(subject);
+  Future<void> show(BuildContext context, {double reduction = 0.9}) async {
     return showDialog(
         context: context,
         builder: (context) {
           return LayoutBuilder(builder: (context, constraints) {
-            double x = min(constraints.maxWidth, constraints.maxHeight * 0.666, ) * reduction;
+            double x = min(constraints.maxWidth, constraints.maxHeight * (2 / 3)) * reduction;
             return Dialog(
-                insetPadding: EdgeInsets.zero,
-                child: SizedBox(
-                    width: x,
-                    height: x * 1.5,
-                    child: Padding(padding: const EdgeInsets.all(15), child: jq)));
+                shape: RoundedRectangleBorder(borderRadius: kBorderRadius),
+                child: SizedBox(width: x, height: x * 3 / 2, child: JsonQrDisplay(subject)));
           });
         });
   }

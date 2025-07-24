@@ -34,9 +34,6 @@ class ErrorCorruptor implements Corruptor {
 }
 final Corruptor corruptor = ErrorCorruptor();
 
-typedef TranslateFn = dynamic Function(dynamic);
-TranslateFn? translateFn;
-
 const domain2statementType = {
   kOneofusDomain: kOneofusType,
 };
