@@ -91,8 +91,9 @@ Future<void> signIn(String scanned, BuildContext context) async {
 
   List<String> credentialTypes = ['- identity public key'];
   if (b(delegateKeyPairJson)) credentialTypes.add(('delegate public/private key pair'));
-  await alert('Credentials sent', '''${credentialTypes.join('\n- ')}
-transmitted to: $domain''',
+  await alert('Credentials sent', '''transmitted to $domain:
+${credentialTypes.join('\n- ')}
+''',
       ['Okay'], context);
 }
 
