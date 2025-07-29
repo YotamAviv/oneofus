@@ -105,7 +105,7 @@ class KeyWidget extends StatelessWidget {
         // Code for onTap below works. Maybe later, especially if we include a translate option
         // ("Me", "Andrew", "My delegate on nerdster.com", ...)
         // onTap: () => JsonQrDisplay(Jsonish.find(keyToken)!.json).show(context),
-        onDoubleTap: () => JsonQrDisplay(json).show(context, reduction: 0.9),
+        onDoubleTap: () => JsonQrDisplay(json, translate: ValueNotifier(false)).show(context, reduction: 0.9),
         child: Tooltip(
           message: tooltip,
           child: Icon(
