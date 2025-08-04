@@ -14,11 +14,8 @@ class Prefs {
 
   // Not persisted
   static ValueNotifier<bool> dev = ValueNotifier<bool>(false);
-  static ValueNotifier<bool> cloudFunctionsFetch = ValueNotifier<bool>(false);
+  static ValueNotifier<bool> httpFetch = ValueNotifier<bool>(false);
   static ValueNotifier<bool> batchFetch = ValueNotifier<bool>(false);
-  static ValueNotifier<bool> streamBatchFetch = ValueNotifier<bool>(false);
-  static ValueNotifier<bool> fetchRecent = ValueNotifier<bool>(false);
-  static ValueNotifier<bool> slowFetch = ValueNotifier<bool>(false);
 
   static Future<void> init() async {
     try {
