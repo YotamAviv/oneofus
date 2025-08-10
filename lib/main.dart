@@ -27,13 +27,6 @@ const bool exceptionWhenTryingToPush = false;
 // TODO: Phone rotation, d'oh!
 // Try: https://stackoverflow.com/questions/49418332/flutter-how-to-prevent-device-orientation-changes-and-force-portrait
 
-class ErrorCorruptor implements Corruptor {
-  @override
-  void corrupt(String token, String error, String? details) =>
-      throw ('Corrupt!: $token, $error, $details');
-}
-final Corruptor corruptor = ErrorCorruptor();
-
 const domain2statementType = {
   kOneofusDomain: kOneofusType,
 };
