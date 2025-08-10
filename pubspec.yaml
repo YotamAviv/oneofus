@@ -45,8 +45,9 @@ dev_dependencies:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path_android: assets/images/oneofus.png
-
+  image_path_android: assets/images/oneofus_1024.png
+  image_path_ios: assets/images/oneofus_1024.png
+  min_sdk_android: 21
 flutter:
 
   uses-material-design: true
