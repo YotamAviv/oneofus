@@ -2,7 +2,7 @@ name: oneofus
 description: "A new Flutter project."
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 1.0.59+59
+version: 1.0.60+60
 
 environment:
   sdk: '>=3.4.3 <4.0.0'
@@ -40,8 +40,11 @@ dev_dependencies:
 
   flutter_lints: ^6.0.0
 
+# Icon last updated 2025-08-10
+# To regenerate, uncomment and run: dart run flutter_launcher_icons
 flutter_launcher_icons:
   android: true
+  ios: true
   image_path_android: assets/images/oneofus.png
 
 flutter:
