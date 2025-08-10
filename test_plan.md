@@ -41,7 +41,6 @@ Email me or submit at: https://github.com/YotamAviv/nerdster/issues
   - revoke delegate at first (the earlier of the 2, "A")
   - refresh Nerdster and check. You should see A but not B.
     - (Nerdster should display revoked key cross out like on the phone.)
-  - TODO: Don't allow submitting with revoked key. Looks like I'm halfway there - an assertion fires.
   - revoke at "since always" and check. You should see neither A nor B.
   - un-revoke. You should see both A and B again.
 
@@ -56,7 +55,7 @@ Email me or submit at: https://github.com/YotamAviv/nerdster/issues
 
 - Claim an existing key, use Yotam's
   - Use menu State => {replace}
-  - Scan Yotam's key from https://nerdster.web.app/?showJson=true&showStatements=true&showKeys=true&skipVerify=true
+  - Scan Yotam's key
   - Verify that you see options related to last statement token
   - Trust yourself and fail gracefully (Use a trust method to trust these below)
     - Yotam
