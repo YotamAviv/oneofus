@@ -36,7 +36,7 @@ class DemoKeysRoute extends StatelessWidget {
         const Linky('''
 Your keys (private/public pairs) are stored on your phone. 
 Public keys can be 
-  - your active one-of-us identity key (green)
+  - your active identity key (green)
   - your active one delegate keys (blue)
   - someone else's key (gray)'''),
         Row(
@@ -103,7 +103,7 @@ class DemoStatementRoute extends StatelessWidget {
     return Scaffold(
         appBar: AppBar(title: const Text('Statements')),
         body: ListView(shrinkWrap: true, physics: const AlwaysScrollableScrollPhysics(), children: [
-          const Linky('''One-of-us trust statements are 
+          const Linky('''Statements are 
 - signed by a key (top right of statement box display)
 - use a verb: trust, block, replace, delegate
 - reference another key (top left of statement box display)
