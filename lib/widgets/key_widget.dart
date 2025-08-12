@@ -71,14 +71,14 @@ class KeyWidget extends StatelessWidget {
     String activeS = revoked ? 'revoked or blocked' : 'valid';
     if (local) {
       if (keyType == KeyType.oneofus) {
-        tooltip = 'My $activeS Oneofus key';
+        tooltip = 'My $activeS identity key';
       } else {
         tooltip = 'An $activeS delegate key of mine';
       }
     } else {
       if (keyType == KeyType.oneofus) {
         assert(revoked);
-        tooltip = 'An equivalent, replaced Oneofus key of mine';
+        tooltip = 'An equivalent, replaced identity key of mine';
       } else if (keyType == KeyType.delegate) {
         tooltip = 'A lost, $activeS delegate key of mine';
       } else {

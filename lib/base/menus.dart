@@ -122,9 +122,9 @@ Widget buildHelpMenu(context) {
               'Congratulations',
               '''You posses a public/private cryptographic key pair!
 
-- Your public key is displayed in both QR and text on the main screen. Other folks with the app can scan that to one-of-us trust you as a responsible human.
+- Your identity public key is displayed in both QR and text on the main screen. Other folks with the app can scan that to trust you as a responsible human.
 
-- Click the QR icon to scan other folks' keys to trust them. Doing so will use your private key to sign a trust statement and publish it to grow your (and our) trust network of responsible humans.
+- Click the QR icon to scan other folks' keys to trust them. Doing so will use your private key to sign and publish a statement to grow your (and our) identity network of responsible humans.
 
 - Click the QR icon to sign in to a delegate partner.
 
@@ -138,11 +138,11 @@ https://one-of-us.net
         onPressed: () async {
           await alert(
               'Main screen',
-              '''The QR code front and center is your public key (the gibberish below is the text).
+              '''The QR code front and center is your public identity key (the gibberish below is the text).
                     
 Your public/private key pair is stored on your phone and is used to sign and publish trust statements.
 
-Click the QR icon (bottom right) to scan someone else's public key to one-of-us trust them.
+Click the QR icon (bottom right) to scan someone else's public identity key to vouch for their humanity and identity.
 
 Click the QR icon (bottom right) to sign in to a delegate partner (the Nerd'ster) as yourself''',
               ['Okay'],
