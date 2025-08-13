@@ -105,8 +105,11 @@ class DemoStatementRoute extends StatelessWidget {
         body: ListView(shrinkWrap: true, physics: const AlwaysScrollableScrollPhysics(), children: [
           const Linky('''Statements are 
 - signed by a key (top right of statement box display)
-- use a verb: trust, block, replace, delegate
 - reference another key (top left of statement box display)
+- use a verb: trust, block, replace, or delegate
+
+Find (and restate or clear) all statements signed by you (by your active or equivalent keys) under the State menu.
+
 Different verbs may require different fields, such as: moniker, revokeAt, comment, etc..
 Samples below:'''),
 

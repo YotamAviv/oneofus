@@ -41,9 +41,9 @@ class _BaseState extends State<Base> {
       return Scaffold(
           body: SafeArea(
               child: Column(children: [
-        Row(mainAxisSize: MainAxisSize.min, children: <Widget>[
-          Expanded(child: MenuBar(children: buildMenus(context))),
-        ]),
+        Row(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[Expanded(child: MenuBar(children: buildMenus(context)))]),
         const FancySplash()
       ])));
     }
@@ -65,11 +65,8 @@ class NoKeys extends StatelessWidget {
           const Spacer(),
           OutlinedButton(
               onPressed: () async {
-                await Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => ImportExport(),
-                  ),
-                );
+                await Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (context) => ImportExport()));
                 // TODO: This "if (context.mounted)" seems wrong. Same elsewhere.
                 // BUG: MINOR: prepareX throws exception if nothing was imported and back was chosen.
                 if (context.mounted) await prepareX(context);
@@ -97,21 +94,8 @@ https://manual#replace''',
         children: [
           OutlinedButton(
               onPressed: () async {
+                await congratulate(context);
                 OouKeyPair newKeyPair = await crypto.createKeyPair();
-                await alert(
-                    'Congratulations',
-                    '''You're about to posses a public/private cryptographic key pair!
-
-- Your public key is displayed in both QR and text on the main screen. Other folks with the app can scan that to one-of-us trust you as a responsible human.
-
-- Click the QR icon to scan other folks' keys to trust them. Doing so will use your private key to sign a trust statement and publish it to grow your (and our) trust network of responsible humans.
-
-- Click the QR icon to sign in to a delegate partner.
-
-https://one-of-us.net
-''',
-                    ['Okay'],
-                    context);
                 await MyKeys.storeOneofusKey(newKeyPair);
               },
               child: const Text('Create new key')),
