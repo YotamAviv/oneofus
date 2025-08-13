@@ -116,39 +116,7 @@ Widget buildEtcMenu(context) {
 
 Widget buildHelpMenu(context) {
   return SubmenuButton(menuChildren: <Widget>[
-    MenuItemButton(
-        onPressed: () async {
-          await alert(
-              'Congratulations',
-              '''You posses a public/private cryptographic key pair!
-
-- Your identity public key is displayed in both QR and text on the main screen. Other folks with the app can scan that to trust you as a responsible human.
-
-- Click the QR icon to scan other folks' keys to trust them. Doing so will use your private key to sign and publish a statement to grow your (and our) identity network of responsible humans.
-
-- Click the QR icon to sign in to a delegate partner.
-
-https://one-of-us.net 
-''',
-              ['Okay'],
-              context);
-        },
-        child: const Text('Congratulations')),
-    MenuItemButton(
-        onPressed: () async {
-          await alert(
-              'Main screen',
-              '''The QR code front and center is your public identity key (the gibberish below is the text).
-                    
-Your public/private key pair is stored on your phone and is used to sign and publish trust statements.
-
-Click the QR icon (bottom right) to scan someone else's public identity key to vouch for their humanity and identity.
-
-Click the QR icon (bottom right) to sign in to a delegate partner (the Nerd'ster) as yourself''',
-              ['Okay'],
-              context);
-        },
-        child: const Text('Main screen')),
+    MenuItemButton(onPressed: () => congratulate(context), child: const Text('Congratulations')),
     MenuItemButton(
         onPressed: () async {
           await showDemoKeys(context);
@@ -166,6 +134,24 @@ Click the QR icon (bottom right) to sign in to a delegate partner (the Nerd'ster
         },
         child: const Text('About')),
   ], child: const Text('?'));
+}
+
+Future<void> congratulate(BuildContext context) async {
+  await alert(
+      'Congratulations!',
+      '''You posses a public/private cryptographic key pair!
+
+- Your public key is displayed in both QR and text on the main screen. Other folks with the app can scan that to vouch for your humanity and identity.
+(Consider backing up your private key; use the menu /etc => Import/Export to get at it.)
+
+Use the QR icon (bottom right) to:
+- scan other folks' keys to vouch for their identities. Doing so will use your private key to sign and publish a statement which will grow your (and our) identity network.
+- sign in to a service using a delegate key.
+
+https://one-of-us.net
+''',
+      ['Okay'],
+      context);
 }
 
 class DevMenu extends StatefulWidget {

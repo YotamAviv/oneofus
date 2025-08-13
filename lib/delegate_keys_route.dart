@@ -42,7 +42,7 @@ import 'statement_action_picker.dart';
 ///
 
 const String _descTop =
-    '''Delegate key pairs allow other services (eg. the Nerd'ster) to state stuff as you.
+    '''Delegate keys allow other services to state stuff as you.
 You can revoke these at any time (including retroactively).''';
 const String _descVerbs = '''delegate: Claim this delegate key as yours (revoked or not).
 clear: disassociate yourself from this key.''';

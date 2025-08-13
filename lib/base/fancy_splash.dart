@@ -117,7 +117,7 @@ class _KeyQrTextState extends State<_KeyQrText> {
       // shrinkWrap: true,
       // mainAxisSize: MainAxisSize.max,
       children: [
-        SportRow(),
+        const SizedBox(height: 20),
         QrImageView(
           data: dataString,
           version: QrVersions.auto,
@@ -133,29 +133,5 @@ class _KeyQrTextState extends State<_KeyQrText> {
                 color: Colors.black)),
       ],
     );
-  }
-}
-
-class SportRow extends StatelessWidget {
-  final random = Random();
-  final String kImageSport = 'assets/images/sportdeath_large.gif';
-  final String kImageNerd = 'assets/images/nerd.gif';
-  SportRow({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    // return Row(
-    //   children: List.generate(
-    //       7, (index) => Expanded(child: Image.asset(index == 0 || index == 6 ? kImage1 : kImage2))),
-    // );
-    return SizedBox(height: 20);
-    // return Row(children: [
-    //   ...List.generate(6, (index) => Expanded(child: SizedBox(height: 20,))),
-    //   // Expanded(child: Image.asset(kImageNerd)),
-    //   // ...List.generate(2, (index) => Expanded(child: SizedBox())),
-    //   // Expanded(child: Image.asset(random.nextInt(100) <= 90 ? kImageNerd : kImageSport)),
-    // ]);
   }
 }
