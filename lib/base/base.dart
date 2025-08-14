@@ -29,9 +29,7 @@ class _BaseState extends State<Base> {
     super.dispose();
   }
 
-  void listener() {
-    setState(() {});
-  }
+  void listener() => setState(() {});
 
   @override
   Widget build(BuildContext context) {
@@ -41,9 +39,35 @@ class _BaseState extends State<Base> {
       return Scaffold(
           body: SafeArea(
               child: Column(children: [
-        Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[Expanded(child: MenuBar(children: buildMenus(context)))]),
+        Material(
+          color: Theme.of(context).colorScheme.surfaceContainer, // match the menu’s gray
+          child: SizedBox(
+            height: 40,
+            width: double.infinity, // fill width so no white shows after the menu
+            child: Row(
+              children: [
+                MenuBar(
+                  // Let the Material's color show through
+                  style: const MenuStyle(
+                    backgroundColor: WidgetStatePropertyAll(Colors.transparent),
+                    elevation: WidgetStatePropertyAll(0),
+                    padding: WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 8)),
+                  ),
+                  children: buildMenus(context),
+                ),
+                const Spacer(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                  child: CircleAvatar(
+                    backgroundImage: const AssetImage('assets/images/oneofus_1024.png'),
+                    radius: 16,
+                    backgroundColor: Colors.transparent, // blends with the bar
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
         const FancySplash()
       ])));
     }
