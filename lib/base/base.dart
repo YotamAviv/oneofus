@@ -39,35 +39,18 @@ class _BaseState extends State<Base> {
       return Scaffold(
           body: SafeArea(
               child: Column(children: [
-        Material(
-          color: Theme.of(context).colorScheme.surfaceContainer, // match the menu’s gray
-          child: SizedBox(
-            height: 40,
-            width: double.infinity, // fill width so no white shows after the menu
-            child: Row(
-              children: [
-                MenuBar(
-                  // Let the Material's color show through
-                  style: const MenuStyle(
-                    backgroundColor: WidgetStatePropertyAll(Colors.transparent),
-                    elevation: WidgetStatePropertyAll(0),
-                    padding: WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 8)),
-                  ),
-                  children: buildMenus(context),
-                ),
-                const Spacer(),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                  child: CircleAvatar(
-                    backgroundImage: const AssetImage('assets/images/oneofus_1024.png'),
-                    radius: 16,
-                    backgroundColor: Colors.transparent, // blends with the bar
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+        IntrinsicHeight(
+            // ensures Stack gets finite height from MenuBar
+            child: Stack(children: [
+          // MenuBar as-is (keeps default look)
+          Row(children: [Expanded(child: MenuBar(children: buildMenus(context)))]),
+          // Right-side image pinned over the menu bar
+          Align(
+              alignment: Alignment.centerRight,
+              child: Padding(
+                  padding: EdgeInsets.only(right: 8),
+                  child: Image.asset(height: 38, 'assets/images/oneofus_1024.png')))
+        ])),
         const FancySplash()
       ])));
     }
