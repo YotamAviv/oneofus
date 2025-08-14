@@ -27,6 +27,7 @@ class FancySplash extends StatelessWidget {
       Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
+          // MINOR BUG: I'm not observing Prefs.dev, hot reload shows the copy icon.
           if (Prefs.dev.value)
             FloatingActionButton(
                 heroTag: 'Copy',
@@ -43,7 +44,7 @@ class FancySplash extends StatelessWidget {
               child: const Icon(Icons.qr_code_2),
               onPressed: () async {
                 String? scanned = await QrScanner.scan(
-                    'Scan key QR to trust or Delegate QR sign-in', validateKeyOrSignIn, context);
+                    '''Scan: key or sign-in QR''', validateKeyOrSignIn, context);
                 if (b(scanned)) {
                   if (context.mounted) await prepareX(context);
                   if (await validateKey(scanned!)) {
@@ -53,7 +54,7 @@ class FancySplash extends StatelessWidget {
                     assert(await validateSignIn(scanned));
                     try {
                       await signIn(scanned, context);
-                    } catch(e, stackTrace) {
+                    } catch (e, stackTrace) {
                       print('*** signIn exception: $e');
                       print(stackTrace);
                       await alertException(context, e);
@@ -72,7 +73,6 @@ Future<bool> validateKeyOrSignIn(String s) async {
   bool signIn = await validateSignIn(s);
   return key || signIn;
 }
-
 
 class _KeyQrText extends StatefulWidget {
   const _KeyQrText({super.key});
@@ -128,9 +128,7 @@ class _KeyQrTextState extends State<_KeyQrText> {
             maxLines: null,
             readOnly: true,
             style: GoogleFonts.courierPrime(
-                fontWeight: FontWeight.w700,
-                fontSize: 10,
-                color: Colors.black)),
+                fontWeight: FontWeight.w700, fontSize: 10, color: Colors.black)),
       ],
     );
   }

@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:oneofus/base/about.dart';
 import 'package:oneofus/fire/firebase_options.dart';
-import 'package:oneofus/oneofus/fetcher.dart';
 import 'package:oneofus/prefs.dart';
 
 import 'base/base.dart';
@@ -63,8 +62,7 @@ void main() async {
 
   runApp(
     GlobalLoaderOverlay(
-        child: const MaterialApp(
-            debugShowCheckedModeBanner: false, title: 'ONE-OF-US.NET', home: Base())),
+        child: const MaterialApp(title: 'ONE-OF-US.NET', home: Base())),
   );
 }
 

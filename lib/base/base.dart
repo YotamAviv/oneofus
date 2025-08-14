@@ -29,9 +29,7 @@ class _BaseState extends State<Base> {
     super.dispose();
   }
 
-  void listener() {
-    setState(() {});
-  }
+  void listener() => setState(() {});
 
   @override
   Widget build(BuildContext context) {
@@ -41,9 +39,18 @@ class _BaseState extends State<Base> {
       return Scaffold(
           body: SafeArea(
               child: Column(children: [
-        Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[Expanded(child: MenuBar(children: buildMenus(context)))]),
+        IntrinsicHeight(
+            // ensures Stack gets finite height from MenuBar
+            child: Stack(children: [
+          // MenuBar as-is (keeps default look)
+          Row(children: [Expanded(child: MenuBar(children: buildMenus(context)))]),
+          // Right-side image pinned over the menu bar
+          Align(
+              alignment: Alignment.centerRight,
+              child: Padding(
+                  padding: EdgeInsets.only(right: 8),
+                  child: Image.asset(height: 38, 'assets/images/oneofus_1024.png')))
+        ])),
         const FancySplash()
       ])));
     }

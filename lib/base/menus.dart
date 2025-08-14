@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:oneofus/base/about.dart';
 import 'package:oneofus/base/my_statements.dart';
-import 'package:oneofus/main.dart';
-import 'package:oneofus/oneofus/distincter.dart';
 import 'package:oneofus/oneofus/fetcher.dart';
 import 'package:oneofus/oneofus/fire_factory.dart';
 import 'package:oneofus/oneofus/fire_util.dart';
@@ -43,7 +41,7 @@ String formatVerbs(Iterable<TrustVerb> verbs) {
   return Set.of(verbs.where((v) => v != TrustVerb.clear).map((v) => v.label)).toString();
 }
 
-Widget buildStateMenu(context) {
+Widget buildStateMenu(BuildContext context) {
   return SubmenuButton(menuChildren: <Widget>[
     MenuItemButton(
         onPressed: () async {
@@ -78,7 +76,7 @@ Widget buildStateMenu(context) {
   ], child: const Text('State'));
 }
 
-Widget buildEtcMenu(context) {
+Widget buildEtcMenu(BuildContext context) {
   return SubmenuButton(
     menuChildren: [
       SubmenuButton(menuChildren: [
@@ -114,7 +112,7 @@ Widget buildEtcMenu(context) {
   );
 }
 
-Widget buildHelpMenu(context) {
+Widget buildHelpMenu(BuildContext context) {
   return SubmenuButton(menuChildren: <Widget>[
     MenuItemButton(onPressed: () => congratulate(context), child: const Text('Congratulations')),
     MenuItemButton(
@@ -180,16 +178,8 @@ class DevMenuState extends State<DevMenu> {
 
   @override
   Widget build(BuildContext context) {
-    if (Prefs.dev.value) {
-      return buildDevMenu(context);
-    } else {
-      return SizedBox();
-    }
+    return (Prefs.dev.value) ? buildDevMenu(context) : const SizedBox();
   }
-}
-
-String display(List l) {
-  return l.map((x) => x is DateTime ? formatUiDatetime(x) : x.toString()).join('\n');
 }
 
 Widget buildDevMenu(BuildContext context) {
@@ -202,7 +192,7 @@ Widget buildDevMenu(BuildContext context) {
               context.loaderOverlay.show();
               List out = await checkRead(FireFactory.find(kOneofusDomain), kOneofusCol);
               context.loaderOverlay.hide();
-              await alert('Fire check', display(out), ['okay'], context);
+              await alert('Fire check', _display(out), ['okay'], context);
             } catch (e) {
               await alertException(context, e);
             } finally {
@@ -216,7 +206,7 @@ Widget buildDevMenu(BuildContext context) {
               context.loaderOverlay.show();
               List out = await checkWrite(FireFactory.find(kOneofusDomain), kOneofusCol);
               context.loaderOverlay.hide();
-              await alert('Fire check', display(out), ['okay'], context);
+              await alert('Fire check', _display(out), ['okay'], context);
             } catch (e) {
               await alertException(context, e);
             } finally {
@@ -241,7 +231,7 @@ Widget buildDevMenu(BuildContext context) {
   ], child: const Text('dev'));
 }
 
-List<Widget> buildMenus(context) {
+List<Widget> buildMenus(BuildContext context) {
   return [
     buildStateMenu(context),
     buildEtcMenu(context),
@@ -250,4 +240,8 @@ List<Widget> buildMenus(context) {
     DevMenu(),
     buildHelpMenu(context),
   ];
+}
+
+String _display(List l) {
+  return l.map((x) => x is DateTime ? formatUiDatetime(x) : x.toString()).join('\n');
 }
