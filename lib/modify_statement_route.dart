@@ -49,6 +49,7 @@ class RouteSpec {
   final String descTop;
   final String descState;
   final Map<TrustVerb, String> descStateVerb;
+
   const RouteSpec(this.verbs, this.descTop, this.descState, this.descStateVerb);
 }
 
@@ -74,7 +75,8 @@ class ModifyStatementRoute extends StatefulWidget {
   State<StatefulWidget> createState() => _ModifyStatementRouteState();
 
   // CODE: Understand what a "MaterialPageRoute" is and consider getting rid of these "show" helpers.
-  static Future<TrustStatement?> show(TrustStatement statement, RouteSpec spec, BuildContext context,
+  static Future<TrustStatement?> show(
+      TrustStatement statement, RouteSpec spec, BuildContext context,
       {KeyWidget? subjectKeyDemo}) async {
     TrustStatement? out = await Navigator.of(context).push(MaterialPageRoute(
         builder: (context) =>
@@ -164,15 +166,8 @@ class _ModifyStatementRouteState extends State<ModifyStatementRoute> {
           if (widget.statement.iToken != MyKeys.oneofusToken) const Linky('''NOTE:
 The statement below was signed by one of your replaced, equivalent keys, not by your current, active key.            
 If you restate this statement with your active key, the old statement signed by your old key cannot be overwritten but should be understood to be stale.'''),
-          StatementWidget(
-            widget.statement,
-            null,
-            subjectKeyDemo: widget.subjectKeyDemo,
-          ),
-          if (choice != null)
-            Column(
-              children: editorWidgets!,
-            ),
+          StatementWidget(widget.statement, null, subjectKeyDemo: widget.subjectKeyDemo),
+          if (choice != null) Column(children: editorWidgets!),
           Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: buttons),
         ]));
   }
@@ -249,17 +244,16 @@ If you restate this statement with your active key, the old statement signed by 
   }
 
   Future<bool> _checkChoice(TrustVerb verb) async {
-    assert(verb != TrustVerb.clear || widget.statement.iToken == MyKeys.oneofusToken, "can't");
+    assert(verb != TrustVerb.clear || widget.statement.iToken == MyKeys.oneofusToken, "can't"); // BUG: asserts disabled in release mode.
 
     // warn re: blocks
     if (verb == TrustVerb.block) {
       String? okay = await alert(
           'Block? Really?',
-          '''Blocking a one-of-us key is harsh!
-You should only block a key in case you have strong reason to believe that the key
-- does not represent a real person
-- or maybe it does represent a person, but that person is not acting in good faith (eg. blocks indiscriminately, trusts fake "Elon", etc..)
-- or maybe that person trusts too carelessly or just doesn't get it (eg. scans QR keys from Instagram)
+          '''Only block a key if you believe that: 
+- It does not represent a singular person, or
+- The person is not acting in good faith, or
+- The person shows a clear lack of understanding (e.g., blocks indiscriminately, trusts fake “Elon,” scans QR keys from Instagram, etc...).
 https://manual#block''',
           ['Okay', 'Cancel'],
           context);
@@ -268,8 +262,8 @@ https://manual#block''',
     if (verb == TrustVerb.clear && widget.statement.verb == TrustVerb.replace) {
       String? okay = await alert(
           'Careful..',
-          '''When you clear a replace statement, a key that used to be understood as representing you may no longer  be understood to represent you.
-Folks may be using that key to trust you or follow you.
+          '''When you clear a replace statement, a key that used to be understood as representing you may no longer be understood as representing you.
+Folks may be using that key to trust or follow you.
 If you've used that key to trust others but have not re-stated that trust using your current key, then the path of trust from you to them may be cleared as well.
 https://manual#clear-replace
 https://manual#revoke-equivalent
@@ -297,7 +291,7 @@ https://manual#revoke-delegate
     Map<String, String> map = {};
     for (FieldEditor w in editorWidgets!) {
       if (b(w.value)) {
-        map[w.field] = w.value!;
+        map[w.field] = w.value!.trim();
       }
     }
     // We don't allow changing domain, and so if a delegate statement is being edited we don't
@@ -311,7 +305,7 @@ https://manual#revoke-delegate
     return json;
   }
 
-  Future<TrustStatement?> _state(json, BuildContext context) async {
+  Future<TrustStatement?> _state(Json json, BuildContext context) async {
     String token = MyKeys.oneofusToken;
     Fetcher f = Fetcher(token, kOneofusDomain);
     await f.fetch();
@@ -357,7 +351,12 @@ https://manual#revoke-delegate
     switch (verb) {
       case TrustVerb.trust:
         editorWidgets = [
-          TextEditor('moniker', statement.moniker, minLength: 3),
+          TextEditor(
+            'moniker',
+            statement.moniker,
+            minLength: 3,
+            alpha: true,
+          ),
           TextEditor('comment', statement.comment, maxLines: 3),
         ];
       case TrustVerb.block:
