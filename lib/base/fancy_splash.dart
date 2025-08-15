@@ -27,24 +27,16 @@ class FancySplash extends StatelessWidget {
       Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          // MINOR BUG: I'm not observing Prefs.dev, hot reload shows the copy icon.
-          if (Prefs.dev.value)
-            FloatingActionButton(
-                heroTag: 'Copy',
-                tooltip: 'Copy',
-                child: const Icon(Icons.copy),
-                onPressed: () async {
-                  await Clipboard.setData(ClipboardData(
-                      text: encoder.convert(MyKeys.oneofusPublicKey)));
-                }),
-          if (Prefs.dev.value) const SizedBox(width: 8),
+          DevCopyFab(),
           const Spacer(),
           FloatingActionButton(
-              tooltip: '''Scan someone's key QR to trust or a delegate site's QR to sign-in''',
+              tooltip: '''Scan:
+- a person's public key to trust (or a bad actor's or bot's to block)
+- a delegate service's sign-in parameters''',
               child: const Icon(Icons.qr_code_2),
               onPressed: () async {
                 String? scanned = await QrScanner.scan(
-                    '''Scan: key or sign-in QR''', validateKeyOrSignIn, context);
+                    'Scan key or sign-in parameters', validateKeyOrSignIn, context);
                 if (b(scanned)) {
                   if (context.mounted) await prepareX(context);
                   if (await validateKey(scanned!)) {
@@ -131,5 +123,54 @@ class _KeyQrTextState extends State<_KeyQrText> {
                 fontWeight: FontWeight.w700, fontSize: 10, color: Colors.black)),
       ],
     );
+  }
+}
+
+// chatGPT... show FloatingActionButton when in DEV mode
+class DevCopyFab extends StatefulWidget {
+  const DevCopyFab({super.key});
+
+  @override
+  State<DevCopyFab> createState() => _DevCopyFabState();
+}
+
+class _DevCopyFabState extends State<DevCopyFab> {
+  late bool _dev;
+
+  void _onDevChanged() {
+    if (Prefs.dev.value != _dev && mounted) {
+      setState(() => _dev = Prefs.dev.value);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _dev = Prefs.dev.value;
+    Prefs.dev.addListener(_onDevChanged);
+  }
+
+  @override
+  void dispose() {
+    Prefs.dev.removeListener(_onDevChanged);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_dev) return const SizedBox.shrink();
+    return Row(mainAxisSize: MainAxisSize.min, children: [
+      FloatingActionButton(
+        heroTag: 'Copy',
+        tooltip: 'Copy',
+        onPressed: () async {
+          await Clipboard.setData(
+            ClipboardData(text: encoder.convert(MyKeys.oneofusPublicKey)),
+          );
+        },
+        child: const Icon(Icons.copy),
+      ),
+      const SizedBox(width: 8),
+    ]);
   }
 }
