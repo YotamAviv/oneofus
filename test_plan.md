@@ -45,7 +45,6 @@ Email me or submit at: https://github.com/YotamAviv/nerdster/issues
   - un-revoke. You should see both A and B again.
 
 - Trust a stranger, use Amotz
-  - Scan QR from the https://nerdster.web.app (or use local Nerdster on emulator copy)
     - (Trusting from both the main screen or the trusts screen should be tested, maybe test a different one each time.)
     - Exit app and restart.
     - Trust Amotz again. App should should show existing trust
@@ -60,8 +59,7 @@ Email me or submit at: https://github.com/YotamAviv/nerdster/issues
   - Trust yourself and fail gracefully (Use a trust method to trust these below)
     - Yotam
     - Yotam's delegate
-    - Yourself (You'll need to QR sign into the Nerdster to see your own QR code)
-  - Verify: The app should show Yotam's not-local delegate key uner menu State => {delegate}
+  - Verify: The app should show Yotam's not-local delegate key under menu State => {delegate}
 
 - Claim a delegate
   - fail gracefully on these below:
@@ -76,18 +74,10 @@ Email me or submit at: https://github.com/YotamAviv/nerdster/issues
       - Andrew should no longer have a delegate key 
       - Clear my reaction completely works as expected regardless (impressive in cases where Yotam and Andrew rated)
 
-- Start again (wipe) (probably not necessary, can probably optimize)
-
-- Claim Yotam's key from the start
-  - Replace Yotam's key revoking a few statements back
-
-- QR sign in
-  - App should offer to create delegate key, YES
-  - Verify Nerdster seems okay with me using Yotam's Oneofus key.. Just submit something.
-
 - Replace my key (State menu => {replace})
   - Replace my key
-    - re-state trust in Amotz with the new replacement key
+    - Re-state trust in someone using new replacement key
+  - Possible Nerdster BUG: Claim former delegate with new key is necessary to rate on Nerdster (otherwise it says that my delegate isn't associated with me), but if I claim it then my old key suffers a notification as it still tries to claim that key. 
   
 - Check all hyperlinks
   - menu => ?

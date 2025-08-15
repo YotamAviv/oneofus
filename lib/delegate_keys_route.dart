@@ -109,7 +109,7 @@ Future<TrustStatement?> createNewDelegateKey(String? domain, BuildContext contex
 }
 
 Future<TrustStatement?> claimDelegateKey(BuildContext context) async {
-  String? scanned = await QrScanner.scan('Scan a public key QR code', validateKey, context);
+  String? scanned = await QrScanner.scan('Scan key', validateKey, context);
   if (b(scanned)) {
     Json subjectKeyJson = await parsePublicKey(scanned!);
     return await stateClaimDelegateKey(subjectKeyJson, context);

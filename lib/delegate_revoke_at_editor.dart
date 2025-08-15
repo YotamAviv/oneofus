@@ -84,8 +84,8 @@ class _DelegateRevokeAtEditorState extends State<DelegateRevokeAtEditor> {
   }
 
   Future<void> _scanDelegateRevokedAt(BuildContext context) async {
-    String? scanned = await QrScanner.scan('Scan statement QR', _validateDelegateRevokedAt, context,
-        text: 'Scan a statement JSON or statement token QR code from the delegate service.');
+    String? scanned = await QrScanner.scan('Scan Statement', _validateDelegateRevokedAt, context,
+        text: 'Scan a delegate statement or statement token.');
     if (b(scanned)) {
       String? token = tryDecodeHex(scanned!);
       if (b(token)) {

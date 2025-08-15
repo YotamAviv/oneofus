@@ -23,18 +23,13 @@ class QrScanner extends StatefulWidget {
       String title, Future<bool> Function(String) validator, BuildContext context,
       {String? text}) async {
     String? scanned = await Navigator.of(context).push(
-      MaterialPageRoute(
-          builder: (context) => QrScanner(
-                title,
-                validator,
-                text: text,
-              )),
+      MaterialPageRoute(builder: (context) => QrScanner(title, validator, text: text)),
     );
     return scanned;
   }
 
   static Future<Json?> scanPublicKey(BuildContext context) async {
-    String? scanned = await QrScanner.scan('Scan a public key QR code', validateKey, context);
+    String? scanned = await QrScanner.scan('Scan key', validateKey, context);
     if (b(scanned)) {
       if (!context.mounted) return null;
       Json json = await parsePublicKey(scanned!);
@@ -71,7 +66,6 @@ class _QrScannerState extends State<QrScanner> {
     if (mounted) {
       final clipboardData = await Clipboard.getData(Clipboard.kTextPlain);
       String? clipboardText = clipboardData?.text;
-      print('clipboardText=$clipboardText');
       if (b(clipboardText) && !handled) {
         bool valid = await widget.validator(clipboardText!);
         if (valid) {
@@ -98,57 +92,37 @@ class _QrScannerState extends State<QrScanner> {
 
     const textStyle = TextStyle(color: Colors.white);
     return Scaffold(
-      appBar: AppBar(title: Text(widget.title)),
-      backgroundColor: Colors.black,
-      body: Stack(
-        children: [
-          MobileScanner(
-            onDetect: handleBarcode,
-          ),
+        appBar: AppBar(title: Text(widget.title)),
+        backgroundColor: Colors.black,
+        body: Stack(children: [
+          MobileScanner(onDetect: handleBarcode),
           if (b(widget.text))
             Align(
-              alignment: Alignment.topCenter,
-              child: Container(
                 alignment: Alignment.topCenter,
-                height: 100,
-                color: Colors.black.withOpacity(0.4),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Expanded(
-                      child: Center(child: Text(style: textStyle, widget.text!)),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+                child: Container(
+                    alignment: Alignment.topCenter,
+                    height: 100,
+                    color: Colors.black.withOpacity(0.4),
+                    child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+                      Expanded(child: Center(child: Text(style: textStyle, widget.text!)))
+                    ]))),
           Align(
-            alignment: Alignment.bottomCenter,
-            child: Container(
               alignment: Alignment.bottomCenter,
-              height: 100,
-              color: Colors.black.withOpacity(0.4),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Expanded(
-                    child: Center(
-                        child: Text(barcodeDisplay, overflow: TextOverflow.fade, style: textStyle)),
-                  ),
-                  const Spacer(),
-                  const Text('Or paste', style: textStyle),
-                  IconButton(
-                      onPressed: () {
-                        handlePaste();
-                      },
-                      icon: const Icon(Icons.paste, color: Colors.white))
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+              child: Container(
+                  alignment: Alignment.bottomCenter,
+                  height: 100,
+                  color: Colors.black.withOpacity(0.4),
+                  child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+                    Expanded(
+                        child: Center(
+                            child: Text(barcodeDisplay,
+                                overflow: TextOverflow.fade, style: textStyle))),
+                    const Spacer(),
+                    const Text('Or paste', style: textStyle),
+                    IconButton(
+                        onPressed: handlePaste, icon: const Icon(Icons.paste, color: Colors.white))
+                  ])))
+        ]));
   }
 }
 

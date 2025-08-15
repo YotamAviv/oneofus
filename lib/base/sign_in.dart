@@ -2,12 +2,15 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:oneofus/base/fancy_splash.dart';
 import 'package:oneofus/base/menus.dart';
 import 'package:oneofus/delegate_keys_route.dart';
 import 'package:oneofus/main.dart';
 import 'package:oneofus/oneofus/statement.dart';
 import 'package:oneofus/oneofus/trust_statement.dart';
 import 'package:oneofus/oneofus/ui/alert.dart';
+import 'package:oneofus/oneofus/ui/my_checkbox.dart';
+import 'package:oneofus/prefs.dart';
 
 import '../oneofus/crypto/crypto.dart';
 import '../oneofus/jsonish.dart';
@@ -91,10 +94,22 @@ Future<void> signIn(String scanned, BuildContext context) async {
 
   List<String> credentialTypes = ['- identity public key'];
   if (b(delegateKeyPairJson)) credentialTypes.add(('delegate public/private key pair'));
-  await alert('Credentials sent', '''transmitted to $domain:
-${credentialTypes.join('\n- ')}
-''',
-      ['Okay'], context);
+
+  keyFancyAnimation.currentState?.throwQr();
+
+  if (!Prefs.skipCredentialsSent.value) {
+    await alert(
+        'Sent to $domain',
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('\n${credentialTypes.join('\n- ')}'),
+            MyCheckbox(Prefs.skipCredentialsSent, "Don't show again")
+          ],
+        ),
+        ['Okay'],
+        context);
+  }
 }
 
 Future<bool?> createDelegateOrNot(String domain, BuildContext context) async {
