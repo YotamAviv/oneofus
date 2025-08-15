@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:oneofus/base/fancy_splash.dart';
 import 'package:oneofus/base/menus.dart';
 import 'package:oneofus/delegate_keys_route.dart';
 import 'package:oneofus/main.dart';
@@ -91,9 +92,11 @@ Future<void> signIn(String scanned, BuildContext context) async {
 
   List<String> credentialTypes = ['- identity public key'];
   if (b(delegateKeyPairJson)) credentialTypes.add(('delegate public/private key pair'));
-  await alert('Credentials sent', '''transmitted to $domain:
-${credentialTypes.join('\n- ')}
-''',
+
+  // when triggering:
+  keyFancyAnimation.currentState?.throwQr();
+
+  await alert('Sent to $domain', '\n${credentialTypes.join('\n- ')}',
       ['Okay'], context);
 }
 

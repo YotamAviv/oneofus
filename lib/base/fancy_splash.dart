@@ -15,6 +15,9 @@ import '../widgets/qr_scanner.dart';
 import 'my_keys.dart';
 import 'sign_in.dart';
 
+// animation by chatGPT
+final keyFancyAnimation = GlobalKey<_KeyQrTextState>();
+
 class FancySplash extends StatelessWidget {
   const FancySplash({
     super.key,
@@ -23,7 +26,7 @@ class FancySplash extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Stack(alignment: Alignment.bottomRight, children: [
-      const _KeyQrText(),
+      _KeyQrText(key: keyFancyAnimation),
       Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
@@ -73,56 +76,90 @@ class _KeyQrText extends StatefulWidget {
   State<StatefulWidget> createState() => _KeyQrTextState();
 }
 
-class _KeyQrTextState extends State<_KeyQrText> {
+class _KeyQrTextState extends State<_KeyQrText> with SingleTickerProviderStateMixin {
   Json data = {};
 
+  late final AnimationController _ctrl;
+  late final Animation<Offset> _offset; // px translation
+  late final Animation<double> _rot; // radians
+
   @override
-  initState() {
+  void initState() {
     super.initState();
     MyKeys.publicExportNotifier.addListener(listener);
     listener();
+
+    // --- throw animation (jerky) ---
+    _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 520));
+    // A few quick “steps”: back, snap forward, overshoot, settle
+    _offset = TweenSequence<Offset>([
+      TweenSequenceItem(tween: Tween(begin: Offset.zero, end: const Offset(-8, 0)), weight: 12),
+      TweenSequenceItem(
+          tween: Tween(begin: const Offset(-8, 0), end: const Offset(26, -8)), weight: 22),
+      TweenSequenceItem(
+          tween: Tween(begin: const Offset(26, -8), end: const Offset(46, -14)), weight: 22),
+      TweenSequenceItem(
+          tween: Tween(begin: const Offset(46, -14), end: const Offset(0, 0)), weight: 44),
+    ]).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic));
+    _rot = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: -3 * pi / 180), weight: 12),
+      TweenSequenceItem(tween: Tween(begin: -3 * pi / 180, end: 5 * pi / 180), weight: 22),
+      TweenSequenceItem(tween: Tween(begin: 5 * pi / 180, end: 8 * pi / 180), weight: 22),
+      TweenSequenceItem(tween: Tween(begin: 8 * pi / 180, end: 0.0), weight: 44),
+    ]).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic));
+  }
+
+  // Public method: trigger the throw
+  Future<void> throwQr() async {
+    if (!_ctrl.isAnimating) {
+      await _ctrl.forward(from: 0);
+    }
   }
 
   @override
   void dispose() {
     MyKeys.publicExportNotifier.removeListener(listener);
+    _ctrl.dispose();
     super.dispose();
   }
 
-  void listener() async {
+  void listener() {
     setState(() {
-      // (Keys.oneofusPublicKey has a questionable null check!)
-      if (MyKeys.publicExportNotifier.value.isNotEmpty) {
-        data = MyKeys.oneofusPublicKey;
-      } else {
-        data = {};
-      }
+      data = MyKeys.publicExportNotifier.value.isNotEmpty ? MyKeys.oneofusPublicKey : {};
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    Size availSize = MediaQuery.of(context).size;
-    double size = min(availSize.width, availSize.height) * 0.80;
-    String dataString = encoder.convert(data);
-    return Column(
-      // shrinkWrap: true,
-      // mainAxisSize: MainAxisSize.max,
-      children: [
-        const SizedBox(height: 20),
-        QrImageView(
+    final availSize = MediaQuery.of(context).size;
+    final size = min(availSize.width, availSize.height) * 0.80;
+    final dataString = encoder.convert(data);
+
+    return Column(children: [
+      const SizedBox(height: 20),
+      AnimatedBuilder(
+        animation: _ctrl,
+        builder: (context, child) => Transform.translate(
+          offset: _offset.value,
+          child: Transform.rotate(
+            angle: _rot.value,
+            child: child,
+          ),
+        ),
+        child: QrImageView(
           data: dataString,
           version: QrVersions.auto,
           size: size,
         ),
-        TextField(
-            controller: TextEditingController()..text = dataString,
-            maxLines: null,
-            readOnly: true,
-            style: GoogleFonts.courierPrime(
-                fontWeight: FontWeight.w700, fontSize: 10, color: Colors.black)),
-      ],
-    );
+      ),
+      TextField(
+        controller: TextEditingController()..text = dataString,
+        maxLines: null,
+        readOnly: true,
+        style: GoogleFonts.courierPrime(
+            fontWeight: FontWeight.w700, fontSize: 10, color: Colors.black),
+      ),
+    ]);
   }
 }
 
