@@ -104,9 +104,10 @@ Widget buildEtcMenu(BuildContext context) {
           },
           child: const Text('Import/Export...')),
       SubmenuButton(menuChildren: [
-        MyCheckbox(Prefs.skipLgtm, 'Skip statement reviews'),
+        MyCheckbox(Prefs.skipLgtm, 'Statement review/confirmation', opposite: true),
+        MyCheckbox(Prefs.skipCredentialsSent, 'Sign-in credentials sent', opposite: true),
         // MyCheckbox(Prefs.showDevMenu, 'show DEV menu'),
-      ], child: const Text('Prefs')),
+      ], child: const Text("Show/don't show")),
     ],
     child: const Text('/etc'),
   );
