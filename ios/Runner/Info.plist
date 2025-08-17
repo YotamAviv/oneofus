@@ -5,6 +5,9 @@
 	<key>NSCameraUsageDescription</key>
 	<string>This app uses camera to scan key or statement QR codes.</string>
 
+  <key>ITSAppUsesNonExemptEncryption</key>
+  <false/>
+
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>

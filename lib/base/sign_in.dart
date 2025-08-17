@@ -6,7 +6,6 @@ import 'package:oneofus/base/fancy_splash.dart';
 import 'package:oneofus/base/menus.dart';
 import 'package:oneofus/delegate_keys_route.dart';
 import 'package:oneofus/main.dart';
-import 'package:oneofus/oneofus/statement.dart';
 import 'package:oneofus/oneofus/trust_statement.dart';
 import 'package:oneofus/oneofus/ui/alert.dart';
 import 'package:oneofus/oneofus/ui/my_checkbox.dart';
@@ -21,27 +20,33 @@ const Map<String, String> _headers = {
   'Content-Type': 'application/json; charset=UTF-8',
 };
 
-Future<bool> validateSignIn(String text) async {
+/// See notes for V1/V2 "sign in parameters" in Nerdster project.
+Future<bool> validateSignIn(String scanned) async {
   try {
-    Json received = jsonDecode(text);
-    return received.containsKey('method') &&
-        received.containsKey('session') &&
-        received.containsKey('publicKey');
+    Json received = jsonDecode(scanned);
+    return (received.containsKey('uri') || received.containsKey('url')) &&
+        (received.containsKey('publicKey') || received.containsKey('encryptionPk')) &&
+        received.containsKey('domain');
   } catch (e) {
     return false;
   }
 }
 
 Future<void> signIn(String scanned, BuildContext context) async {
-  Json received = jsonDecode(scanned);
-  String session = received['session']!;
-  String domain = received['domain']!;
+  assert(await validateSignIn(scanned));
+  final Json received = jsonDecode(scanned);
+  final String urlKey = received.containsKey('url') ? 'url' : 'uri';
+  final String encryptionPkKey =
+      received.containsKey('encryptionPk') ? 'encryptionPk' : 'publicKey';
+
+  final String domain = received['domain']!;
 
   // Encrypt delegate key pair, include Oneofus public key for center
-  Json pkePublicKeyJson = received['publicKey']!;
-  PkePublicKey webPkePublicKey = await crypto.parsePkePublicKey(pkePublicKeyJson);
-  PkeKeyPair myPkeKeyPair = await crypto.createPke();
-  PkePublicKey myPkePublicKey = await myPkeKeyPair.publicKey;
+  final Json pkePublicKeyJson = received[encryptionPkKey]!;
+  final String session = getToken(pkePublicKeyJson);
+  final PkePublicKey webPkePublicKey = await crypto.parsePkePublicKey(pkePublicKeyJson);
+  final PkeKeyPair myPkeKeyPair = await crypto.createPke();
+  final PkePublicKey myPkePublicKey = await myPkeKeyPair.publicKey;
   // Oneofus center without delegate 'sign in' should be allowed.
   Json? delegateKeyPairJson = MyKeys.getDelegateKeyPair(domain);
   if (!b(delegateKeyPairJson)) {
@@ -55,32 +60,36 @@ Future<void> signIn(String scanned, BuildContext context) async {
     }
   }
 
-  Map<String, dynamic> send = {
+  final Map<String, dynamic> send = {
     'date': clock.nowIso, // time so that I can delete these at some point in the future.
     'one-of-us.net': MyKeys.oneofusPublicKey,
+    'session': session,
   };
 
   String? delegateCleartext;
   if (b(delegateKeyPairJson)) {
+    // TODO: Rename to something that conveys that this is the phone's ephemeral public key, which is required
     send['publicKey'] = await myPkePublicKey.json;
 
-    // Don't encrypt on iOS
-    bool isIOS = Theme.of(context).platform == TargetPlatform.iOS;
+    // Do encrypt on iOS (was: Don't encrypt on iOS)
+    // bool isIOS = Theme.of(context).platform == TargetPlatform.iOS;
     delegateCleartext = encoder.convert(delegateKeyPairJson);
-    if (isIOS) {
-      send['delegateCleartext'] = delegateCleartext;
-    } else {
-      String delegateCiphertext = await myPkeKeyPair.encrypt(delegateCleartext, webPkePublicKey);
-      send['delegateCiphertext'] = delegateCiphertext;
-    }
+    // if (isIOS) {
+    //   send['delegateCleartext'] = delegateCleartext;
+    // } else {
+    String delegateCiphertext = await myPkeKeyPair.encrypt(delegateCleartext, webPkePublicKey);
+    send['delegateCiphertext'] = delegateCiphertext;
+    // }
   }
 
-  assert(received['method'] == 'POST');
-  send['session'] = session;
-  Uri uri = Uri.parse(received['uri']);
+  Uri uri = Uri.parse(received[urlKey]);
   if (fireChoice == FireChoice.emulator) {
-    uri = uri.replace(port: 5001, host: '10.0.2.2', path: '/nerdster/us-central1/signin');
+    // 10.0.2.2 is a magic alias inside the Android Emulator that maps to 127.0.0.1 (localhost) on your development machine.
+    // This is not the right check (checks if fire is emulator, not if Android is, fire emulator is the only time we use 127.0.0.1)
+    uri = uri.replace(host: '10.0.2.2');
   }
+  // print('uri=$uri');
+
   // Enforce that POST domain URI matches delegate domain.
   if (fireChoice == FireChoice.prod) {
     List<String> ss = uri.host.split('.');
@@ -88,7 +97,7 @@ Future<void> signIn(String scanned, BuildContext context) async {
     if (uriDomain != domain) throw Exception('$uriDomain != $domain');
   }
   http.Response response = await http.post(uri, headers: _headers, body: jsonEncode(send));
-  print('response.statusCode: ${response.statusCode}'); // (201 expected)
+  // print('response.statusCode: ${response.statusCode}'); // (201 expected)
 
   Navigator.popUntil(context, ModalRoute.withName(Navigator.defaultRouteName));
 
@@ -157,10 +166,13 @@ In case you don't, you can continue by:
   );
 }
 
-var sampleSignIn = {
-  "domain": "nerdster.org",
-  "publicKey": {"crv": "X25519", "kty": "OKP", "x": "vVGxbPqAwNpGUCuYio5c2WHVuG3rCeP2WaoIQtsIGxE"},
-  "session": "05167cbeaa42acb5e680961648afd24ddf15a3ec",
-  "method": "POST",
-  "uri": "https://signin.nerdster.org/signin"
-};
+/// chatGPT regarding encryption on iOS:
+/// With your use of standard end-to-end encryption, the combo is:
+// Info.plist
+// <key>ITSAppUsesNonExemptEncryption</key>
+// <false/>
+// App Store Connect → Export Compliance
+// “Does your app use encryption?” → Yes
+// “Is your use exempt?” → Yes (standard consumer encryption)
+//
+// That’s it. You do not need extra export filings for typical client→server crypto (HTTPS/TLS, standard public-key, CryptoKit/Security, etc.).
