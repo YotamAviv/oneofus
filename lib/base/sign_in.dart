@@ -68,8 +68,7 @@ Future<void> signIn(String scanned, BuildContext context) async {
 
   String? delegateCleartext;
   if (b(delegateKeyPairJson)) {
-    // TODO: Rename to something that conveys that this is the phone's ephemeral public key, which is required
-    send['publicKey'] = await myPkePublicKey.json;
+    send['ephemeralPK'] = await myPkePublicKey.json;
 
     // Do encrypt on iOS (was: Don't encrypt on iOS)
     // bool isIOS = Theme.of(context).platform == TargetPlatform.iOS;
