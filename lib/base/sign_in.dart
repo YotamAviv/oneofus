@@ -6,6 +6,7 @@ import 'package:oneofus/base/fancy_splash.dart';
 import 'package:oneofus/base/menus.dart';
 import 'package:oneofus/delegate_keys_route.dart';
 import 'package:oneofus/main.dart';
+import 'package:oneofus/oneofus/fetcher.dart';
 import 'package:oneofus/oneofus/trust_statement.dart';
 import 'package:oneofus/oneofus/ui/alert.dart';
 import 'package:oneofus/oneofus/ui/my_checkbox.dart';
@@ -64,6 +65,7 @@ Future<void> signIn(String scanned, BuildContext context) async {
     'date': clock.nowIso, // time so that I can delete these at some point in the future.
     'identity': MyKeys.oneofusPublicKey,
     'session': session,
+    'endpoint': Fetcher.getEndpoint(kOneofusDomain),
   };
 
   String? delegateCleartext;
