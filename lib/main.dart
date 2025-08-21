@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:oneofus/base/about.dart';
 import 'package:oneofus/fire/firebase_options.dart';
+import 'package:oneofus/oneofus/endpoint.dart';
+import 'package:oneofus/oneofus/fetcher.dart';
 import 'package:oneofus/prefs.dart';
 
 import 'base/base.dart';
@@ -30,15 +32,6 @@ const domain2statementType = {
   kOneofusDomain: kOneofusType,
 };
 
-const Map<FireChoice, Map<String, (String, String)>> exportUrl = {
-  FireChoice.prod: {
-    kOneofusDomain: ('export.one-of-us.net', '')
-  },
-  FireChoice.emulator: {
-    kOneofusDomain: ('127.0.0.1:5002', 'one-of-us-net/us-central1/export'),
-  },
-};
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -53,6 +46,19 @@ void main() async {
     FireFactory.register(kOneofusDomain, FirebaseFirestore.instance, null);
   } else {
     FireFactory.register(kOneofusDomain, FakeFirebaseFirestore(), null);
+  }
+
+  switch (fireChoice) {
+    case FireChoice.fake:
+      throw UnimplementedError();
+    case FireChoice.emulator:
+      Fetcher.initEndpoint(kOneofusDomain,
+          const Endpoint('http', '127.0.0.1', 'one-of-us-net/us-central1/export', port: 5002));
+    case FireChoice.prod:
+    /// DEFER: Get export.one-of-us.net from the QR sign in process instead of having it hard-coded here.
+    /// Furthermore, replace "one-of-us.net" with "identity" everywhere (for elegance only as
+    /// there is no other identity... but there could be)
+      Fetcher.initEndpoint(kOneofusDomain, const Endpoint('https', 'export.one-of-us.net', ''));
   }
 
   await About.init();
