@@ -17,6 +17,7 @@ class Prefs {
   static ValueNotifier<bool> dev = ValueNotifier<bool>(false);
   static ValueNotifier<bool> httpFetch = ValueNotifier<bool>(false);
   static ValueNotifier<bool> batchFetch = ValueNotifier<bool>(false);
+  static final ValueNotifier<bool> bogus = ValueNotifier<bool>(false);
 
   static Future<void> init() async {
     try {

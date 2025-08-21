@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:oneofus/base/menus.dart';
 import 'package:oneofus/base/my_keys.dart';
+import 'package:oneofus/main.dart';
+import 'package:oneofus/oneofus/fetcher.dart';
+import 'package:oneofus/oneofus/trust_statement.dart';
 import 'package:oneofus/oneofus/ui/linky.dart';
 import 'package:oneofus/oneofus/ui/my_checkbox.dart';
 import 'package:oneofus/prefs.dart';
@@ -14,12 +17,14 @@ class ConfirmStatementRoute extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Uri uri = Fetcher.makeSimpleUri(kOneofusDomain, MyKeys.oneofusToken);
+    String uriDisplay = Uri.decodeFull(uri.toString());
     return Scaffold(
         appBar: AppBar(title: const Text('Confirm Statement')),
         body: ListView(children: [
           Linky('''For your review: This app intends to:
-- Sign the statemet below using your one-of-us key
-- Publish it at: https://export.one-of-us.net/?token=${MyKeys.oneofusToken}'''),
+- Sign the statement below using your identity private key
+- Publish it at: $uriDisplay'''),
           TextField(
             enabled: false,
             style: GoogleFonts.courierPrime(

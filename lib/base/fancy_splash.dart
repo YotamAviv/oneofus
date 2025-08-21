@@ -41,7 +41,7 @@ class FancySplash extends StatelessWidget {
                 String? scanned = await QrScanner.scan(
                     'Scan key or sign-in parameters', validateKeyOrSignIn, context);
                 if (b(scanned)) {
-                  if (context.mounted) await prepareX(context);
+                  await prepareX(context); // CONSIDER how I do this, who's responsible, ...
                   if (await validateKey(scanned!)) {
                     Json jsonPublicKey = await parsePublicKey(scanned);
                     await startTrust(jsonPublicKey, context);
