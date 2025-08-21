@@ -62,7 +62,7 @@ Future<void> signIn(String scanned, BuildContext context) async {
 
   final Map<String, dynamic> send = {
     'date': clock.nowIso, // time so that I can delete these at some point in the future.
-    'one-of-us.net': MyKeys.oneofusPublicKey,
+    'identity': MyKeys.oneofusPublicKey,
     'session': session,
   };
 
