@@ -3,7 +3,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:oneofus/oneofus/jsonish.dart';
+import 'package:oneofus/oneofus/trust_statement.dart';
 import 'package:oneofus/oneofus/ui/alert.dart';
+import 'package:oneofus/oneofus/util.dart';
 import '../base/my_keys.dart';
 import '../oneofus/ok_cancel.dart';
 
@@ -14,22 +17,43 @@ class ImportExport extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() => ImportExportState();
+
+  static Json internal2display(Json internal) => _swap(kOneofusDomain, kIdentity, internal);
+
+  static Json display2internal(Json display) => _swap(kIdentity, kOneofusDomain, display);
+
+  static Json _swap(String from, String to, Json json) {
+    final Map<String, dynamic> result = {};
+    // 1. Insert renamed key first
+    if (json.containsKey(from)) result[to] = json[from];
+    // 2. Insert the rest of the entries, skipping the renamed one
+    json.forEach((key, value) {
+      if (key != from) result[key] = value;
+    });
+    return result;
+  }
 }
+
+const String kIdentity = 'identity';
 
 class ImportExportState extends State<ImportExport> {
   final TextEditingController controller = TextEditingController()
-    ..text = _encoder.convert(MyKeys.export());
+    ..text = _encoder.convert(ImportExport.internal2display(MyKeys.export()));
 
   ImportExportState();
 
   @override
   Widget build(BuildContext context) {
     VoidCallback? onPaste;
-    if (controller.text != _encoder.convert(MyKeys.export())) {
+    if (controller.text != _encoder.convert(ImportExport.internal2display(MyKeys.export()))) {
       onPaste = () async {
         try {
-          dynamic content = jsonDecode(controller.text);
-          await MyKeys.import(content);
+          Json content = jsonDecode(controller.text);
+          // all values should be public/private key pairs
+          content.forEach((key, value) async {
+            await crypto.parseKeyPair(value);
+          });
+          await MyKeys.import(ImportExport.display2internal(content));
           await alert('New keys imported', '', ['Okay'], context);
           Navigator.pop(context);
         } catch (e) {
@@ -47,8 +71,7 @@ class ImportExportState extends State<ImportExport> {
                   maxLines: null,
                   expands: true,
                   readOnly: true,
-                  style: GoogleFonts.courierPrime(
-                      fontSize: 14, color: Colors.black))),
+                  style: GoogleFonts.courierPrime(fontSize: 14, color: Colors.black))),
           // ListView(shrinkWrap: true,
           Column(
             children: [
@@ -64,18 +87,15 @@ class ImportExportState extends State<ImportExport> {
                         ],
                       ),
                       onPressed: () async {
-                        await Clipboard.setData(
-                            ClipboardData(text: controller.text));
+                        await Clipboard.setData(ClipboardData(text: controller.text));
                       }),
                   const SizedBox(width: 5),
                   OutlinedButton(
-                      child: Row(
-                        children: [
-                          const Text('Paste'),
-                          const SizedBox(width: 5),
-                          const Icon(Icons.paste),
-                        ],
-                      ),
+                      child: Row(children: [
+                        const Text('Paste'),
+                        const SizedBox(width: 5),
+                        const Icon(Icons.paste)
+                      ]),
                       onPressed: () async {
                         ClipboardData? clipboardData =
                             await Clipboard.getData(Clipboard.kTextPlain);

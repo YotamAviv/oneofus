@@ -160,7 +160,7 @@ class MyKeys {
   static Iterable<String> getLocalDelegateKeys() =>
       publicExportNotifier.value.values.map((k) => Jsonish(k).token);
 
-  static Json export() => _useExportNotifier.value;
+  static Json export() => Map.unmodifiable(_useExportNotifier.value);
 
   static Future<void> import(Json json) async {
     // validate input (should throw exception if input is bad)
