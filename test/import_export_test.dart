@@ -36,4 +36,19 @@ void main() {
     Json internal = ImportExport.display2internal(display);
     expect(jsonEncode(internal), jsonEncode(expected));
   });
+
+  test('display2internal legacy', () async {
+    Json display = {
+      'one-of-us.net' : {'Hi!': 'Hi'},
+      'nerdster.org' : {'there': 'there'}
+    };
+
+    Json expected = {
+      'one-of-us.net' : {'Hi!': 'Hi'},
+      'nerdster.org' : {'there': 'there'}
+    };
+
+    Json internal = ImportExport.display2internal(display);
+    expect(jsonEncode(internal), jsonEncode(expected));
+  });
 }
