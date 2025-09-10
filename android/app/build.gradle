@@ -1,17 +1,18 @@
 plugins {
     id "com.android.application"
-    // START: FlutterFire Configuration
     id 'com.google.gms.google-services'
-    // END: FlutterFire Configuration
     id "kotlin-android"
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id "dev.flutter.flutter-gradle-plugin"
 }
 
 android {
     namespace = "net.one_of_us.app"
-    compileSdk = flutter.compileSdkVersion
-    ndkVersion = "27.0.12077973"
+    compileSdk = 35
+    ndkVersion = "28.0.12433566"
+
+    buildFeatures {
+        buildConfig = true
+    }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -23,20 +24,15 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "net.oneofus.app"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        minSdk = 21
+        targetSdk = 35
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.debug
         }
     }
@@ -47,8 +43,6 @@ flutter {
 }
 
 dependencies {
-    // Import the BoM for the Firebase platform
     implementation platform('com.google.firebase:firebase-bom:33.7.0')
-    // Declare the dependencies for the desired Firebase products without specifying versions
     implementation 'com.google.firebase:firebase-firestore'
 }
