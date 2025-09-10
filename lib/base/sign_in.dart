@@ -95,7 +95,7 @@ Future<void> signIn(String scanned, BuildContext context) async {
   if (fireChoice == FireChoice.prod) {
     List<String> ss = uri.host.split('.');
     String uriDomain = '${ss[ss.length - 2]}.${ss[ss.length - 1]}';
-    if (uriDomain != domain) throw Exception('$uriDomain != $domain');
+    // TEMP: if (uriDomain != domain) throw Exception('$uriDomain != $domain');
   }
   http.Response response = await http.post(uri, headers: _headers, body: jsonEncode(send));
   // print('response.statusCode: ${response.statusCode}'); // (201 expected)
