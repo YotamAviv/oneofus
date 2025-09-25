@@ -25,7 +25,7 @@ Email me or submit at: https://github.com/YotamAviv/nerdster/issues
 - QR web sign-in using phone scanner, without creating a delegate key
   - create delegate: NO
   - Verify
-    - Phone: Use menu /etc => Import/Export, verify that you only see the one-of-us.net key.
+    - Phone: Use menu /etc => Import/Export, verify that you only see the identity key.
     - Nerdster on Web: centered (not centered as Yotam) but not with delegate. On the Nerdster, turn on menu => Settings => everything. In the tree view, verify that "Me" has no children. Scan QR with phone to verify.
 
 - QR web sign-in again, create delegate
