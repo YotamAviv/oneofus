@@ -41,42 +41,68 @@ String formatVerbs(Iterable<TrustVerb> verbs) {
   return Set.of(verbs.where((v) => v != TrustVerb.clear).map((v) => v.label)).toString();
 }
 
+const iconSpacer = SizedBox(width: 3);
+const divider = PopupMenuDivider(height: 4);
+
+const String signHelp = '''Statements you sign and publish are divided into 3 groups:
+- {trust, block}: which keys represent actual folks you know, or not.
+- {delegate}: which keys represent you on other services
+- {replace}: which keys have represented your identity in the past
+
+Pick a group to see, state (or re-state, or clear), sign, and publish these statements.''';
+
+const String shareHelp = '''It's challenging because it's different:
+1) Help them get the app by sharing a link to $homeUrl
+2) Share your public identity key
+
+Depending on if you're in person or remote, showing or emailing may be appropriate.''';
+
+const String settingsHelp = '''It's a good idea to back up your private keys.
+Use the Import/Export menu to copy them as text and consider emailing a copy to yourself.''';
+
 Widget buildStateMenu(BuildContext context) {
-  return SubmenuButton(menuChildren: <Widget>[
-    MenuItemButton(
-        onPressed: () async {
-          await prepareX(context);
-          if (context.mounted) await encourageDelegateRepInvariant(context);
-          await Navigator.of(context)
-              .push(MaterialPageRoute(builder: (context) => const TrustsRoute()));
-          if (context.mounted) await prepareX(context);
-          if (context.mounted) await encourageDelegateRepInvariant(context);
-        },
-        child: Text('My network: ${formatVerbs(TrustsRoute.spec.verbs)}')),
-    MenuItemButton(
-        onPressed: () async {
-          await prepareX(context);
-          if (context.mounted) await encourageDelegateRepInvariant(context);
-          await Navigator.of(context)
-              .push(MaterialPageRoute(builder: (context) => const DelegateKeysRoute()));
-          if (context.mounted) await prepareX(context);
-          if (context.mounted) await encourageDelegateRepInvariant(context);
-        },
-        child: Text('My authorized services: ${formatVerbs(DelegateKeysRoute.spec.verbs)}')),
-    MenuItemButton(
-        onPressed: () async {
-          await prepareX(context);
-          if (context.mounted) await encourageDelegateRepInvariant(context);
-          await Navigator.of(context)
-              .push(MaterialPageRoute(builder: (context) => const OneofusKeysRoute()));
-          if (context.mounted) await prepareX(context);
-          if (context.mounted) await encourageDelegateRepInvariant(context);
-        },
-        child: Text('My equivalent one-of-us keys: ${formatVerbs(OneofusKeysRoute.spec.verbs)}')),
-  ], child: const Text('State'));
+  return SubmenuButton(
+    menuChildren: <Widget>[
+      MenuItemButton(
+          onPressed: () async {
+            await prepareX(context);
+            if (context.mounted) await encourageDelegateRepInvariant(context);
+            await Navigator.of(context)
+                .push(MaterialPageRoute(builder: (context) => const TrustsRoute()));
+            if (context.mounted) await prepareX(context);
+            if (context.mounted) await encourageDelegateRepInvariant(context);
+          },
+          child: Text('My network: ${formatVerbs(TrustsRoute.spec.verbs)}')),
+      MenuItemButton(
+          onPressed: () async {
+            await prepareX(context);
+            if (context.mounted) await encourageDelegateRepInvariant(context);
+            await Navigator.of(context)
+                .push(MaterialPageRoute(builder: (context) => const DelegateKeysRoute()));
+            if (context.mounted) await prepareX(context);
+            if (context.mounted) await encourageDelegateRepInvariant(context);
+          },
+          child: Text('My authorized services: ${formatVerbs(DelegateKeysRoute.spec.verbs)}')),
+      MenuItemButton(
+          onPressed: () async {
+            await prepareX(context);
+            if (context.mounted) await encourageDelegateRepInvariant(context);
+            await Navigator.of(context)
+                .push(MaterialPageRoute(builder: (context) => const OneofusKeysRoute()));
+            if (context.mounted) await prepareX(context);
+            if (context.mounted) await encourageDelegateRepInvariant(context);
+          },
+          child: Text('My equivalent one-of-us keys: ${formatVerbs(OneofusKeysRoute.spec.verbs)}')),
+      divider,
+      MenuHelp(signHelp),
+    ],
+    child: const Row(
+      children: [Icon(Icons.fingerprint), iconSpacer, Text('Sign')],
+    ),
+  );
 }
 
-Widget buildEtcMenu(BuildContext context) {
+Widget buildShareMenu(BuildContext context) {
   return SubmenuButton(
     menuChildren: [
       SubmenuButton(menuChildren: [
@@ -91,6 +117,28 @@ Widget buildEtcMenu(BuildContext context) {
             },
             child: const Text('JSON text')),
       ], child: const Text('Share my public key')),
+      SubmenuButton(menuChildren: [
+        MenuItemButton(
+            onPressed: () async {
+              await shareHomeLinkQR();
+            },
+            child: const Text('QR code')),
+        MenuItemButton(
+            onPressed: () async {
+              await shareHomeLinkText();
+            },
+            child: const Text('text')),
+      ], child: const Text('Share link to $homeUrl')),
+      divider,
+      MenuHelp(shareHelp),
+    ],
+    child: const Row(children: [Icon(Icons.share), iconSpacer, Text('Share')]),
+  );
+}
+
+Widget buildSettingsMenu(BuildContext context) {
+  return SubmenuButton(
+    menuChildren: [
       MenuItemButton(
           onPressed: () async {
             await prepareX(context);
@@ -108,14 +156,19 @@ Widget buildEtcMenu(BuildContext context) {
         MyCheckbox(Prefs.skipCredentialsSent, 'Sign-in credentials sent', opposite: true),
         // MyCheckbox(Prefs.showDevMenu, 'show DEV menu'),
       ], child: const Text("Show/don't show")),
+      divider,
+      MenuHelp(settingsHelp),
     ],
-    child: const Text('/etc'),
+    child: const Row(children: [Icon(Icons.settings), iconSpacer, Text('Settings')]),
   );
 }
 
 Widget buildHelpMenu(BuildContext context) {
   return SubmenuButton(menuChildren: <Widget>[
     MenuItemButton(onPressed: () => congratulate(context), child: const Text('Congratulations')),
+    MenuItemButton(
+        onPressed: () => delegateServicesHelp(context),
+        child: const Text('Delegate Services Sign-in')),
     MenuItemButton(
         onPressed: () async {
           await showDemoKeys(context);
@@ -148,6 +201,22 @@ Use the QR icon (bottom right) to:
 - sign in to a service using a delegate key.
 
 https://one-of-us.net
+''',
+      ['Okay'],
+      context);
+}
+
+Future<void> delegateServicesHelp(BuildContext context) async {
+  await alert(
+      'Delegate Services',
+      '''Sign in using your identity
+
+- Access https://nerdster.org on a computer.
+- Initiate QR Sign-in there.
+- Click the QR button on the QR Icon at the bottom right of your phone app and show the sign-in parameters QR code displayed by the service to your phone app.
+- When prompted to create a delegate key, choose yes.
+
+(Yes, This works with any service... as long as it's the Nerdster ;)
 ''',
       ['Okay'],
       context);
@@ -235,7 +304,8 @@ Widget buildDevMenu(BuildContext context) {
 List<Widget> buildMenus(BuildContext context) {
   return [
     buildStateMenu(context),
-    buildEtcMenu(context),
+    buildShareMenu(context),
+    buildSettingsMenu(context),
     // SizedBox(width: 50,),
     // const MenuTitle(['one-', 'of-', 'us.', 'net']),
     DevMenu(),
@@ -246,3 +316,31 @@ List<Widget> buildMenus(BuildContext context) {
 String _display(List l) {
   return l.map((x) => x is DateTime ? formatUiDatetime(x) : x.toString()).join('\n');
 }
+
+class MenuHelp extends StatelessWidget {
+  final text;
+
+  const MenuHelp(this.text, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+      child: Row(
+        children: [
+          ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.8),
+            child: Text(
+              text,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Colors.grey[700],
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
