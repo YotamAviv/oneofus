@@ -209,15 +209,14 @@ https://one-of-us.net
 Future<void> delegateServicesHelp(BuildContext context) async {
   await alert(
       'Delegate Services',
-      '''Sign in using your identity
+      '''Use your identity on any service
 
 - Access https://nerdster.org on a computer.
-- Initiate QR Sign-in there.
-- Click the QR button on the QR Icon at the bottom right of your phone app and show the sign-in parameters QR code displayed by the service to your phone app.
-- When prompted to create a delegate key, choose yes.
+- Initiate QR Sign-in there which should display a QR code with Sign-in Parameters for your app to scan.
+- Click the QR icon on the bottom right of your phone app and show the Sign-in Parameters QR code displayed by the service to your phone app.
+- In case you're prompted to create a delegate key, choose yes.
 
-(Yes, This works with any service... as long as it's the Nerdster ;)
-''',
+This should work with any service... (as long as it's the Nerdster ;)''',
       ['Okay'],
       context);
 }
