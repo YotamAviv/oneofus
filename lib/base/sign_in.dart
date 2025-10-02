@@ -7,10 +7,11 @@ import 'package:oneofus/base/menus.dart';
 import 'package:oneofus/delegate_keys_route.dart';
 import 'package:oneofus/main.dart';
 import 'package:oneofus/oneofus/fetcher.dart';
+import 'package:oneofus/oneofus/prefs.dart';
 import 'package:oneofus/oneofus/trust_statement.dart';
 import 'package:oneofus/oneofus/ui/alert.dart';
 import 'package:oneofus/oneofus/ui/my_checkbox.dart';
-import 'package:oneofus/prefs.dart';
+import 'package:oneofus/setting_type.dart';
 
 import '../oneofus/crypto/crypto.dart';
 import '../oneofus/jsonish.dart';
@@ -107,14 +108,14 @@ Future<void> signIn(String scanned, BuildContext context) async {
 
   keyFancyAnimation.currentState?.throwQr();
 
-  if (!Prefs.skipCredentialsSent.value) {
+  if (!Setting.get(SettingType.skipCredentialsSent).value) {
     await alert(
         'Sent to $domain',
         Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text('\n${credentialTypes.join('\n- ')}'),
-            MyCheckbox(Prefs.skipCredentialsSent, "Don't show again")
+            MyCheckbox(Setting.get<bool>(SettingType.skipCredentialsSent).notifier, "Don't show again")
           ],
         ),
         ['Okay'],

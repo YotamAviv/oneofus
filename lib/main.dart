@@ -7,7 +7,7 @@ import 'package:oneofus/base/about.dart';
 import 'package:oneofus/fire/firebase_options.dart';
 import 'package:oneofus/oneofus/endpoint.dart';
 import 'package:oneofus/oneofus/fetcher.dart';
-import 'package:oneofus/prefs.dart';
+import 'package:oneofus/oneofus/prefs.dart';
 
 import 'base/base.dart';
 import 'base/my_keys.dart';

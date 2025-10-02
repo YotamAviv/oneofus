@@ -6,11 +6,11 @@ import 'package:oneofus/base/my_statements.dart';
 import 'package:oneofus/delegate_revoke_at_editor.dart';
 import 'package:oneofus/field_editor.dart';
 import 'package:oneofus/main.dart';
-import 'package:oneofus/oneofus/statement.dart';
+import 'package:oneofus/oneofus/prefs.dart';
 import 'package:oneofus/oneofus/ui/alert.dart';
 import 'package:oneofus/oneofus/ui/linky.dart';
 import 'package:oneofus/oneofus_revoke_at_editor.dart';
-import 'package:oneofus/prefs.dart';
+import 'package:oneofus/setting_type.dart';
 import 'package:oneofus/text_editor.dart';
 import 'package:oneofus/widgets/key_widget.dart';
 
@@ -199,7 +199,7 @@ If you restate this statement with your active key, the old statement signed by 
           return;
         }
         bool? lgtm;
-        if (Prefs.skipLgtm.value) {
+        if (Setting.get(SettingType.skipLgtm).value) {
           lgtm = true;
         } else {
           lgtm = await Navigator.of(context).push(

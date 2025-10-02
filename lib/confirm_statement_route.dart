@@ -4,10 +4,11 @@ import 'package:oneofus/base/menus.dart';
 import 'package:oneofus/base/my_keys.dart';
 import 'package:oneofus/main.dart';
 import 'package:oneofus/oneofus/fetcher.dart';
+import 'package:oneofus/oneofus/prefs.dart';
 import 'package:oneofus/oneofus/trust_statement.dart';
 import 'package:oneofus/oneofus/ui/linky.dart';
 import 'package:oneofus/oneofus/ui/my_checkbox.dart';
-import 'package:oneofus/prefs.dart';
+import 'package:oneofus/setting_type.dart';
 
 import 'oneofus/jsonish.dart';
 
@@ -45,7 +46,7 @@ class ConfirmStatementRoute extends StatelessWidget {
                   },
                   child: const Text('Looks good')),
               const SizedBox(width: 2),
-              MyCheckbox(Prefs.skipLgtm, '''Don't show again'''),
+              MyCheckbox(Setting.get<bool>(SettingType.skipLgtm).notifier, '''Don't show again'''),
               const SizedBox(width: 2),
             ],
           )

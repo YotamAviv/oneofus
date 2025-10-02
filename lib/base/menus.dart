@@ -5,10 +5,11 @@ import 'package:oneofus/base/my_statements.dart';
 import 'package:oneofus/oneofus/fetcher.dart';
 import 'package:oneofus/oneofus/fire_factory.dart';
 import 'package:oneofus/oneofus/fire_util.dart';
+import 'package:oneofus/oneofus/prefs.dart';
 import 'package:oneofus/oneofus/trust_statement.dart';
 import 'package:oneofus/oneofus/ui/alert.dart';
 import 'package:oneofus/oneofus/ui/my_checkbox.dart';
-import 'package:oneofus/prefs.dart';
+import 'package:oneofus/setting_type.dart';
 import 'package:oneofus/share.dart';
 import 'package:oneofus/widgets/demo_statement_route.dart';
 
@@ -152,8 +153,12 @@ Widget buildSettingsMenu(BuildContext context) {
           },
           child: const Text('Import/Export...')),
       SubmenuButton(menuChildren: [
-        MyCheckbox(Prefs.skipLgtm, 'Statement review/confirmation', opposite: true),
-        MyCheckbox(Prefs.skipCredentialsSent, 'Sign-in credentials sent', opposite: true),
+        MyCheckbox(
+            Setting.get<bool>(SettingType.skipLgtm).notifier, 'Statement review/confirmation',
+            opposite: true),
+        MyCheckbox(
+            Setting.get<bool>(SettingType.skipCredentialsSent).notifier, 'Sign-in credentials sent',
+            opposite: true),
         // MyCheckbox(Prefs.showDevMenu, 'show DEV menu'),
       ], child: const Text("Show/don't show")),
       divider,
@@ -232,13 +237,13 @@ class DevMenuState extends State<DevMenu> {
   @override
   void initState() {
     super.initState();
-    Prefs.dev.addListener(listener);
+    Setting.get(SettingType.dev).notifier.addListener(listener);
   }
 
   @override
   void dispose() {
     super.dispose();
-    Prefs.dev.removeListener(listener);
+    Setting.get(SettingType.dev).notifier.removeListener(listener);
   }
 
   void listener() {
@@ -247,7 +252,7 @@ class DevMenuState extends State<DevMenu> {
 
   @override
   Widget build(BuildContext context) {
-    return (Prefs.dev.value) ? buildDevMenu(context) : const SizedBox();
+    return (Setting.get(SettingType.dev).notifier.value) ? buildDevMenu(context) : const SizedBox();
   }
 }
 
@@ -332,9 +337,9 @@ class MenuHelp extends StatelessWidget {
             child: Text(
               text,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Colors.grey[700],
-                fontStyle: FontStyle.italic,
-              ),
+                    color: Colors.grey[700],
+                    fontStyle: FontStyle.italic,
+                  ),
             ),
           ),
         ],
@@ -342,4 +347,3 @@ class MenuHelp extends StatelessWidget {
     );
   }
 }
-

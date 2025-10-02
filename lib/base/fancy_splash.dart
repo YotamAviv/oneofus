@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:oneofus/base/menus.dart';
+import 'package:oneofus/oneofus/prefs.dart';
 import 'package:oneofus/oneofus/ui/alert.dart';
-import 'package:oneofus/prefs.dart';
+import 'package:oneofus/setting_type.dart';
 import 'package:oneofus/trusts_route.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
@@ -175,21 +176,21 @@ class _DevCopyFabState extends State<DevCopyFab> {
   late bool _dev;
 
   void _onDevChanged() {
-    if (Prefs.dev.value != _dev && mounted) {
-      setState(() => _dev = Prefs.dev.value);
+    if (Setting.get(SettingType.dev).value != _dev && mounted) {
+      setState(() => _dev = Setting.get(SettingType.dev).value);
     }
   }
 
   @override
   void initState() {
     super.initState();
-    _dev = Prefs.dev.value;
-    Prefs.dev.addListener(_onDevChanged);
+    _dev = Setting.get(SettingType.dev).value;
+    Setting.get(SettingType.dev).addListener(_onDevChanged);
   }
 
   @override
   void dispose() {
-    Prefs.dev.removeListener(_onDevChanged);
+    Setting.get(SettingType.dev).removeListener(_onDevChanged);
     super.dispose();
   }
 

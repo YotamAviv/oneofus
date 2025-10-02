@@ -6,13 +6,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 
 import '../main.dart';
-import '../prefs.dart'; // CODE: Kludgey way to include, but works with phone codebase.
+import '../setting_type.dart';
 import 'distincter.dart';
 import 'endpoint.dart';
 import 'fire_factory.dart';
 import 'jsonish.dart';
 import 'measure.dart';
 import 'oou_verifier.dart';
+import 'prefs.dart'; // CODE: Kludgey way to include, but works with phone codebase.
 import 'statement.dart';
 import 'util.dart';
 import 'value_waiter.dart';
@@ -74,21 +75,21 @@ import 'value_waiter.dart';
 
 final DateTime date0 = DateTime.fromMicrosecondsSinceEpoch(0);
 
-abstract class Corruptor {
+abstract class CorruptionProblemCollector {
   void corrupt(String token, String error, String? details);
 }
 
-class ErrorCorruptor implements Corruptor {
+class _ErrorCorruptor implements CorruptionProblemCollector {
   @override
   void corrupt(String token, String error, String? details) =>
       throw ('Corrupt!: $token, $error, $details');
 }
 
-final Corruptor corruptor = ErrorCorruptor();
+final CorruptionProblemCollector collector = _ErrorCorruptor();
 
 class Fetcher {
   static final OouVerifier _verifier = OouVerifier();
-  static Corruptor corruptor = ErrorCorruptor();
+  static CorruptionProblemCollector corruptor = _ErrorCorruptor();
   static final Map<String, Endpoint> _endpoints = <String, Endpoint>{};
   static final Measure mVerify = Measure('mVerify');
   static final Map<String, Fetcher> _fetchers = <String, Fetcher>{};
@@ -177,9 +178,9 @@ class Fetcher {
   // Skip cached fetchers?
   // - or make that the caller's responsibility?
   // Futhermore, I think that I batch fetch everyone when I'm just missing Amotz.
-  static Future<List<Fetcher>> batchFetch(Map<String, String?> token2revokeAt, String domain,
-      {String? mName}) async {
-    if (fireChoice == FireChoice.fake || !Prefs.batchFetch.value) {
+  static Future<List<Fetcher>> batchFetch(
+      Map<String, String?> token2revokeAt, String domain) async {
+    if (fireChoice == FireChoice.fake || !Setting.get<bool>(SettingType.batchFetch).value) {
       // serial fetch
       for (MapEntry e in token2revokeAt.entries) {
         Fetcher f = Fetcher(e.key, domain);
@@ -251,10 +252,10 @@ class Fetcher {
     if (b(_cached)) return;
     try {
       DateTime? time;
-      if (fireChoice != FireChoice.fake && Prefs.httpFetch.value) {
+      if (fireChoice != FireChoice.fake && Setting.get<bool>(SettingType.httpFetch).value) {
         _cached = <Statement>[];
         if (jsons == null) {
-          if (Prefs.batchFetch.value) print('batcher miss $domain $token');
+          if (Setting.get<bool>(SettingType.batchFetch).value) print('batcher miss $domain $token');
           jsons = await _httpFetchJsons();
         }
 
@@ -277,7 +278,7 @@ class Fetcher {
           j.remove('id'); // No problem, unless we end up here twice (which we shouldn't).
 
           Jsonish jsonish;
-          if (Prefs.skipVerify.value) {
+          if (Setting.get<bool>(SettingType.skipVerify).value) {
             jsonish = Jsonish(j);
           } else {
             jsonish = await mVerify.mAsync(() => Jsonish.makeVerify(j, _verifier));
@@ -312,7 +313,7 @@ class Fetcher {
         for (final docSnapshot in snapshots.docs) {
           final Json json = docSnapshot.data();
           Jsonish jsonish;
-          if (Prefs.skipVerify.value) {
+          if (Setting.get<bool>(SettingType.skipVerify).value) {
             jsonish = Jsonish(json);
           } else {
             jsonish = await mVerify.mAsync(() => Jsonish.makeVerify(json, _verifier));
@@ -474,7 +475,7 @@ class Fetcher {
     return endpoint.build(params);
   }
 
-  static void setCorruptor(Corruptor corruptor) {
+  static void setCorruptionCollector(CorruptionProblemCollector corruptor) {
     Fetcher.corruptor = corruptor;
   }
 

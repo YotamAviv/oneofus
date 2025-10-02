@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:oneofus/oneofus/prefs.dart';
 import 'package:oneofus/oneofus/ui/linky.dart';
-import 'package:oneofus/prefs.dart';
+import 'package:oneofus/setting_type.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 int _taps = 0;
@@ -35,7 +36,7 @@ class About extends StatelessWidget {
                 onTap: () {
                   _taps++;
                   if (_taps == 7) {
-                    Prefs.dev.value = true;
+                    Setting.get(SettingType.dev).value  = true;
                     print('You are now a developer.');
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
