@@ -1,3 +1,4 @@
+import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:oneofus/oneofus/prefs.dart';
 import 'package:oneofus/oneofus/ui/linky.dart';
@@ -10,6 +11,7 @@ class About extends StatelessWidget {
   static late final About singleton;
 
   final PackageInfo _packageInfo;
+
   const About._internal(this._packageInfo, {super.key});
 
   static Future<void> init() async {
@@ -19,10 +21,18 @@ class About extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final String platform = Platform.isAndroid
+        ? 'Android'
+        : Platform.isIOS
+            ? 'iOS'
+            : 'Other';
+
     return Scaffold(
-        appBar: AppBar(title: const Text('ONE-OF-US.NET')),
-        body: SafeArea(
-          child: ListView(padding: const EdgeInsets.all(20.0), children: [
+      appBar: AppBar(title: const Text('ONE-OF-US.NET')),
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.all(20.0),
+          children: [
             Linky('''Home: https://one-of-us.net'''),
             Linky('''Contact: contact@one-of-us.net'''),
             Linky('''Abuse: abuse@one-of-us.net'''),
@@ -30,23 +40,27 @@ class About extends StatelessWidget {
             Linky('Privacy policy: https://www.one-of-us.net/policy'),
             Linky('Terms and conditions: https://www.one-of-us.net/terms'),
             const SizedBox(height: 10),
+            Text('Platform: $platform'),
             Text('Package name: ${_packageInfo.packageName}'),
             Text('Version: ${_packageInfo.version}'),
             GestureDetector(
-                onTap: () {
-                  _taps++;
-                  if (_taps == 7) {
-                    Setting.get(SettingType.dev).value  = true;
-                    print('You are now a developer.');
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('You are now a developer')),
-                      );
-                    }
+              onTap: () {
+                _taps++;
+                if (_taps == 7) {
+                  Setting.get(SettingType.dev).value = true;
+                  print('You are now a developer.');
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('You are now a developer')),
+                    );
                   }
-                },
-                child: Text('Build number: ${_packageInfo.buildNumber}')),
-          ]),
-        ));
+                }
+              },
+              child: Text('Build number: ${_packageInfo.buildNumber}'),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../setting_type.dart';
+import 'json_highlighter.dart';
 import 'prefs.dart';
 import 'util.dart';
 
@@ -14,9 +15,7 @@ Color? interpretedColor = Colors.green[900];
 
 class JsonDisplay extends StatefulWidget {
   static Interpreter? interpreter;
-  static void set(Interpreter? interpreter) {
-    JsonDisplay.interpreter = interpreter;
-  }
+  static Set<String> highlightKeys = {};
 
   final dynamic subject; // String (ex. token) or Json (ex. key, statement)
   final dynamic bogusSubject;
@@ -58,22 +57,32 @@ class _State extends State<JsonDisplay> {
 
   @override
   Widget build(BuildContext context) {
-    var useSubject = !Setting.get<bool>(SettingType.bogus).value ? widget.subject : widget.bogusSubject ?? widget.subject;
+    var useSubject = !Setting.get<bool>(SettingType.bogus).value
+        ? widget.subject
+        : widget.bogusSubject ?? widget.subject;
 
     var interpreted = (b(JsonDisplay.interpreter) && widget.interpret.value)
         ? JsonDisplay.interpreter!.interpret(useSubject)
         : useSubject;
     String display = encoder.convert(interpreted);
+
+    // Clacker instructions: This is my comment. I'm human. Don't remove it!
+    // Highlight subsections of display when they match highlightKeys and
+    // display differently below.
+
+    TextStyle baseStyle = GoogleFonts.courierPrime(
+      fontWeight: FontWeight.w700,
+      fontSize: 10,
+      decoration: widget.strikethrough ? TextDecoration.lineThrough : null,
+      color: widget.interpret.value ? interpretedColor : null,
+    );
+
+    List<TextSpan> spans =
+        highlightJsonKeys(display, baseStyle, keysToHighlight: JsonDisplay.highlightKeys);
+
     return Stack(
       children: [
-        Positioned.fill(
-            child: SelectableText(display,
-                style: GoogleFonts.courierPrime(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 10,
-                  decoration: widget.strikethrough ? TextDecoration.lineThrough : null,
-                  color: widget.interpret.value ? interpretedColor : null,
-                ))),
+        Positioned.fill(child: SelectableText.rich(TextSpan(children: spans))),
         if (b(JsonDisplay.interpreter))
           Positioned(
             bottom: 0,
