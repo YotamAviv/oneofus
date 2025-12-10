@@ -6,8 +6,8 @@ plugins {
 }
 
 android {
-    namespace = "net.one_of_us.app"
-    compileSdk = 35
+    namespace = "net.oneofus.app"
+    compileSdk = 34
     ndkVersion = "28.0.12433566"
 
     buildFeatures {
@@ -20,13 +20,13 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17
+        jvmTarget = "17"
     }
 
     defaultConfig {
         applicationId = "net.oneofus.app"
         minSdk = 21
-        targetSdk = 35
+        targetSdk = 34
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
