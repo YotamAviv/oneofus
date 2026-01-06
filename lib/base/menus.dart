@@ -98,7 +98,7 @@ Widget buildStateMenu(BuildContext context) {
       MenuHelp(signHelp),
     ],
     child: const Row(
-      children: [Icon(Icons.fingerprint), iconSpacer, Text('Sign')],
+      children: [Icon(Icons.draw), iconSpacer, Text('Sign')],
     ),
   );
 }
