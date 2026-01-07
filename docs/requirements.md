@@ -2,6 +2,10 @@
 
 This document outlines the high-level requirements for the ONE-OF-US.NET mobile app.
 
+## Introduction
+
+This document specifies the functional and non-functional requirements for the ONE-OF-US.NET mobile app. It details the core features, use cases, and security considerations that guide the app's design and development.
+
 ## 1. Core Requirements
 
 ### 1.1. Build the Identity Network
