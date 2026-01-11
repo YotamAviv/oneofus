@@ -2,6 +2,10 @@
 
 This document outlines the proposed architecture for the `oneofus` mobile app's data layer, a strategy for sharing code with the `nerdster` project, and a plan for testing.
 
+## From the human
+- check out the oneofus project minus .git and truly start from scratch?
+- get started on the "magic" connecting domain to app as that takes time.
+
 ## 1. Problem Statement
 
 The current data-fetching logic (`Fetcher`) is complex and difficult to maintain. The `nerdster` project contains a more modern "v2" data layer, but simply copying this code is undesirable and leads to maintenance issues. The `oneofus` app also has different requirements than `nerdster`; it is primarily a writer of its own statements and does not need to read statements from many users in parallel.
